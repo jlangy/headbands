@@ -1,0 +1,9 @@
+.controls-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-group {
+  width: 600px;
+}

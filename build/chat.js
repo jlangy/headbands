@@ -1,12 +1,15 @@
 // const socket = io.connect("http://192.168.0.100:3000")
-const socket = io.connect("http://localhost:3000")
+
+function main(){
+
+const socket = io.connect("http://localhost:3001")
 
 const localVideo = document.getElementById('local');
 const remoteVideo = document.getElementById('remote');
 const roomId = document.getElementById('roomId');
+const joinRoomBtn = document.getElementById('joinRoom');
 const makeRoomBtn = document.getElementById('makeRoom');
 const roomName = document.getElementById('createRoomInput');
-const joinRoomBtn = document.getElementById('joinRoom');
 const joinRoomInput = document.getElementById('roomIdInput');
 
 let seekingRoom = false;
@@ -28,10 +31,11 @@ async function makeRoom(){
 
   //RTC setup
   peerConn = new RTCPeerConnection(null); //{'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }]});
-  peerConn.addEventListener('icecandidate', handleConnection);
+  // peerConn.addEventListener('icecandidate', handleConnection);
   feedLocalStream(stream);
 
-  socket.emit('make room', roomName.value)
+  socket.emit('make room', roomName.value);
+  console.log('make rm emit')
 }
 
 function joinRoom(){
@@ -52,7 +56,7 @@ function joinRoom(){
 function feedLocalStream(stream){
   localVideo.srcObject = stream;
   localStream = stream;
-  roomId.innerText = `Connected to room ${socket.id}`
+  // roomId.innerText = `Connected to room ${socket.id}`
   localStream.getTracks().forEach(track => {
     console.log('adding track')
     peerConn.addTrack(track, localStream);
@@ -79,7 +83,6 @@ socket.on('message', async msg => {
     socket.emit('answer', answer);
   } else if (msg.type === 'answer' && awaitingAnswer){
     await peerConn.setRemoteDescription(msg.answer);
-    console.log('I think the descs are all set now', peerConn.iceConnectionState)
   }
   else if(msg.type === 'room does not exist'){
     console.log('bad room name mate')
@@ -87,10 +90,8 @@ socket.on('message', async msg => {
 })
 
 function gotStream(event){
-  console.log('trigggggerrrrrrrrred', event)
   remoteVideo.srcObject = event.streams[0];
 }
-
-function handleConnection(e){
-  // peerConn.addIceCandidate(e.candidate)
 }
+
+window.onload = main;
