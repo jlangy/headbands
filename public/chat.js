@@ -1,12 +1,13 @@
 const socket = io.connect("http://192.168.0.100:3000")
 // const socket = io.connect("http://localhost:3000")
 
-const localVideo = document.getElementById('local')
-const remoteVideo = document.getElementById('remote')
-const roomId = document.getElementById('roomId')
-const makeRoomBtn = document.getElementById('makeRoom')
-const joinRoomBtn = document.getElementById('joinRoom')
-const joinRoomInput = document.getElementById('roomIdInput')
+const localVideo = document.getElementById('local');
+const remoteVideo = document.getElementById('remote');
+const roomId = document.getElementById('roomId');
+const makeRoomBtn = document.getElementById('makeRoom');
+const roomName = document.getElementById('createRoomInput');
+const joinRoomBtn = document.getElementById('joinRoom');
+const joinRoomInput = document.getElementById('roomIdInput');
 
 let seekingRoom = false;
 let acceptingFriends = false;
@@ -30,6 +31,7 @@ async function makeRoom(){
   peerConn.addEventListener('icecandidate', handleConnection);
   feedLocalStream(stream);
 
+  socket.emit('make room', roomName.value)
 }
 
 function joinRoom(){
@@ -64,7 +66,6 @@ socket.on('message', async msg => {
   }
   if(msg.type === 'joinRequest' && acceptingFriends){
     console.log('joinRequestEvent')
-    // if(msg.roomId !== )
     const offer = await peerConn.createOffer()
     await peerConn.setLocalDescription(offer)
 
@@ -79,6 +80,9 @@ socket.on('message', async msg => {
   } else if (msg.type === 'answer' && awaitingAnswer){
     await peerConn.setRemoteDescription(msg.answer);
     console.log('I think the descs are all set now', peerConn.iceConnectionState)
+  }
+  else if(msg.type === 'room does not exist'){
+    console.log('bad room name mate')
   }
 })
 
