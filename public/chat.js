@@ -16,6 +16,7 @@ function main(){
   const makeRoomBtn = document.getElementById('makeRoom');
   const roomName = document.getElementById('createRoomInput');
   const joinRoomInput = document.getElementById('roomIdInput');
+  const numPlayersSelect = document.getElementById('players-number'); 
 
   let peerConn;
 
@@ -23,6 +24,11 @@ function main(){
   joinRoomBtn.addEventListener('click', joinRoom)
 
   async function makeRoom(){
+    //Verify number of players set 
+    const numPlayers = numPlayersSelect.value;
+    if(!numPlayers){
+      return console.log('Need to add players')
+    }
     //Setup media 
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
