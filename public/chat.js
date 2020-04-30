@@ -19,6 +19,8 @@ function main(){
   const numPlayersSelect = document.getElementById('players-number'); 
 
   let peerConn;
+  let localStream;
+  const connections = {};
 
   makeRoomBtn.addEventListener('click', makeRoom)
   joinRoomBtn.addEventListener('click', joinRoom)
@@ -34,10 +36,10 @@ function main(){
       audio: false,
       video: true
     });
-    
-    //Setup RTC connection, connect stream to html and RTC connection, and notify server
-    peerConn = new RTCPeerConnection(null);
-    feedLocalStream(stream);
+
+    //Connect stream to html and notify server
+    localStream = stream;
+    localVideo.srcObject = stream;
     socket.emit('make room', roomName.value);
   }
 
@@ -49,22 +51,15 @@ function main(){
   //socket trip
   function joinRoom(){
     // Create connection with ICE listener
-    peerConn = new RTCPeerConnection(null);
-    peerConn.onicecandidate = function(event){
-      if(event.candidate){
-        socket.emit('iceCandidate', event.candidate)
-      }
-    }
+
     //Tell server, wait 
     const roomName = joinRoomInput.value;    
-    socket.emit('join room', roomName);
-    peerConn.ontrack = gotStream;
+    socket.emit('join room', {roomName, socketId: socket.id});
   }
 
-  function feedLocalStream(stream){
-    localVideo.srcObject = stream;
+  function feedLocalStream(stream, connectionId){
     stream.getTracks().forEach(track => {
-      peerConn.addTrack(track, stream);
+      connections[connectionId].addTrack(track, stream);
     });   
   }
 
@@ -72,21 +67,35 @@ function main(){
     switch (msg.type) {
       //Server sending ICE candidate, add to connection
       case socketMessages.iceCandidate:
-        return peerConn.addIceCandidate(new RTCIceCandidate(msg.event))
-      //Received join request, create offer, set and send description
+        console.log(connections, msg.fromId)
+        return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
+
+      //Received join request, create connection and attach stream, create offer, set and send description
       case socketMessages.joinRequest:
-        const offer = await peerConn.createOffer()
-        await peerConn.setLocalDescription(offer)
-        return socket.emit('description', peerConn.localDescription);
+        connections[msg.socketId] = new RTCPeerConnection(null);
+        feedLocalStream(localStream, msg.socketId);
+        const offer = await connections[msg.socketId].createOffer()
+        await connections[msg.socketId].setLocalDescription(offer)
+        //This should only emit to connectee, currently emitting to ereyone
+        return socket.emit('description', {description: connections[msg.socketId].localDescription, toId: msg.socketId, fromId: socket.id});
+      
       //recieved offer, set description, set and send answer
       case socketMessages.offer:
-        await peerConn.setRemoteDescription(msg.description);
-        const answer = await peerConn.createAnswer();
-        await peerConn.setLocalDescription(answer);
-        return socket.emit('answer', answer);
+        connections[msg.fromId] = new RTCPeerConnection(null);
+        connections[msg.fromId].onicecandidate = function(event){
+          if(event.candidate){
+            socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
+          }
+        }
+        connections[msg.fromId].ontrack = gotStream;
+        await connections[msg.fromId].setRemoteDescription(msg.description);
+        const answer = await connections[msg.fromId].createAnswer();
+        await connections[msg.fromId].setLocalDescription(answer);
+        return socket.emit('answer', {answer, toId: msg.fromId, fromId: socket.id});
+      
       //received answer, set description
       case socketMessages.answer:
-        return await peerConn.setRemoteDescription(msg.answer);
+        return await connections[msg.fromId].setRemoteDescription(msg.answer);
         
       case socketMessages.badRoomName:
         return console.log('handle room name here')

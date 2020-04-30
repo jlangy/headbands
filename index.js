@@ -13,23 +13,24 @@ io.on('connection', function(socket){
     socket.join(name);
   })
 
-  socket.on('join room', id => {
-    if(io.sockets.adapter.rooms[id]){
-      socket.to(id).emit('message', {type: 'joinRequest', roomId: id})
+  socket.on('join room', msg => {
+    if(io.sockets.adapter.rooms[msg.roomName]){
+      socket.to(msg.roomName).emit('message', {type: 'joinRequest', roomId: msg.roomName, socketId: msg.socketId})
     } else {
       socket.emit('message', {type:'room does not exist'})
     }
   });
 
   socket.on('description', data => {
-    socket.broadcast.emit('message', {type: 'offer', description: data})
+    console.log(Object.keys(io.sockets.sockets), data.socketId)
+    io.sockets.sockets[data.toId].emit('message', {type: 'offer', description: data.description, toId: data.toId, fromId: data.fromId})
   });
 
   socket.on('answer', answer => {
-    socket.broadcast.emit('message', {type: 'answer', answer})
+    io.sockets.sockets[answer.toId].emit('message', {type: 'answer', answer: answer.answer, fromId: answer.fromId})
   });
 
   socket.on('iceCandidate', event => {
-    socket.broadcast.emit('message', {type: 'iceCandidate', event})
+    io.sockets.sockets[event.toId].emit('message', {type: 'iceCandidate', candidate: event.candidate, fromId: event.fromId})
   })
 })
