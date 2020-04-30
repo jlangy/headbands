@@ -3,7 +3,8 @@ const socketMessages = {
   joinRequest: 'joinRequest',
   offer: 'offer',
   answer: 'answer',
-  badRoomName: 'room does not exist'
+  badRoomName: 'room does not exist',
+  ready: 'gameReady'
 }
 
 function main(){
@@ -18,9 +19,9 @@ function main(){
   const joinRoomInput = document.getElementById('roomIdInput');
   const numPlayersSelect = document.getElementById('players-number'); 
 
-  let peerConn;
   let localStream;
   const connections = {};
+  let room;
 
   makeRoomBtn.addEventListener('click', makeRoom)
   joinRoomBtn.addEventListener('click', joinRoom)
@@ -40,18 +41,11 @@ function main(){
     //Connect stream to html and notify server
     localStream = stream;
     localVideo.srcObject = stream;
-    socket.emit('make room', roomName.value);
+    room = roomName.value;
+    socket.emit('make room', {name: roomName.value, totalPlayers: numPlayers});
   }
 
-  //Current setup is to notify other connection,
-  //Who initiates the offer/answer process,
-  //Which made more sense to me conceptually 
-  //As they created the room. But possibly should
-  //initiate offer/answer here, save a 
-  //socket trip
   function joinRoom(){
-    // Create connection with ICE listener
-
     //Tell server, wait 
     const roomName = joinRoomInput.value;    
     socket.emit('join room', {roomName, socketId: socket.id});
@@ -64,10 +58,10 @@ function main(){
   }
 
   socket.on('message', async msg => {
+    console.log(msg)
     switch (msg.type) {
       //Server sending ICE candidate, add to connection
       case socketMessages.iceCandidate:
-        console.log(connections, msg.fromId)
         return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
 
       //Received join request, create connection and attach stream, create offer, set and send description
@@ -76,10 +70,9 @@ function main(){
         feedLocalStream(localStream, msg.socketId);
         const offer = await connections[msg.socketId].createOffer()
         await connections[msg.socketId].setLocalDescription(offer)
-        //This should only emit to connectee, currently emitting to ereyone
         return socket.emit('description', {description: connections[msg.socketId].localDescription, toId: msg.socketId, fromId: socket.id});
       
-      //recieved offer, set description, set and send answer
+      //recieved offer, create connection, add candidate handler, set description, set and send answer
       case socketMessages.offer:
         connections[msg.fromId] = new RTCPeerConnection(null);
         connections[msg.fromId].onicecandidate = function(event){
@@ -95,10 +88,15 @@ function main(){
       
       //received answer, set description
       case socketMessages.answer:
+        socket.emit('ready', room)
         return await connections[msg.fromId].setRemoteDescription(msg.answer);
         
       case socketMessages.badRoomName:
         return console.log('handle room name here')
+
+      case socketMessages.ready:
+        console.log('this is up yo')
+        window.dispatchEvent(new Event('gameReady'))
       
       default:
         console.log('no handling for server socket emit: ', msg)
