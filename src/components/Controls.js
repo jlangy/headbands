@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./controls.css";
 
-async function turnOnLocalMedia(addStreams, name){
+async function turnOnLocalMedia(addStreams, name, setRoom){
   //Setup media 
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
@@ -12,15 +12,16 @@ async function turnOnLocalMedia(addStreams, name){
   addStreams(stream, name)
 }
 
-function Controls({addStreams, socket}) {
+function Controls({addStreams, socket, setRoom}) {
 
   const [begin, setBegin] = useState(false);
   const [numPlayers, setNumPlayers] = useState(0);
   const [joinRoomName, setJoinRoomName] = useState('');
   const [makeRoomName, setMakeRoomName] = useState('');
+  const [nameToGuess, setNameToGuess] = useState('');
 
   useEffect(() => {
-    window.addEventListener("gameReady", () => setBegin(true));
+    window.addEventListener("gameReady", () => {console.log('yeaaaa boi'); setBegin(true)});
   }, []);
 
   async function makeRoom(){
@@ -29,18 +30,28 @@ function Controls({addStreams, socket}) {
       return console.log('Need to add players')
     }
     turnOnLocalMedia(addStreams, 'local');
+    setRoom(makeRoomName);
     socket.emit('make room', {name: makeRoomName, totalPlayers: numPlayers});
   }
 
   async function joinRoom(){
     //Tell server, wait     
     await turnOnLocalMedia(addStreams);
+    setRoom(joinRoomName);
     socket.emit('join room', {roomName: joinRoomName, socketId: socket.id});
+  }
+
+  function setGameName(event){
+    socket.emit('setName', {name: nameToGuess, room: makeRoomName || joinRoomName})
   }
 
   return (
     <div className="controls-container">
-      {begin && <input type="text" placeholder="select name"/>}
+      {begin && 
+        <div className="input-group">
+          <input type="text" placeholder="select name" onChange={e => setNameToGuess(e.target.value)}/>
+          <button placeholder="enter famous name" onClick={setGameName}>Set</button>
+        </div>}
       <div className="input-group">
         <input type="text" id="createRoomInput" placeholder="room name" onChange={e => setMakeRoomName(e.target.value)}/>
         <button id="makeRoom" onClick={makeRoom}>Create Room</button>

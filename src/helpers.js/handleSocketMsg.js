@@ -4,7 +4,8 @@ const socketMessages = {
   offer: 'offer',
   answer: 'answer',
   badRoomName: 'room does not exist',
-  ready: 'gameReady'
+  ready: 'gameReady',
+  gotNames: 'give names'
 }
 
 const connections = {};
@@ -13,6 +14,12 @@ function feedLocalStream(stream, connectionId){
   stream.getTracks().forEach(track => {
     connections[connectionId].addTrack(track, stream);
   });   
+}
+
+function createStreamConnection(socketId, localStream, addStreams){
+  connections[socketId] = new RTCPeerConnection(null);
+  feedLocalStream(localStream, socketId);
+  connections[socketId].ontrack = e => addStreams(e.streams[0]);
 }
 
 export default async function(msg, localStream, socket, addStreams, room){
@@ -24,23 +31,19 @@ export default async function(msg, localStream, socket, addStreams, room){
 
     //Received join request, create connection and attach stream, create offer, set and send description
     case socketMessages.joinRequest:
-      connections[msg.socketId] = new RTCPeerConnection(null);
-      feedLocalStream(localStream, msg.socketId);
-      connections[msg.socketId].ontrack = e => addStreams(e.streams[0]);
+      createStreamConnection(msg.socketId, localStream, addStreams)
       const offer = await connections[msg.socketId].createOffer()
       await connections[msg.socketId].setLocalDescription(offer)
       return socket.emit('description', {description: connections[msg.socketId].localDescription, toId: msg.socketId, fromId: socket.id});
     
     //recieved offer, create connection, add candidate handler, set description, set and send answer
     case socketMessages.offer:
-      connections[msg.fromId] = new RTCPeerConnection(null);
-      feedLocalStream(localStream, msg.fromId);
+      createStreamConnection(msg.fromId, localStream, addStreams)
       connections[msg.fromId].onicecandidate = function(event){
         if(event.candidate){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
         }
       }
-      connections[msg.fromId].ontrack = e => addStreams(e.streams[0]);
       await connections[msg.fromId].setRemoteDescription(msg.description);
       const answer = await connections[msg.fromId].createAnswer();
       await connections[msg.fromId].setLocalDescription(answer);
@@ -54,11 +57,13 @@ export default async function(msg, localStream, socket, addStreams, room){
     case socketMessages.badRoomName:
       return console.log('handle room name here')
 
+    case socketMessages.gotNames:
+      return window.dispatchEvent(new CustomEvent('receivedName', {detail: msg.name}));
+
     case socketMessages.ready:
-      console.log('socket is up yo')
-      window.dispatchEvent(new Event('gameReady'))
+      return window.dispatchEvent(new Event('gameReady'))
     
     default:
-      console.log('no handling for server socket emit: ', msg)
+      console.log('no handling for server socket emit: ')
   }
 }

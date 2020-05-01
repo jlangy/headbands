@@ -8,13 +8,26 @@ const io = socket(server);
 
 let players = 0;
 let totalPlayers;
+let names = [];
+
+function shiftNames(){
+  const shiftedNames = [];
+  names.forEach((name,i) => {
+    if(i === names.length - 1){
+      shiftedNames[0] = {fromId: names[0].fromId, name: name.name};
+    } else {
+      shiftedNames[i+1] = {fromId: names[i+1].fromId, name: name.name}
+    }
+  });
+  return shiftedNames
+}
 
 io.on('connection', function(socket){
   console.log('connection made');
   
   socket.on('make room', msg => {
     socket.join(msg.name);
-    totalPlayers = msg.totalPlayers;
+    totalPlayers = Number(msg.totalPlayers);
     players = 1;
   })
 
@@ -37,7 +50,17 @@ io.on('connection', function(socket){
 
   socket.on('iceCandidate', event => {
     io.sockets.sockets[event.toId].emit('message', {type: 'iceCandidate', candidate: event.candidate, fromId: event.fromId})
-  })
+  });
+
+  socket.on('setName', name => {
+    names.push({fromId: socket.id, name: name.name});
+    if(names.length === totalPlayers){
+      const shiftedNames = shiftNames();
+      shiftedNames.forEach(name => {
+        io.sockets.sockets[name.fromId].emit('message', {type: 'give names', name: name.name})
+      })
+    }
+  });
 
   socket.on('ready', msg => {
     players += 1;
