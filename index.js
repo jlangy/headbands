@@ -15,7 +15,6 @@ io.on('connection', function(socket){
   socket.on('make room', msg => {
     socket.join(msg.name);
     totalPlayers = msg.totalPlayers;
-    console.log(totalPlayers)
     players = 1;
   })
 
