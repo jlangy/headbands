@@ -18,11 +18,11 @@ function feedLocalStream(stream, connectionId){
 
 function createStreamConnection(socketId, localStream, addStreams){
   connections[socketId] = new RTCPeerConnection(null);
+  connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
   feedLocalStream(localStream, socketId);
-  connections[socketId].ontrack = e => addStreams(e.streams[0]);
 }
 
-export default async function(msg, localStream, socket, addStreams, room){
+export default async function(msg, localStream, socket, addStreams, room, addStreamNames){
   console.log(msg)
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
@@ -58,7 +58,9 @@ export default async function(msg, localStream, socket, addStreams, room){
       return console.log('handle room name here')
 
     case socketMessages.gotNames:
-      return window.dispatchEvent(new CustomEvent('receivedName', {detail: msg.name}));
+      console.log('got NAMES!!!', msg)
+      addStreamNames(msg.names);
+      // return window.dispatchEvent(new CustomEvent('receivedName', {detail: msg.name}));
 
     case socketMessages.ready:
       return window.dispatchEvent(new Event('gameReady'))

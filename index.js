@@ -14,9 +14,9 @@ function shiftNames(){
   const shiftedNames = [];
   names.forEach((name,i) => {
     if(i === names.length - 1){
-      shiftedNames[0] = {fromId: names[0].fromId, name: name.name};
+      shiftedNames[0] = {toId: names[0].fromId, name: name.name};
     } else {
-      shiftedNames[i+1] = {fromId: names[i+1].fromId, name: name.name}
+      shiftedNames[i+1] = {toId: names[i+1].fromId, name: name.name}
     }
   });
   return shiftedNames
@@ -52,13 +52,12 @@ io.on('connection', function(socket){
     io.sockets.sockets[event.toId].emit('message', {type: 'iceCandidate', candidate: event.candidate, fromId: event.fromId})
   });
 
-  socket.on('setName', name => {
-    names.push({fromId: socket.id, name: name.name});
+  socket.on('setName', msg => {
+    names.push({fromId: socket.id, name: msg.name});
+    console.log('set name ran', names.length, totalPlayers)
     if(names.length === totalPlayers){
       const shiftedNames = shiftNames();
-      shiftedNames.forEach(name => {
-        io.sockets.sockets[name.fromId].emit('message', {type: 'give names', name: name.name})
-      })
+      io.in(msg.room).emit('message', {type: 'give names', names: shiftedNames})
     }
   });
 

@@ -9,7 +9,7 @@ async function turnOnLocalMedia(addStreams, name, setRoom){
   });
 
   //Connect stream to html and notify server
-  addStreams(stream, name)
+  addStreams(stream, 'local')
 }
 
 function Controls({addStreams, socket, setRoom}) {
