@@ -43,10 +43,13 @@ function App() {
   }
 
   function addStreams(stream, socketId){
-    if(streams.length === 0){
-      localStream = stream;
-    }
-    setStreams(prev => [...prev, {stream, socketId}])
+    setStreams(prev => {
+      if(prev.length === 0){
+        console.log('local stream added')
+        localStream = stream;
+      }
+      return [...prev, {stream, socketId}]
+    });
   }
 
   function setRoom(roomName){

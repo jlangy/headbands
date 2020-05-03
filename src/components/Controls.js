@@ -22,6 +22,11 @@ function Controls({addStreams, socket, setRoom}) {
 
   useEffect(() => {
     window.addEventListener("gameReady", () => {console.log('yeaaaa boi'); setBegin(true)});
+    window.addEventListener('makeRoom', async () => {
+      console.log('makeroom event ran')
+      await turnOnLocalMedia(addStreams, 'local');
+      setRoom(makeRoomName);
+    })
   }, []);
 
   async function makeRoom(){
@@ -29,8 +34,6 @@ function Controls({addStreams, socket, setRoom}) {
     if(!numPlayers){
       return console.log('Need to add players')
     }
-    turnOnLocalMedia(addStreams, 'local');
-    setRoom(makeRoomName);
     socket.emit('make room', {name: makeRoomName, totalPlayers: numPlayers});
   }
 
@@ -38,11 +41,11 @@ function Controls({addStreams, socket, setRoom}) {
     //Tell server, wait     
     await turnOnLocalMedia(addStreams);
     setRoom(joinRoomName);
-    socket.emit('join room', {roomName: joinRoomName, socketId: socket.id});
+    socket.emit('join room', {roomName: joinRoomName, fromId: socket.id});
   }
 
   function setGameName(event){
-    socket.emit('setName', {name: nameToGuess, room: makeRoomName || joinRoomName})
+    socket.emit('setName', {nameToGuess, roomName: makeRoomName || joinRoomName})
   }
 
   return (

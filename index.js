@@ -6,9 +6,9 @@ const app = express();
 const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
-let players = 0;
-let totalPlayers;
 let names = [];
+
+let rooms = [];
 
 function shiftNames(){
   const shiftedNames = [];
@@ -23,49 +23,54 @@ function shiftNames(){
 }
 
 io.on('connection', function(socket){
-  console.log('connection made');
-  
-  socket.on('make room', msg => {
-    socket.join(msg.name);
-    totalPlayers = Number(msg.totalPlayers);
-    players = 1;
+
+  socket.on('make room', ({name, totalPlayers}) => {
+    totalPlayers = Number(totalPlayers);
+    if(rooms.some(room => room.name === name)){
+      return socket.emit('message', {type: 'name taken'});
+    }
+    socket.emit('message', {type: 'room name ok'})
+    rooms.push({totalPlayers, name, playersJoined: 1, namesToGuess: []});
+    socket.join(name);
   })
 
-  socket.on('join room', msg => {
-    if(io.sockets.adapter.rooms[msg.roomName]){
-      socket.to(msg.roomName).emit('message', {type: 'joinRequest', roomId: msg.roomName, socketId: msg.socketId})
-      socket.join(msg.roomName)
+  socket.on('join room', ({roomName, fromId}) => {
+    let roomToJoin = io.sockets.adapter.rooms[roomName]
+    if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
+      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId})
+      socket.join(roomName)
     } else {
-      socket.emit('message', {type:'room does not exist'})
+      socket.emit('message', {type:'cannot join'})
     }
   });
 
-  socket.on('description', data => {
-    io.sockets.sockets[data.toId].emit('message', {type: 'offer', description: data.description, toId: data.toId, fromId: data.fromId})
+  socket.on('description', ({description, toId, fromId}) => {
+    io.sockets.sockets[data.toId].emit('message', {type: 'offer', description, toId, fromId})
   });
 
-  socket.on('answer', answer => {
-    io.sockets.sockets[answer.toId].emit('message', {type: 'answer', answer: answer.answer, fromId: answer.fromId})
+  socket.on('answer', ({answer, fromId}) => {
+    io.sockets.sockets[answer.toId].emit('message', {type: 'answer', answer, fromId})
   });
 
-  socket.on('iceCandidate', event => {
-    io.sockets.sockets[event.toId].emit('message', {type: 'iceCandidate', candidate: event.candidate, fromId: event.fromId})
+  socket.on('iceCandidate', ({candidate, fromId}) => {
+    io.sockets.sockets[event.toId].emit('message', {type: 'iceCandidate', candidate, fromId})
   });
 
-  socket.on('setName', msg => {
-    names.push({fromId: socket.id, name: msg.name});
-    console.log('set name ran', names.length, totalPlayers)
-    if(names.length === totalPlayers){
+  socket.on('setName', ({nameToGuess, roomName}) => {
+    // names.push({fromId: socket.id, name: msg.name});
+    const namesToGuess = rooms[roomName].namesToGuess;
+    namesToGuess.push({fromId: socket.id, nameToGuess})
+    if(namesToGuess.length === rooms[roomName].totalPlayers){
       const shiftedNames = shiftNames();
-      io.in(msg.room).emit('message', {type: 'give names', names: shiftedNames})
+      io.in(roomName).emit('message', {type: 'give names', names: shiftedNames})
     }
   });
 
-  socket.on('ready', msg => {
-    players += 1;
-    if (players == totalPlayers){
-      console.log('ready ran', msg)
-      io.in(msg).emit('message', {type: 'gameReady'})
+  socket.on('ready', roomName => {
+    const room = rooms[roomName];
+    room.playersJoined += 1;
+    if (room.playersJoined == room.totalPlayers){
+      io.in(roomName).emit('message', {type: 'gameReady'})
     }
   })
 })
