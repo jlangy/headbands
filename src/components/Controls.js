@@ -22,11 +22,6 @@ function Controls({addStreams, socket, setRoom}) {
 
   useEffect(() => {
     window.addEventListener("gameReady", () => {console.log('yeaaaa boi'); setBegin(true)});
-    window.addEventListener('makeRoom', async () => {
-      console.log('makeroom event ran')
-      await turnOnLocalMedia(addStreams, 'local');
-      setRoom(makeRoomName);
-    })
   }, []);
 
   async function makeRoom(){
@@ -35,6 +30,11 @@ function Controls({addStreams, socket, setRoom}) {
       return console.log('Need to add players')
     }
     socket.emit('make room', {name: makeRoomName, totalPlayers: numPlayers});
+    window.addEventListener('makeRoom', async () => {
+      console.log('makeroom event')
+      await turnOnLocalMedia(addStreams, 'local');
+      setRoom(makeRoomName);
+    })
   }
 
   async function joinRoom(){

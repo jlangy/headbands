@@ -8,9 +8,9 @@ const io = socket(server);
 
 let names = [];
 
-let rooms = [];
+let rooms = {};
 
-function shiftNames(){
+function shiftNames(names){
   const shiftedNames = [];
   names.forEach((name,i) => {
     if(i === names.length - 1){
@@ -26,18 +26,19 @@ io.on('connection', function(socket){
 
   socket.on('make room', ({name, totalPlayers}) => {
     totalPlayers = Number(totalPlayers);
-    if(rooms.some(room => room.name === name)){
+    if(rooms[name]){
       return socket.emit('message', {type: 'name taken'});
     }
     socket.emit('message', {type: 'room name ok'})
-    rooms.push({totalPlayers, name, playersJoined: 1, namesToGuess: []});
+    rooms[name] = {totalPlayers, name, playersJoined: 1, namesToGuess: []};
     socket.join(name);
   })
 
   socket.on('join room', ({roomName, fromId}) => {
-    let roomToJoin = io.sockets.adapter.rooms[roomName]
+    let roomToJoin = rooms[roomName];
     if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
-      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId})
+      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId});
+      socket.emit('message', {type: 'joining'})
       socket.join(roomName)
     } else {
       socket.emit('message', {type:'cannot join'})
@@ -45,15 +46,15 @@ io.on('connection', function(socket){
   });
 
   socket.on('description', ({description, toId, fromId}) => {
-    io.sockets.sockets[data.toId].emit('message', {type: 'offer', description, toId, fromId})
+    io.sockets.sockets[toId].emit('message', {type: 'offer', description, toId, fromId})
   });
 
-  socket.on('answer', ({answer, fromId}) => {
-    io.sockets.sockets[answer.toId].emit('message', {type: 'answer', answer, fromId})
+  socket.on('answer', ({answer, fromId, toId}) => {
+    io.sockets.sockets[toId].emit('message', {type: 'answer', answer, fromId})
   });
 
-  socket.on('iceCandidate', ({candidate, fromId}) => {
-    io.sockets.sockets[event.toId].emit('message', {type: 'iceCandidate', candidate, fromId})
+  socket.on('iceCandidate', ({candidate, fromId, toId}) => {
+    io.sockets.sockets[toId].emit('message', {type: 'iceCandidate', candidate, fromId})
   });
 
   socket.on('setName', ({nameToGuess, roomName}) => {
@@ -61,7 +62,7 @@ io.on('connection', function(socket){
     const namesToGuess = rooms[roomName].namesToGuess;
     namesToGuess.push({fromId: socket.id, nameToGuess})
     if(namesToGuess.length === rooms[roomName].totalPlayers){
-      const shiftedNames = shiftNames();
+      const shiftedNames = shiftNames(nameToGuess);
       io.in(roomName).emit('message', {type: 'give names', names: shiftedNames})
     }
   });

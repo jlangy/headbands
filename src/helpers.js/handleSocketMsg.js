@@ -7,7 +7,8 @@ const socketMessages = {
   ready: 'gameReady',
   gotNames: 'give names',
   nameTaken: 'name taken',
-  roomNameOk: 'room name ok'
+  roomNameOk: 'room name ok',
+  joining: 'joining'
 }
 
 const connections = {};
@@ -24,7 +25,7 @@ function createStreamConnection(socketId, localStream, addStreams){
   connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
 }
 
-export default async function(msg, localStream, socket, addStreams, room, addStreamNames){
+export default async function(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn){
   console.log(msg)
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
@@ -40,7 +41,6 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
     
     //recieved offer, create connection, add candidate handler, set description, set and send answer
     case socketMessages.offer:
-      console.log(connections)
       createStreamConnection(msg.fromId, localStream, addStreams)
       connections[msg.fromId].onicecandidate = function(event){
         if(event.candidate){
@@ -54,8 +54,8 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
     
     //received answer, set description
     case socketMessages.answer:
-      socket.emit('ready', room)
-      console.log(connections)
+      console.log(window.roomName)
+      socket.emit('ready', window.roomName)
       return await connections[msg.fromId].setRemoteDescription(msg.answer);
       
     case socketMessages.badRoomName:
@@ -72,6 +72,9 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
 
     case socketMessages.ready:
       return window.dispatchEvent(new Event('gameReady'))
+
+    case socketMessages.joining:
+      return setGameOn(true);
     
     default:
       console.log('no handling for server socket emit: ')

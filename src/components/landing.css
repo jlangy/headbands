@@ -1,0 +1,45 @@
+.landing-button {
+  font-size: 52px;
+  font-family: StaatLiches;
+  padding: 20px;
+  background-color: orange;
+  border: 3px solid red;
+  width: 400px;
+}
+
+button:focus {
+  outline: none;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.input-slider {
+  position: relative;
+  transition: height 0.5s;
+  overflow: hidden;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-name > button {
+  font-size: 32px;
+  font-family: StaatLiches;
+  padding: 0px 10px;
+  background-color: orange;
+  border: 3px solid red;
+}
+
+.game-name > input {
+  height: 32px;
+  flex-grow: 1;
+}

@@ -6,3 +6,9 @@ main {
   width: 80%;
   margin: auto;
 }
+
+h1 {
+  font-family: StaatLiches;
+  font-size: 100px;
+  text-align: center;
+}
