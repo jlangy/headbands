@@ -1,7 +1,7 @@
 const express = require('express');
 const socket = require('socket.io');
 const path = require('path')
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 const app = express();
 // const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
@@ -11,7 +11,7 @@ const io = socket(server);
 let names = [];
 let rooms = {};
 
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(express.static(path.join(__dirname, 'build')));
 
 function shiftNames(names){
   const shiftedNames = [];
@@ -84,3 +84,19 @@ io.on('connection', function(socket){
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname+'/build/index.html'));
 });
+
+
+//server.js
+// const express = require('express');
+// const path = require('path');
+// const port = process.env.PORT || 8080;
+// const app = express();
+// // the __dirname is the current directory from where the script is running
+// app.use(express.static(__dirname));
+// app.use(express.static(path.join(__dirname, 'build')));
+
+// app.get('/*', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
+
+// app.listen(port);
