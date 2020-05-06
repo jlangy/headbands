@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./landing.css";
 
 async function turnOnLocalMedia(addStreams, name, setRoom) {
@@ -12,11 +12,10 @@ async function turnOnLocalMedia(addStreams, name, setRoom) {
   addStreams(stream, "local");
 }
 
-function Landing({ addStreams, socket, streams, setRoom, setGameOn }) {
+function Landing({ addStreams, socket, setNumPlayers, setRoom, setGameOn, numPlayers }) {
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
   const [begin, setBegin] = useState(false);
-  const [numPlayers, setNumPlayers] = useState(2);
   const [joinRoomName, setJoinRoomName] = useState("");
   const [makeRoomName, setMakeRoomName] = useState("");
   const [nameToGuess, setNameToGuess] = useState("");
@@ -25,7 +24,8 @@ function Landing({ addStreams, socket, streams, setRoom, setGameOn }) {
     window.addEventListener("gameReady", () => setBegin(true));
     window.addEventListener("makeRoom", async () => {
       await turnOnLocalMedia(addStreams, "local");
-      setRoom(makeRoomName);
+      console.log('setting room')
+      setRoom(window.roomName);
       setGameOn(true);
     });
   }, []);
@@ -39,7 +39,7 @@ function Landing({ addStreams, socket, streams, setRoom, setGameOn }) {
     if (!numPlayers) {
       return console.log("Need to add players");
     }
-    socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
+    socket.emit("make room", { name: makeRoomName, totalPlayers: Number(numPlayers.current) });
   }
 
   async function joinRoom() {
@@ -73,7 +73,7 @@ function Landing({ addStreams, socket, streams, setRoom, setGameOn }) {
         >
           <div className="player-number">
             <label htmlFor="players-number">Total Players: </label>
-            <select id="players-number" onChange={e => setNumPlayers(e.target.value)}>
+            <select id="players-number" onChange={e => numPlayers.current = (Number(e.target.value))}>
               <option>2</option>
               <option>3</option>
               <option>4</option>

@@ -1,14 +1,17 @@
 const express = require('express');
 const socket = require('socket.io');
-const port = process.env.PORT || 3001;
+const path = require('path')
+const port = process.env.PORT || 5000;
 
 const app = express();
-const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
+// const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
+const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
 let names = [];
-
 let rooms = {};
+
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 function shiftNames(names){
   const shiftedNames = [];
@@ -36,9 +39,10 @@ io.on('connection', function(socket){
 
   socket.on('join room', ({roomName, fromId}) => {
     let roomToJoin = rooms[roomName];
+    console.log(roomToJoin)
     if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
       socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId});
-      socket.emit('message', {type: 'joining'})
+      socket.emit('message', {type: 'joining', players: roomToJoin.totalPlayers})
       socket.join(roomName)
     } else {
       socket.emit('message', {type:'cannot join'})
@@ -69,9 +73,14 @@ io.on('connection', function(socket){
 
   socket.on('ready', roomName => {
     const room = rooms[roomName];
-    room.playersJoined += 1;
-    if (room.playersJoined == room.totalPlayers){
+    //There will be n-1 answers from nth joiner, so add 1/n-1.
+    room.playersJoined += 1  / Math.floor(room.playersJoined);
+    if (Math.round(room.playersJoined) == room.totalPlayers){
       io.in(roomName).emit('message', {type: 'gameReady'})
     }
   })
 })
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});

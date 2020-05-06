@@ -25,7 +25,7 @@ function createStreamConnection(socketId, localStream, addStreams){
   connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
 }
 
-export default async function(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn){
+export default async function(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn, numPlayers){
   console.log(msg)
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
@@ -74,6 +74,7 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
       return window.dispatchEvent(new Event('gameReady'))
 
     case socketMessages.joining:
+      numPlayers.current = msg.players;
       return setGameOn(true);
     
     default:

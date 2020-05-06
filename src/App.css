@@ -1,5 +1,21 @@
 .videos-container {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  background-color: orange;
+}
+
+.videos-container>h2 {
+  width: 100%;
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 0;
+}
+
+.video-container{
+  height: 280px;
+  width: 320px;
+  background-color: black;
 }
 
 main {
@@ -11,4 +27,9 @@ h1 {
   font-family: StaatLiches;
   font-size: 100px;
   text-align: center;
+}
+
+video {
+  width: 320px;
+  height: 280px;
 }
