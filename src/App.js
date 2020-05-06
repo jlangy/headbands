@@ -18,7 +18,8 @@ function App() {
   const numPlayers = useRef(2);
   
   useEffect(() => {
-    const socket = io.connect("http://192.168.0.100:3001")
+    // const socket = io.connect("http://192.168.0.100:3001")
+    const socket = io.connect(window.location.hostname)
     // let socket = io.connect("http://localhost:3001")
     socket.on('message', msg => {
       handleSocketMsg(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn, numPlayers)
