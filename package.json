@@ -11,12 +11,16 @@
     "path": "^0.12.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-redux": "^7.2.0",
     "react-scripts": "3.4.1",
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0",
     "socket.io": "^2.3.0",
     "uws": "^10.148.1"
   },
   "scripts": {
     "start": "node index.js",
+    "start-react": "react-scripts start",
     "heroku-postbuild": "npm i && npm run build",
     "build": "react-scripts build",
     "test": "react-scripts test",

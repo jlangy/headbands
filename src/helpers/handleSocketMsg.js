@@ -1,3 +1,8 @@
+import store from '../store';
+import { createGame } from '../actions/gameActions';
+import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED } from '../actions/types';
+
+
 const socketMessages = {
   iceCandidate: 'iceCandidate',
   joinRequest: 'joinRequest',
@@ -20,9 +25,11 @@ function feedLocalStream(stream, connectionId){
 }
 
 function createStreamConnection(socketId, localStream, addStreams){
+  console.log('csc ran')
   connections[socketId] = new RTCPeerConnection(null);
-  feedLocalStream(localStream, socketId);
-  connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
+  feedLocalStream(store.getState().streams[0].stream, socketId);
+  // connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
+  connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
 
 export default async function(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn, numPlayers){
@@ -33,7 +40,7 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
       return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
 
     //Received join request, create connection and attach stream, create offer, set and send description
-    case socketMessages.joinRequest:
+    case socketMessages.joinRequest: 
       createStreamConnection(msg.fromId, localStream, addStreams)
       const offer = await connections[msg.fromId].createOffer()
       await connections[msg.fromId].setLocalDescription(offer)
@@ -46,6 +53,7 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
         if(event.candidate){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
         }
+        //TODO: might need some cleanup here if candidate null
       }
       await connections[msg.fromId].setRemoteDescription(msg.description);
       const answer = await connections[msg.fromId].createAnswer();
@@ -54,7 +62,6 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
     
     //received answer, set description
     case socketMessages.answer:
-      console.log(window.roomName)
       socket.emit('ready', window.roomName)
       return await connections[msg.fromId].setRemoteDescription(msg.answer);
       
@@ -68,14 +75,19 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
       return console.log('name taken')
 
     case socketMessages.roomNameOk:
-      return window.dispatchEvent(new Event('makeRoom'))
+      let {name, totalPlayers} = msg;
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true}})
+      // return window.dispatchEvent(new Event('makeRoom'))
 
     case socketMessages.ready:
-      return window.dispatchEvent(new Event('gameReady'))
+      console.log('all ready boss')
+      // return window.dispatchEvent(new Event('gameReady'))
+      return store.dispatch({type: ALL_PLAYERS_JOINED})
 
-    case socketMessages.joining:
-      numPlayers.current = msg.players;
-      return setGameOn(true);
+    case socketMessages.joining:{
+      let {totalPlayers, name} = msg;
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true}})
+    }
     
     default:
       console.log('no handling for server socket emit: ')

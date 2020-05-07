@@ -1,11 +1,11 @@
 const express = require('express');
 const socket = require('socket.io');
 const path = require('path')
-const port = process.env.PORT || 3000;
+const port = 3001;
 
 const app = express();
-// const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
-const server = app.listen(port, () => console.log(`listening on port ${port}`));
+const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
+// const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
 let names = [];
@@ -32,7 +32,7 @@ io.on('connection', function(socket){
     if(rooms[name]){
       return socket.emit('message', {type: 'name taken'});
     }
-    socket.emit('message', {type: 'room name ok'})
+    socket.emit('message', {type: 'room name ok', name, totalPlayers})
     rooms[name] = {totalPlayers, name, playersJoined: 1, namesToGuess: []};
     socket.join(name);
   })
@@ -41,8 +41,10 @@ io.on('connection', function(socket){
     let roomToJoin = rooms[roomName];
     console.log(roomToJoin)
     if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
-      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId});
-      socket.emit('message', {type: 'joining', players: roomToJoin.totalPlayers})
+      setTimeout(() => {
+        socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId});
+      }, 100);
+      socket.emit('message', {type: 'joining', totalPlayers: roomToJoin.totalPlayers, name: roomName})
       socket.join(roomName)
     } else {
       socket.emit('message', {type:'cannot join'})

@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
+import { connect } from 'react-redux'
 import './video.css'
 
-function Video({ stream, id }) {
+function Video({ stream, id, game }) {
   useEffect(() => {
     document.getElementById(id).srcObject = stream;
   }, [stream])
@@ -9,8 +10,14 @@ function Video({ stream, id }) {
   return (
     <div className="video-container">
       <video id={id} autoPlay playsInline></video>
+      {game.allPlayersJoined && <input type="text"/>}
     </div>
   )
 }
 
-export default Video;
+const mapStateToProps = state => ({
+  game: state.game
+});
+
+export default connect(mapStateToProps, null)(Video);
+
