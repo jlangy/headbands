@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux'
 import './video.css'
 
 function Video({ stream, id, game }) {
@@ -10,14 +9,9 @@ function Video({ stream, id, game }) {
   return (
     <div className="video-container">
       <video id={id} autoPlay playsInline></video>
-      {game.allPlayersJoined && <input type="text"/>}
     </div>
   )
 }
 
-const mapStateToProps = state => ({
-  game: state.game
-});
-
-export default connect(mapStateToProps, null)(Video);
+export default Video;
 

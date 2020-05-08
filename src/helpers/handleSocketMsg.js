@@ -1,6 +1,6 @@
 import store from '../store';
 import { createGame } from '../actions/gameActions';
-import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED } from '../actions/types';
+import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES } from '../actions/types';
 
 
 const socketMessages = {
@@ -27,7 +27,7 @@ function feedLocalStream(stream, connectionId){
 function createStreamConnection(socketId, localStream, addStreams){
   console.log('csc ran')
   connections[socketId] = new RTCPeerConnection(null);
-  feedLocalStream(store.getState().streams[0].stream, socketId);
+  feedLocalStream(store.getState().streams['local'].stream, socketId);
   // connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -69,7 +69,9 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
       return console.log('handle room name here')
 
     case socketMessages.gotNames:
-      return addStreamNames(msg.names);
+      console.log('got names', msg.names)
+      return store.dispatch({type: GOT_NAMES, payload: {names: msg.names}})
+      // return addStreamNames(msg.names);
 
     case socketMessages.nameTaken:
       return console.log('name taken')

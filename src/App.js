@@ -13,6 +13,7 @@ let localStream;
 function App({streams, game, createStream}) {
   const [socket, setSocket] = useState();
   const [emptyVideos, setEmptyVideos] = useState([]);
+  const [nameToGuess, setNameToGuess] = useState();
   // const [streams, setStreams] = useState([]);
   const [room, setRoom] = useState('');
   const [gameOn, setGameOn] = useState(false);
@@ -30,31 +31,14 @@ function App({streams, game, createStream}) {
   }, []); 
 
   function addStreamNames(names){
-    // setStreams(prev => {
-    //   const newStreams = [];
-    //   prev.forEach(streamObj => {
-    //     const matchingName = names.find(name => name.toId === streamObj.socketId);
-    //     newStreams.push({...streamObj, name: matchingName && matchingName.name})
-    //   });
-    //   return newStreams;
-    // });
-  }
-
-  function logStreams(){
-    console.log(streams);
   }
 
   function addStreams(stream, socketId){
-    // let fullVideos;
-    // setStreams(prev => {
-    //   if(prev.length === 0){
-    //     localStream = stream;
-    //   }
-    //   fullVideos = prev.length + 1;
-    //   return [...prev, {stream, socketId}]
-    // });
-    // setEmptyVideos(prev => new Array(numPlayers.current - fullVideos).fill(0));
     createStream({stream, socketId})
+  }
+
+  function setName(){
+    socket.emit('setName', {nameToGuess, roomName: game.name})
   }
 
   return (
@@ -62,25 +46,27 @@ function App({streams, game, createStream}) {
         <main>
           <h1>Headbandz</h1>
           <Landing addStreams={addStreams} socket={socket} setRoom={setRoom} setGameOn={setGameOn} numPlayers={numPlayers}/>
+          {game.allPlayersJoined && <><input type="text" onChange={e => setNameToGuess(e.target.value)}/><button onClick={setName}>Set name</button></>}
           {game.afoot && 
             <div>
               <div className="videos-container">
                 <h2>In room: {game.name}</h2>
-                <Video id="local" stream={streams[0] && streams[0].stream}/>
-                {streams.slice(1).map((stream,i) => 
+                <Video id="local" stream={streams['local'] && streams['local'].stream}/>
+                {Object.keys(streams).filter(streamName => streamName !== 'local').map((streamName,i) => 
                 <div>
-                  <Video stream={stream.stream} key={i} id={`stream${i}`}/>
-                  <h3>{stream.name}</h3>
+                  <Video stream={streams[streamName].stream} key={i} id={`stream${i}`}/>
+                  <h3>{streamName}</h3>
+                  <h3>{streams[streamName].name}</h3>
                 </div>
               )}
-              {emptyVideos.map((a,i) => 
+              {game.totalPlayers && new Array((Object.keys(streams).length)).map((a,i) => 
                 <div className='video-container' key={i}>
+                  {i}
                 </div> 
               )}
               </div>
             </div>
           }
-          <button onClick={logStreams}>log streams</button>
         </main>
       </div>
   );

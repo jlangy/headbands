@@ -25,6 +25,13 @@ button:focus {
   flex-direction: column;
 }
 
+.player-number>label {
+  font-family: StaatLiches;
+  font-size: 32px;
+}
+
+
+
 .game-name {
   display: flex;
   align-items: center;
@@ -39,7 +46,36 @@ button:focus {
   border: 3px solid red;
 }
 
-.game-name > input {
-  height: 32px;
+.select-selected {
+  background-color: DodgerBlue;
+}
+
+/* Style the arrow inside the select element: */
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+
+/* Point the arrow upwards when the select box is open (active): */
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+
+
+
+.game-name>input {
+  border: none;
+  height: 100%;
+  background-color: #ae690f;
   flex-grow: 1;
+  font-family: StaatLiches;
+  font-size: 1.5em;
+  padding: 0 10px
 }

@@ -17,12 +17,12 @@ function shiftNames(names){
   const shiftedNames = [];
   names.forEach((name,i) => {
     if(i === names.length - 1){
-      shiftedNames[0] = {toId: names[0].fromId, name: name.name};
+      shiftedNames[0] = {toId: names[0].fromId, name: name.nameToGuess};
     } else {
-      shiftedNames[i+1] = {toId: names[i+1].fromId, name: name.name}
+      shiftedNames[i+1] = {toId: names[i+1].fromId, name: name.nameToGuess}
     }
   });
-  return shiftedNames
+  return shiftedNames                                                           
 }
 
 io.on('connection', function(socket){
@@ -65,10 +65,11 @@ io.on('connection', function(socket){
 
   socket.on('setName', ({nameToGuess, roomName}) => {
     // names.push({fromId: socket.id, name: msg.name});
+    console.log('name logged on backend')
     const namesToGuess = rooms[roomName].namesToGuess;
     namesToGuess.push({fromId: socket.id, nameToGuess})
     if(namesToGuess.length === rooms[roomName].totalPlayers){
-      const shiftedNames = shiftNames(nameToGuess);
+      const shiftedNames = shiftNames(namesToGuess);
       io.in(roomName).emit('message', {type: 'give names', names: shiftedNames})
     }
   });

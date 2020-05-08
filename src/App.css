@@ -15,12 +15,16 @@
 .video-container{
   height: 280px;
   width: 320px;
-  background-color: black;
+  background-color: rgb(43, 43, 43);
 }
 
 main {
   width: 80%;
+  height: 70vh;
+  min-height: 600px;
+  background-color: rgb(230, 165, 80);
   margin: auto;
+  box-shadow: -5px 5px black;
 }
 
 h1 {

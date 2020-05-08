@@ -73,7 +73,7 @@ function Landing({ game, addStreams, socket, setRoom, numPlayers }) {
         </button>
         <div
           className="input-slider"
-          style={{ height: makingGame ? "80px" : "0px" }}
+          style={{ height: makingGame ? "100px" : "0px" }}
         >
           <div className="player-number">
             <label htmlFor="players-number">Total Players: </label>
@@ -106,7 +106,7 @@ function Landing({ game, addStreams, socket, setRoom, numPlayers }) {
         </button>
         <div
           className="input-slider"
-          style={{ height: joiningGame ? "80px" : "0px" }}
+          style={{ height: joiningGame ? "100px" : "0px" }}
         >
           <div className="game-name">
             <input
