@@ -1,39 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
-import Game from './components/Game'
-import handleSocketMsg from "./helpers/handleSocketMsg";
-import io from 'socket.io-client';
-import Landing from './components/Landing'
-import { connect } from 'react-redux';
-import { createStream } from './actions/streamActions';
+import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
+import io from 'socket.io-client';
 
+import handleSocketMsg from "./helpers/handleSocketMsg";
+import './App.scss';
 
-let localStream;
+import Landing from './components/Landing';
+import Game from './components/Game'
 
-function App({streams, game, createStream}) {
+function App() {
   const [socket, setSocket] = useState();
   
   useEffect(() => {
     //connection for local
-    // let socket = io.connect("http://localhost:5000")
+    let socket = io.connect("http://localhost:5000")
     
     //connection for production
-    const socket = io.connect(window.location.hostname)
+    // const socket = io.connect(window.location.hostname)
 
     socket.on('message', msg => {
-      handleSocketMsg(msg, localStream, socket, addStreams)
+      handleSocketMsg(msg, socket)
     });
     setSocket(socket);
   }, []); 
-
-  function addStreams(stream, socketId){
-    createStream({stream, socketId})
-  }
 
   return (
     <Router>
@@ -41,11 +34,13 @@ function App({streams, game, createStream}) {
         <main>
           <h1>Headbandz</h1>
           <Switch>
+            
             <Route path="/game">
               <Game socket={socket}/>
             </Route>
+
             <Route path="/">
-              <Landing addStreams={addStreams} socket={socket}/>
+              <Landing socket={socket}/>
             </Route>
 
           </Switch>
@@ -56,9 +51,4 @@ function App({streams, game, createStream}) {
   );
 }
 
-const mapStateToProps = state => ({
-  streams: state.streams,
-  game: state.game
-});
-
-export default connect(mapStateToProps, {createStream})(App);
+export default App;

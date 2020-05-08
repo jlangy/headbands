@@ -32,7 +32,7 @@ function createStreamConnection(socketId){
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
 
-export default async function(msg, localStream, socket, addStreams){
+export default async function(msg, socket){
   console.log(msg)
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
@@ -41,14 +41,14 @@ export default async function(msg, localStream, socket, addStreams){
 
     //Received join request, create connection and attach stream, create offer, set and send description
     case socketMessages.joinRequest: 
-      createStreamConnection(msg.fromId, localStream, addStreams)
+      createStreamConnection(msg.fromId)
       const offer = await connections[msg.fromId].createOffer()
       await connections[msg.fromId].setLocalDescription(offer)
       return socket.emit('description', {description: connections[msg.fromId].localDescription, toId: msg.fromId, fromId: socket.id});
     
     //recieved offer, create connection, add candidate handler, set description, set and send answer
     case socketMessages.offer:
-      createStreamConnection(msg.fromId, localStream, addStreams)
+      createStreamConnection(msg.fromId)
       connections[msg.fromId].onicecandidate = function(event){
         if(event.candidate){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})

@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import "./landing.css";
+import React, { useState } from 'react';
+import './landing.scss';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { createStream } from '../actions/streamActions'
 
-async function turnOnLocalMedia(addStreams) {
-  //Setup media
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: true,
+async function turnOnLocalMedia(createStream) {
+	//Setup media
+	const stream = await navigator.mediaDevices.getUserMedia({
+		audio: false,
+		video: true
   });
-
-  //Connect stream to html and notify server
-  addStreams(stream, "local");
+  
+  createStream({stream, socketId: 'local'})
 }
 
-function Landing({ addStreams, socket }) {
+function Landing({ socket, createStream }) {
   //UI state for toggling making/joining game dropdowns
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
@@ -34,14 +34,14 @@ function Landing({ addStreams, socket }) {
 
   async function makeRoom() {
     socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
-    turnOnLocalMedia(addStreams)
+    turnOnLocalMedia(createStream)
   }
 
-  async function joinRoom() {
-    //Tell server, wait
-    await turnOnLocalMedia(addStreams);
-    socket.emit("join room", { roomName: joinRoomName, fromId: socket.id });
-  }
+	async function joinRoom() {
+		//Tell server, wait
+		await turnOnLocalMedia(createStream);
+		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
+	}
 
   return (
     <>
@@ -75,7 +75,7 @@ function Landing({ addStreams, socket }) {
               }}
               placeholder="Enter game name"
             />
-            <Link to='/game'><button class='start-game-button' onClick={makeRoom}>Go!</button></Link>
+            <Link to='/game'><button className='start-game-button' onClick={makeRoom}>Go!</button></Link>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ function Landing({ addStreams, socket }) {
                 setJoinRoomName(e.target.value);
               }}
             />
-            <Link to='/game'><button class='start-game-button' onClick={joinRoom}>Go!</button></Link>
+            <Link to='/game'><button className='start-game-button' onClick={joinRoom}>Go!</button></Link>
           </div>
         </div>
       </div>
@@ -107,4 +107,4 @@ const mapStateToProps = state => ({
   streams: state.streams
 });
 
-export default connect(mapStateToProps, {})(Landing);
+export default connect(mapStateToProps, { createStream })(Landing);
