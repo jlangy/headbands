@@ -26,9 +26,9 @@ function Landing({ game, addStreams, socket }) {
 
   async function makeRoom() {
     //Verify number of players set
-    if (!numPlayers) {
-      return console.log("Need to add players");
-    }
+    // if (!numPlayers) {
+    //   return console.log("Need to add players");
+    // }
     socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
     turnOnLocalMedia(addStreams)
   }

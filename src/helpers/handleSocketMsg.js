@@ -25,7 +25,7 @@ function feedLocalStream(stream, connectionId){
 
 function createStreamConnection(socketId){
   console.log('csc ran')
-  connections[socketId] = new RTCPeerConnection({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
+  connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -50,6 +50,9 @@ export default async function(msg, localStream, socket, addStreams){
       connections[msg.fromId].onicecandidate = function(event){
         if(event.candidate){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
+        }
+        else {
+          console.log('ice candidates finished')
         }
         //TODO: might need some cleanup here if candidate null
       }
