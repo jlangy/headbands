@@ -4,8 +4,8 @@ const path = require('path')
 const port = 3001;
 
 const app = express();
-const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
-// const server = app.listen(port, () => console.log(`listening on port ${port}`));
+// const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
+const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
 let names = [];

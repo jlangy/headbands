@@ -1,5 +1,4 @@
 import store from '../store';
-import { createGame } from '../actions/gameActions';
 import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES } from '../actions/types';
 
 
@@ -24,15 +23,14 @@ function feedLocalStream(stream, connectionId){
   });   
 }
 
-function createStreamConnection(socketId, localStream, addStreams){
+function createStreamConnection(socketId){
   console.log('csc ran')
-  connections[socketId] = new RTCPeerConnection(null);
+  connections[socketId] = new RTCPeerConnection({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
   feedLocalStream(store.getState().streams['local'].stream, socketId);
-  // connections[socketId].ontrack = e => addStreams(e.streams[0], socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
 
-export default async function(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn, numPlayers){
+export default async function(msg, localStream, socket, addStreams){
   console.log(msg)
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
@@ -62,7 +60,7 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
     
     //received answer, set description
     case socketMessages.answer:
-      socket.emit('ready', window.roomName)
+      socket.emit('ready', store.getState().game.name)
       return await connections[msg.fromId].setRemoteDescription(msg.answer);
       
     case socketMessages.badRoomName:
@@ -79,11 +77,9 @@ export default async function(msg, localStream, socket, addStreams, room, addStr
     case socketMessages.roomNameOk:
       let {name, totalPlayers} = msg;
       return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true}})
-      // return window.dispatchEvent(new Event('makeRoom'))
 
     case socketMessages.ready:
       console.log('all ready boss')
-      // return window.dispatchEvent(new Event('gameReady'))
       return store.dispatch({type: ALL_PLAYERS_JOINED})
 
     case socketMessages.joining:{

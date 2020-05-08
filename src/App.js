@@ -12,26 +12,18 @@ let localStream;
 
 function App({streams, game, createStream}) {
   const [socket, setSocket] = useState();
-  const [emptyVideos, setEmptyVideos] = useState([]);
   const [nameToGuess, setNameToGuess] = useState();
-  // const [streams, setStreams] = useState([]);
-  const [room, setRoom] = useState('');
-  const [gameOn, setGameOn] = useState(false);
-  const numPlayers = useRef(2);
   
   useEffect(() => {
     // const socket = io.connect("http://192.168.0.100:3001")
-    // const socket = io.connect(window.location.hostname)
+    const socket = io.connect(window.location.hostname)
     // const socket = io.connect('/')
-    let socket = io.connect("http://localhost:3001")
+    // let socket = io.connect("http://localhost:3001")
     socket.on('message', msg => {
-      handleSocketMsg(msg, localStream, socket, addStreams, room, addStreamNames, setGameOn, numPlayers)
+      handleSocketMsg(msg, localStream, socket, addStreams)
     });
     setSocket(socket);
   }, []); 
-
-  function addStreamNames(names){
-  }
 
   function addStreams(stream, socketId){
     createStream({stream, socketId})
@@ -41,11 +33,15 @@ function App({streams, game, createStream}) {
     socket.emit('setName', {nameToGuess, roomName: game.name})
   }
 
+  function times(n){
+    return new Array(n).fill(0);
+  }
+
   return (
       <div className="App">
         <main>
           <h1>Headbandz</h1>
-          <Landing addStreams={addStreams} socket={socket} setRoom={setRoom} setGameOn={setGameOn} numPlayers={numPlayers}/>
+          <Landing addStreams={addStreams} socket={socket}/>
           {game.allPlayersJoined && <><input type="text" onChange={e => setNameToGuess(e.target.value)}/><button onClick={setName}>Set name</button></>}
           {game.afoot && 
             <div>
@@ -59,9 +55,9 @@ function App({streams, game, createStream}) {
                   <h3>{streams[streamName].name}</h3>
                 </div>
               )}
-              {game.totalPlayers && new Array((Object.keys(streams).length)).map((a,i) => 
+              {game.totalPlayers && times(game.totalPlayers - Object.keys(streams).length).map((a,i) => 
                 <div className='video-container' key={i}>
-                  {i}
+                  Waiting for player
                 </div> 
               )}
               </div>
@@ -78,4 +74,3 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {createStream})(App);
-// export default App;

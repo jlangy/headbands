@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./landing.css";
 import { connect } from 'react-redux';
 
-async function turnOnLocalMedia(addStreams, name, setRoom) {
+async function turnOnLocalMedia(addStreams) {
   //Setup media
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
@@ -13,24 +13,12 @@ async function turnOnLocalMedia(addStreams, name, setRoom) {
   addStreams(stream, "local");
 }
 
-function Landing({ game, addStreams, socket, setRoom, numPlayers }) {
+function Landing({ game, addStreams, socket }) {
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
-  const [begin, setBegin] = useState(false);
   const [joinRoomName, setJoinRoomName] = useState("");
   const [makeRoomName, setMakeRoomName] = useState("");
-  const [nameToGuess, setNameToGuess] = useState("");
-
-  useEffect(() => {
-    window.addEventListener("gameReady", () => setBegin(true));
-  }, []);
-
-  // useEffect(() => {
-  //   console.log('gameaffot ra', game)
-  //   if(game.afoot){
-  //     turnOnLocalMedia(addStreams, "local");
-  //   }
-  // }, [game])
+  const [numPlayers, setNumPlayers] = useState(2);
 
   function toggleMakeGame() {
     setMakingGame((prev) => !prev);
@@ -41,22 +29,14 @@ function Landing({ game, addStreams, socket, setRoom, numPlayers }) {
     if (!numPlayers) {
       return console.log("Need to add players");
     }
-    socket.emit("make room", { name: makeRoomName, totalPlayers: Number(numPlayers.current) });
+    socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
     turnOnLocalMedia(addStreams)
   }
 
   async function joinRoom() {
     //Tell server, wait
     await turnOnLocalMedia(addStreams);
-    // setRoom(joinRoomName);
     socket.emit("join room", { roomName: joinRoomName, fromId: socket.id });
-  }
-
-  function setGameName(event) {
-    socket.emit("setName", {
-      nameToGuess,
-      roomName: makeRoomName || joinRoomName,
-    });
   }
 
   function toggleJoinGame() {
@@ -77,7 +57,7 @@ function Landing({ game, addStreams, socket, setRoom, numPlayers }) {
         >
           <div className="player-number">
             <label htmlFor="players-number">Total Players: </label>
-            <select id="players-number" onChange={e => numPlayers.current = (Number(e.target.value))}>
+            <select id="players-number" onChange={e => setNumPlayers(Number(e.target.value))}>
               <option>2</option>
               <option>3</option>
               <option>4</option>
@@ -113,7 +93,6 @@ function Landing({ game, addStreams, socket, setRoom, numPlayers }) {
               type="text"
               onChange={(e) => {
                 setJoinRoomName(e.target.value);
-                window.roomName = e.target.value;
               }}
             />
             <button onClick={joinRoom}>Go!</button>
