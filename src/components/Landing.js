@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./landing.css";
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom'
 
 async function turnOnLocalMedia(addStreams) {
   //Setup media
@@ -13,22 +14,25 @@ async function turnOnLocalMedia(addStreams) {
   addStreams(stream, "local");
 }
 
-function Landing({ game, addStreams, socket }) {
+function Landing({ addStreams, socket }) {
+  //UI state for toggling making/joining game dropdowns
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
+
+  //Input state 
   const [joinRoomName, setJoinRoomName] = useState("");
   const [makeRoomName, setMakeRoomName] = useState("");
   const [numPlayers, setNumPlayers] = useState(2);
 
   function toggleMakeGame() {
-    setMakingGame((prev) => !prev);
+    setMakingGame(prev => !prev);
+  }
+  
+  function toggleJoinGame() {
+    setJoiningGame(prev => !prev);
   }
 
   async function makeRoom() {
-    //Verify number of players set
-    // if (!numPlayers) {
-    //   return console.log("Need to add players");
-    // }
     socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
     turnOnLocalMedia(addStreams)
   }
@@ -39,13 +43,8 @@ function Landing({ game, addStreams, socket }) {
     socket.emit("join room", { roomName: joinRoomName, fromId: socket.id });
   }
 
-  function toggleJoinGame() {
-    setJoiningGame((prev) => !prev);
-  }
-
   return (
     <>
-    {!game.afoot &&
     <div className="container">
       <div>
         <button className="landing-button" onClick={toggleMakeGame}>
@@ -76,7 +75,7 @@ function Landing({ game, addStreams, socket }) {
               }}
               placeholder="Enter game name"
             />
-            <button onClick={makeRoom}>Go!</button>
+            <Link to='/game'><button class='start-game-button' onClick={makeRoom}>Go!</button></Link>
           </div>
         </div>
       </div>
@@ -95,18 +94,17 @@ function Landing({ game, addStreams, socket }) {
                 setJoinRoomName(e.target.value);
               }}
             />
-            <button onClick={joinRoom}>Go!</button>
+            <Link to='/game'><button class='start-game-button' onClick={joinRoom}>Go!</button></Link>
           </div>
         </div>
       </div>
-    </div>}
+    </div>
   </>
   );
 }
 
 const mapStateToProps = state => ({
-  streams: state.streams,
-  game: state.game
+  streams: state.streams
 });
 
 export default connect(mapStateToProps, {})(Landing);

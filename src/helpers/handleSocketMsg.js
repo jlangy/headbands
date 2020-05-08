@@ -15,8 +15,10 @@ const socketMessages = {
   joining: 'joining'
 }
 
+//Save peer connections in form {socketID: RTCPeerConnection instance}
 const connections = {};
 
+//Add local stream to peer connection
 function feedLocalStream(stream, connectionId){
   stream.getTracks().forEach(track => {
     connections[connectionId].addTrack(track, stream);
@@ -24,8 +26,8 @@ function feedLocalStream(stream, connectionId){
 }
 
 function createStreamConnection(socketId){
-  console.log('csc ran')
   connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
+  connections[socketId] = new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]});
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -52,9 +54,9 @@ export default async function(msg, localStream, socket, addStreams){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
         }
         else {
+          //TODO: might need some cleanup here if candidate null
           console.log('ice candidates finished')
         }
-        //TODO: might need some cleanup here if candidate null
       }
       await connections[msg.fromId].setRemoteDescription(msg.description);
       const answer = await connections[msg.fromId].createAnswer();
@@ -70,9 +72,7 @@ export default async function(msg, localStream, socket, addStreams){
       return console.log('handle room name here')
 
     case socketMessages.gotNames:
-      console.log('got names', msg.names)
       return store.dispatch({type: GOT_NAMES, payload: {names: msg.names}})
-      // return addStreamNames(msg.names);
 
     case socketMessages.nameTaken:
       return console.log('name taken')

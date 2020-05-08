@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './video.css'
 
-function Video({ stream, id, game }) {
+function Video({ stream, id }) {
   useEffect(() => {
     document.getElementById(id).srcObject = stream;
   }, [stream])
