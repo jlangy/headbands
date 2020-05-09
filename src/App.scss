@@ -1,3 +1,7 @@
+body {
+  background-color: rgb(43, 43, 43);
+}
+
 .videos-container {
   display: flex;
   flex-wrap: wrap;
@@ -36,4 +40,23 @@ h1 {
 video {
   width: 320px;
   height: 280px;
+}
+
+video#local, video#remote{
+  width: 320
+}
+
+#players-number {
+  background-color: #ae690f;
+  font-family: StaatLiches;
+  font-size: 32px;
+  width: 58px;
+  padding-top: -3px;
+  line-height: 1;
+  border: 0;
+  border-radius: 5px;
+  height: 34px;
+  background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #ae690f;
+  -webkit-appearance: none;
+  background-position-x: 35px;
 }
