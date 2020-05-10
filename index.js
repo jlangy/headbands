@@ -49,7 +49,7 @@ io.on('connection', function(socket){
       path: "/_turn/headbandz",
       method: "PUT",
       headers: {
-          "Authorization": "Basic " + Buffer.from("jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003").toString("base64"),
+          "Authorization": "Basic " + new Buffer("jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003").toString("base64"),
           "Content-Type": "application/json",
           "Content-Length": bodyString.length
       }
