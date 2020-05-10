@@ -12,7 +12,8 @@ const socketMessages = {
   gotNames: 'give names',
   nameTaken: 'name taken',
   roomNameOk: 'room name ok',
-  joining: 'joining'
+  joining: 'joining',
+  xirres: 'xir response'
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -84,6 +85,9 @@ export default async function(msg, socket){
     case socketMessages.ready:
       console.log('all ready boss')
       return store.dispatch({type: ALL_PLAYERS_JOINED})
+
+    case socketMessages.xirres:
+      console.log(msg.res)
 
     case socketMessages.joining:{
       let {totalPlayers, name} = msg;

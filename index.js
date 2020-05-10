@@ -1,6 +1,7 @@
 const express = require('express');
 const socket = require('socket.io');
 const path = require('path')
+let https = require("https");
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -36,6 +37,35 @@ io.on('connection', function(socket){
     rooms[name] = {totalPlayers, name, playersJoined: 1, namesToGuess: []};
     socket.join(name);
   })
+
+  socket.on('xir test', () => {
+    let o = {
+      format: "urls"
+    };
+    
+    let bodyString = JSON.stringify(o);
+    let options = {
+      host: "global.xirsys.net",
+      path: "/_turn/headbandz",
+      method: "PUT",
+      headers: {
+          "Authorization": "Basic " + Buffer.from("jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003").toString("base64"),
+          "Content-Type": "application/json",
+          "Content-Length": bodyString.length
+      }
+    };
+    let httpreq = https.request(options, function(httpres) {
+      let str = "";
+      httpres.on("data", function(data){ str += data; });
+      httpres.on("error", function(e){ console.log("error: ",e); });
+      httpres.on("end", function(){ 
+          socket.emit("message", {type:'xir response', res: str});
+      });
+    });
+    httpreq.on("error", function(e){ console.log("request error: ",e); });
+    httpreq.end();
+    console.log('ran!')
+  });
 
   socket.on('join room', ({roomName, fromId}) => {
     let roomToJoin = rooms[roomName];
