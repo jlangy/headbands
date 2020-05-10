@@ -49,7 +49,7 @@ io.on('connection', function(socket){
       path: "/_turn/headbandz",
       method: "PUT",
       headers: {
-          "Authorization": "Basic " + new Buffer("jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003").toString("base64"),
+          "Authorization": "Basic " + Buffer.from("jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003").toString("base64"),
           "Content-Type": "application/json",
           "Content-Length": bodyString.length
       }
@@ -65,6 +65,16 @@ io.on('connection', function(socket){
     httpreq.on("error", function(e){ console.log("request error: ",e); });
     httpreq.end();
     console.log('ran!')
+
+    fetch('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz', {
+      method: 'PUT',
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: 'foo=bar&lorem=ipsum'
+    })
+    .then(json => console.log(json))
+  
   });
 
   socket.on('join room', ({roomName, fromId}) => {
