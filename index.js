@@ -1,6 +1,7 @@
 const express = require('express');
 const socket = require('socket.io');
-const path = require('path')
+const path = require('path');
+const axios = require('axios');
 let https = require("https");
 const port = process.env.PORT || 5000;
 
@@ -66,13 +67,7 @@ io.on('connection', function(socket){
     httpreq.end();
     console.log('ran!')
 
-    fetch('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz', {
-      method: 'PUT',
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: 'foo=bar&lorem=ipsum'
-    })
+    axios.put('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz')
     .then(json => console.log(json))
   
   });
