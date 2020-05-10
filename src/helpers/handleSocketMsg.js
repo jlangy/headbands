@@ -26,7 +26,7 @@ function feedLocalStream(stream, connectionId){
 }
 
 function createStreamConnection(socketId){
-  connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
+  // connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
   connections[socketId] = new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]});
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
