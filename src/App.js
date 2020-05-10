@@ -33,6 +33,7 @@ function App() {
       <div className="App">
         <main>
           <h1>Headbandz</h1>
+          <button onClick={() => socket.emit('xir test')}>test XIR</button>
           <Switch>
             
             <Route path="/game">
