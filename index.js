@@ -56,7 +56,7 @@ io.on('connection', function(socket){
     };
     let httpreq = https.request(options, function(httpres) {
       let str = "";
-      httpres.on("data", function(data){ str += data; });
+      httpres.on("data", function(data){ str += data; console.log(data) });
       httpres.on("error", function(e){ console.log("error: ",e); });
       httpres.on("end", function(){ 
           socket.emit("message", {type:'xir response', res: str});
