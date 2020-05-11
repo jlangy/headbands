@@ -26,9 +26,10 @@ function feedLocalStream(stream, connectionId){
   });   
 }
 
-function createStreamConnection(socketId){
+function createStreamConnection(socketId, iceServers){
   // connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
-  connections[socketId] = new RTCPeerConnection({'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]});
+  console.log(iceServers)
+  connections[socketId] = new RTCPeerConnection(iceServers.iceServers);
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -42,14 +43,14 @@ export default async function(msg, socket){
 
     //Received join request, create connection and attach stream, create offer, set and send description
     case socketMessages.joinRequest: 
-      createStreamConnection(msg.fromId)
+      createStreamConnection(msg.fromId, msg.iceServers)
       const offer = await connections[msg.fromId].createOffer()
       await connections[msg.fromId].setLocalDescription(offer)
       return socket.emit('description', {description: connections[msg.fromId].localDescription, toId: msg.fromId, fromId: socket.id});
     
     //recieved offer, create connection, add candidate handler, set description, set and send answer
     case socketMessages.offer:
-      createStreamConnection(msg.fromId)
+      createStreamConnection(msg.fromId, msg.iceServers)
       connections[msg.fromId].onicecandidate = function(event){
         if(event.candidate){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
@@ -87,7 +88,7 @@ export default async function(msg, socket){
       return store.dispatch({type: ALL_PLAYERS_JOINED})
 
     case socketMessages.xirres:
-      console.log(msg.res)
+      console.log(msg.iceServers)
 
     case socketMessages.joining:{
       let {totalPlayers, name} = msg;

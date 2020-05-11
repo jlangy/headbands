@@ -17,7 +17,7 @@ function App() {
   
   useEffect(() => {
     //connection for local
-    // let socket = io.connect("http://localhost:5000")
+    // let socket = io.connect("http://localhost:3000")
     
     //connection for production
     const socket = io.connect(window.location.hostname)

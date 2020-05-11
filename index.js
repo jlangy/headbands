@@ -1,8 +1,8 @@
 const express = require('express');
+require('dotenv').config();
 const socket = require('socket.io');
 const path = require('path');
 const axios = require('axios');
-let https = require("https");
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -40,45 +40,17 @@ io.on('connection', function(socket){
   })
 
   socket.on('xir test', () => {
-    let o = {
-      format: "urls"
-    };
-    
-    let bodyString = JSON.stringify(o);
-    let options = {
-      host: "global.xirsys.net",
-      path: "/_turn/headbandz",
-      method: "PUT",
-      headers: {
-          "Authorization": "Basic " + Buffer.from("jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003").toString("base64"),
-          "Content-Type": "application/json",
-          "Content-Length": bodyString.length
-      }
-    };
-    let httpreq = https.request(options, function(httpres) {
-      let str = "";
-      httpres.on("data", function(data){ str += data; console.log(data) });
-      httpres.on("error", function(e){ console.log("error: ",e); });
-      httpres.on("end", function(){ 
-          socket.emit("message", {type:'xir response', res: str});
-      });
-    });
-    httpreq.on("error", function(e){ console.log("request error: ",e); });
-    httpreq.end();
-    console.log('ran!')
-
-    axios.put('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz')
-    .then(json => console.log(json))
-  
+    console.log(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+    axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+    .then(({data}) => socket.emit('message', {type: 'xir response', iceServers: data.v}))  
   });
 
-  socket.on('join room', ({roomName, fromId}) => {
+  socket.on('join room', async ({roomName, fromId}) => {
     let roomToJoin = rooms[roomName];
-    console.log(roomToJoin)
     if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
-      setTimeout(() => {
-        socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId});
-      }, 100);
+      // const xirsysResponse = await axios.put('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz')
+      const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId, iceServers: xirsysResponse.data.v});
       socket.emit('message', {type: 'joining', totalPlayers: roomToJoin.totalPlayers, name: roomName})
       socket.join(roomName)
     } else {
@@ -86,8 +58,9 @@ io.on('connection', function(socket){
     }
   });
 
-  socket.on('description', ({description, toId, fromId}) => {
-    io.sockets.sockets[toId].emit('message', {type: 'offer', description, toId, fromId})
+  socket.on('description', async ({description, toId, fromId}) => {
+    const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+    io.sockets.sockets[toId].emit('message', {type: 'offer', description, toId, fromId, iceServers: xirsysResponse.data.v})
   });
 
   socket.on('answer', ({answer, fromId, toId}) => {
