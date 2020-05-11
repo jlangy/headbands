@@ -29,7 +29,7 @@ function feedLocalStream(stream, connectionId){
 function createStreamConnection(socketId, iceServers){
   // connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
   console.log(iceServers)
-  connections[socketId] = new RTCPeerConnection({iceServers});
+  connections[socketId] = new RTCPeerConnection(iceServers);
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -39,8 +39,8 @@ export default async function(msg, socket){
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
     case socketMessages.iceCandidate:
-      // return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
-      return connections[msg.fromId].addIceCandidate(msg.candidate)
+      return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
+      // return connections[msg.fromId].addIceCandidate(msg.candidate)
 
     //Received join request, create connection and attach stream, create offer, set and send description
     case socketMessages.joinRequest: 
