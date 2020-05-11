@@ -40,17 +40,21 @@ io.on('connection', function(socket){
   })
 
   socket.on('xir test', () => {
-    console.log(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`)
-    axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`, {"format": "urls"})
-    .then(({data}) => socket.emit('message', {type: 'xir response', iceServers: data.v}))  
+    // console.log(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`)
+    // axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`, {"format": "urls"})
+    // .then(({data}) => socket.emit('message', {type: 'xir response', iceServers: data.v}))  
+    const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+    client.tokens.create().then(token => console.log(token));
   });
 
   socket.on('join room', async ({roomName, fromId}) => {
     let roomToJoin = rooms[roomName];
     if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
       // const xirsysResponse = await axios.put('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz')
-      const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`, {"format": "urls"})
-      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId, iceServers: xirsysResponse.data.v});
+      // const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`, {"format": "urls"})
+      const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+      const token = await client.tokens.create();
+      socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId, iceServers: token.iceServers});
       socket.emit('message', {type: 'joining', totalPlayers: roomToJoin.totalPlayers, name: roomName})
       socket.join(roomName)
     } else {
@@ -59,8 +63,10 @@ io.on('connection', function(socket){
   });
 
   socket.on('description', async ({description, toId, fromId}) => {
-    const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`, {"format": "urls"})
-    io.sockets.sockets[toId].emit('message', {type: 'offer', description, toId, fromId, iceServers: xirsysResponse.data.v})
+    // const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`, {"format": "urls"})
+    const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+    const token = await client.tokens.create();
+    io.sockets.sockets[toId].emit('message', {type: 'offer', description, toId, fromId, iceServers: token.iceServers})
   });
 
   socket.on('answer', ({answer, fromId, toId}) => {
