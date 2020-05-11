@@ -40,8 +40,8 @@ io.on('connection', function(socket){
   })
 
   socket.on('xir test', () => {
-    console.log(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
-    axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+    console.log(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`)
+    axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`)
     .then(({data}) => socket.emit('message', {type: 'xir response', iceServers: data.v}))  
   });
 
@@ -49,7 +49,7 @@ io.on('connection', function(socket){
     let roomToJoin = rooms[roomName];
     if( roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers ){
       // const xirsysResponse = await axios.put('https://jlangy:5cca2fee-92e1-11ea-80e2-0242ac150003@global.xirsys.net/_turn/headbandz')
-      const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+      const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`)
       socket.to(roomName).emit('message', {type: 'joinRequest', roomName, fromId, iceServers: xirsysResponse.data.v});
       socket.emit('message', {type: 'joining', totalPlayers: roomToJoin.totalPlayers, name: roomName})
       socket.join(roomName)
@@ -59,7 +59,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('description', async ({description, toId, fromId}) => {
-    const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.path}`)
+    const xirsysResponse = await axios.put(`https://${process.env.XIR_USER}:${process.env.secret}@${process.env.endpoint}/_turn/${process.env.xir_path}`)
     io.sockets.sockets[toId].emit('message', {type: 'offer', description, toId, fromId, iceServers: xirsysResponse.data.v})
   });
 
