@@ -29,7 +29,7 @@ function feedLocalStream(stream, connectionId){
 function createStreamConnection(socketId, iceServers){
   // connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
   const limitedIce = 
-  console.log({iceServers: [{...iceServers.iceServers, urls: [iceServers.iceServers.urls.slice(0,3)]}]})
+  console.log({iceServers: [{...iceServers.iceServers, urls: iceServers.iceServers.urls.slice(0,3)}]})
   connections[socketId] = new RTCPeerConnection({iceServers: [{...iceServers.iceServers, urls: [iceServers.iceServers.urls.slice(0,3)]}]});
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
