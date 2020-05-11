@@ -39,7 +39,8 @@ export default async function(msg, socket){
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
     case socketMessages.iceCandidate:
-      return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
+      // return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
+      return connections[msg.fromId].addIceCandidate(msg.candidate)
 
     //Received join request, create connection and attach stream, create offer, set and send description
     case socketMessages.joinRequest: 
