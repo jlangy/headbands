@@ -1,0 +1,32 @@
+.pass-name-button {
+  font-size: 32px;
+  height: 50px;
+  font-family: StaatLiches;
+  padding: 0px 10px;
+  background-color: orange;
+  border: 3px solid red;
+}
+
+.pass-name-input {
+  border: none;
+  height: 50px;
+  background-color: #ae690f;
+  flex-grow: 1;
+  font-family: StaatLiches;
+  font-size: 1.5em;
+  padding: 0 10px
+}
+
+.set-name {
+  display: flex;
+  align-items: center;
+  width: 500px;
+  margin: auto;
+  margin-bottom: 20px;
+}
+
+.game-status {
+  text-align: center;
+  font-family: StaatLiches;
+  font-size: 1.2em;
+}

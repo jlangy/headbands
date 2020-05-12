@@ -6,7 +6,6 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  background-color: orange;
 }
 
 .videos-container>h2 {
@@ -24,7 +23,6 @@ body {
 
 main {
   width: 80%;
-  height: 70vh;
   min-height: 600px;
   background-color: rgb(230, 165, 80);
   margin: auto;

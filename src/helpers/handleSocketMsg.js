@@ -1,5 +1,5 @@
 import store from '../store';
-import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES } from '../actions/types';
+import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE } from '../actions/types';
 
 
 const socketMessages = {
@@ -13,7 +13,8 @@ const socketMessages = {
   nameTaken: 'name taken',
   roomNameOk: 'room name ok',
   joining: 'joining',
-  xirres: 'xir response'
+  xirres: 'xir response',
+  updateSetNames: 'update set names'
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -27,9 +28,8 @@ function feedLocalStream(stream, connectionId){
 }
 
 function createStreamConnection(socketId, iceServers){
-  // connections[socketId] = new RTCPeerConnection(null) //({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
-  console.log(iceServers)
-  connections[socketId] = new RTCPeerConnection({iceServers});
+  // connections[socketId] = new RTCPeerConnection({iceServers});
+  connections[socketId] = new RTCPeerConnection(null);
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -39,7 +39,7 @@ export default async function(msg, socket){
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
     case socketMessages.iceCandidate:
-      return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
+        return connections[msg.fromId].addIceCandidate(new RTCIceCandidate(msg.candidate))
       // return connections[msg.fromId].addIceCandidate(msg.candidate)
 
     //Received join request, create connection and attach stream, create offer, set and send description
@@ -56,7 +56,12 @@ export default async function(msg, socket){
           console.log('ice candidates finished')
         }
       }
-      return socket.emit('description', {description: connections[msg.fromId].localDescription, toId: msg.fromId, fromId: socket.id});
+      return socket.emit('description', {
+        description: connections[msg.fromId].localDescription, 
+        toId: msg.fromId, 
+        fromId: socket.id,
+        room: store.getState().game.name  
+      });
     
     //recieved offer, create connection, add candidate handler, set description, set and send answer
     case socketMessages.offer:
@@ -78,20 +83,23 @@ export default async function(msg, socket){
     //received answer, set description
     case socketMessages.answer:
       socket.emit('ready', store.getState().game.name)
+      //Set players joined here
+      store.dispatch({type: ADD_PLAYER})
       return await connections[msg.fromId].setRemoteDescription(msg.answer);
       
     case socketMessages.badRoomName:
       return console.log('handle room name here')
 
     case socketMessages.gotNames:
-      return store.dispatch({type: GOT_NAMES, payload: {names: msg.names}})
+      store.dispatch({type: GOT_NAMES, payload: {names: msg.names}})
+      return store.dispatch({type: SETUP_COMPLETE})
 
     case socketMessages.nameTaken:
       return console.log('name taken')
 
     case socketMessages.roomNameOk:
       let {name, totalPlayers} = msg;
-      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true}})
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true, playersJoined: 1}})
 
     case socketMessages.ready:
       console.log('all ready boss')
@@ -101,9 +109,12 @@ export default async function(msg, socket){
       console.log(msg.iceServers)
 
     case socketMessages.joining:{
-      let {totalPlayers, name} = msg;
-      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true}})
+      let {totalPlayers, name, playersJoined} = msg;
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true, playersJoined}})
     }
+
+    case socketMessages.updateSetNames:
+      return store.dispatch({type: NAME_ADDED})
     
     default:
       console.log('no handling for server socket emit: ')

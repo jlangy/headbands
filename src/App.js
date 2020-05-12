@@ -17,10 +17,10 @@ function App() {
   
   useEffect(() => {
     //connection for local
-    // let socket = io.connect("http://localhost:3000")
+    let socket = io.connect("http://localhost:3000")
     
     //connection for production
-    const socket = io.connect(window.location.hostname)
+    // const socket = io.connect(window.location.hostname)
 
     socket.on('message', msg => {
       handleSocketMsg(msg, socket)
@@ -33,7 +33,7 @@ function App() {
       <div className="App">
         <main>
           <h1>Headbandz</h1>
-          <button onClick={() => socket.emit('xir test')}>test XIR</button>
+          <button onClick={() => socket.emit('xir test')}>log rooms</button>
           <Switch>
             
             <Route path="/game">
