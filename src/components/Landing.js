@@ -8,7 +8,7 @@ async function turnOnLocalMedia(createStream, streams) {
   //Setup media
   if(!streams['local']){
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
+      audio: true,
       video: true
     });
     
