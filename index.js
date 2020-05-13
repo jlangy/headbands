@@ -1,5 +1,5 @@
 const express = require('express');
-require('dotenv').config();
+// require('dotenv').config();
 const socket = require('socket.io');
 const path = require('path');
 const axios = require('axios');
@@ -14,6 +14,14 @@ let names = [];
 let rooms = {};
 
 app.use(express.static(path.join(__dirname, 'build')));
+
+function endGame(roomName){
+  delete rooms[roomName];
+  io.of('/').in(roomName).clients((error, socketIds) => {
+    if (error) throw error;
+    socketIds.forEach(socketId => io.sockets.sockets[socketId] && io.sockets.sockets[socketId].leave(roomName));
+  });
+}
 
 function shiftNames(names) {
 	const shiftedNames = [];
@@ -52,13 +60,11 @@ io.on('connection', function (socket) {
     const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
     if(rooms[roomName] && rooms[roomName].host == socket.id){
       io.in(roomName).emit('message', {type: 'host disconnection'});
-      delete rooms[roomName];
-      io.of('/').in(roomName).clients((error, socketIds) => {
-        if (error) throw error;
-        socketIds.forEach(socketId => io.sockets.sockets[socketId] && io.sockets.sockets[socketId].leave(roomName));
-      });
+      endGame(roomName);
     }
-	});
+  });
+  
+  // socket.on('end game')
 
 	socket.on('xir test', () => {
     const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
@@ -69,8 +75,8 @@ io.on('connection', function (socket) {
 	socket.on('join room', async ({ roomName, fromId }) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-			const token = { iceServers: null }; //await client.tokens.create();
+			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			const token = await client.tokens.create();
 			socket
 				.to(roomName)
 				.emit('message', {
@@ -92,8 +98,8 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('description', async ({ description, toId, fromId }) => {
-		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-		const token = { iceServers: null }; //await client.tokens.create();
+		const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+		const token = await client.tokens.create();
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,
