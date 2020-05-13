@@ -20,13 +20,13 @@ function Game({ streams, game, socket }) {
 	function localStream(){
 		const localStream = streams['local'] && streams['local'].stream;
 		if(localStream){
-			const audioTrack = localStream.getAudioTracks();
+			const removeAudioLocalStream = localStream.clone();
+			const audioTrack = removeAudioLocalStream.getAudioTracks();
 			if(audioTrack.length > 0){
-				const noAudioLocalStream = localStream.clone();
-				noAudioLocalStream.removeTrack(audioTrack[0]);
+				removeAudioLocalStream.removeTrack(audioTrack[0]);
 			}
 		}
-		return noAudioLocalStream;
+		return removeAudioLocalStream;
 	}
 
 	return (
