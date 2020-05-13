@@ -1,5 +1,6 @@
 import store from '../store';
 import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE } from '../actions/types';
+import gamePhases from '../reducers/gamePhases';
 
 
 const socketMessages = {
@@ -99,7 +100,7 @@ export default async function(msg, socket){
 
     case socketMessages.roomNameOk:
       let {name, totalPlayers} = msg;
-      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true, playersJoined: 1}})
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, gamePhase: gamePhases.joining, playersJoined: 1}})
 
     case socketMessages.ready:
       console.log('all ready boss')
@@ -110,7 +111,7 @@ export default async function(msg, socket){
 
     case socketMessages.joining:{
       let {totalPlayers, name, playersJoined} = msg;
-      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, afoot: true, playersJoined}})
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, gamePhase: gamePhases.joining, playersJoined}})
     }
 
     case socketMessages.updateSetNames:

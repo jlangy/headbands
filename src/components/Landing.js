@@ -29,7 +29,7 @@ function Landing({ socket, createStream }) {
   }
   
   function toggleJoinGame() {
-    setJoiningGame(prev => !prev);
+    setJoiningGame(prev => !prev);  
   }
 
   async function makeRoom() {

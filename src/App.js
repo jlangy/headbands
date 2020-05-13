@@ -5,6 +5,7 @@ import {
   Route
 } from "react-router-dom";
 import io from 'socket.io-client';
+import { connect } from 'react-redux';
 
 import handleSocketMsg from "./helpers/handleSocketMsg";
 import './App.scss';
@@ -12,7 +13,7 @@ import './App.scss';
 import Landing from './components/Landing';
 import Game from './components/Game'
 
-function App() {
+function App({game}) {
   const [socket, setSocket] = useState();
   
   useEffect(() => {
@@ -37,7 +38,7 @@ function App() {
           <Switch>
             
             <Route path="/game">
-              <Game socket={socket}/>
+              {game.gamePhase && <Game socket={socket}/>}
             </Route>
 
             <Route path="/">
@@ -52,4 +53,8 @@ function App() {
   );
 }
 
-export default App;
+const mapStateToProps = state => ({
+  game: state.game
+})
+
+export default connect(mapStateToProps, null)(App);
