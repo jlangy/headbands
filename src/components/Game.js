@@ -25,8 +25,8 @@ function Game({ streams, game, socket }) {
 			if(audioTrack.length > 0){
 				removeAudioLocalStream.removeTrack(audioTrack[0]);
 			}
+			return removeAudioLocalStream;
 		}
-		return removeAudioLocalStream;
 	}
 
 	return (
