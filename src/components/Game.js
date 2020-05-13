@@ -22,10 +22,11 @@ function Game({ streams, game, socket }) {
 		if(localStream){
 			const audioTrack = localStream.getAudioTracks();
 			if(audioTrack.length > 0){
-				localStream.removeTrack(audioTrack[0]);
+				const noAudioLocalStream = localStream.clone();
+				noAudioLocalStream.removeTrack(audioTrack[0]);
 			}
 		}
-		return localStream;
+		return noAudioLocalStream;
 	}
 
 	return (
