@@ -7,7 +7,7 @@ import { createStream } from '../actions/streamActions'
 async function turnOnLocalMedia(createStream) {
 	//Setup media
 	const stream = await navigator.mediaDevices.getUserMedia({
-		audio: false,
+		audio: true,
 		video: true
   });
   
