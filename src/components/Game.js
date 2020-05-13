@@ -17,6 +17,17 @@ function Game({ streams, game, socket }) {
 		return Object.keys(streams).filter((streamName) => streamName !== 'local');
 	}
 
+	function localStream(){
+		const localStream = streams['local'] && streams['local'].stream;
+		if(localStream){
+			const audioTrack = localStream.getAudioTracks();
+			if(audioTrack.length > 0){
+				localStream.removeTrack(audioTrack[0]);
+			}
+		}
+		return localStream;
+	}
+
 	return (
 		<>
 			{(game.gamePhase === gamePhases.joining ||
@@ -27,7 +38,8 @@ function Game({ streams, game, socket }) {
 				<h2>In room: {game.name}</h2>
 				<Video
 					id="local"
-					stream={streams['local'] && streams['local'].stream}
+					// stream={streams['local'] && streams['local'].stream}
+					stream={localStream()}
 				/>
 				{incomingStreams().map((streamName, i) => (
 					<div>
