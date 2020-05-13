@@ -10,13 +10,14 @@ function Game({ streams, game, socket }) {
 		//Initializes to 1 to prevent jumpy render after loading local stream
 		const activeStreams = Object.keys(streams).length || 1;
 		const numEmpty = game.totalPlayers - activeStreams;
-		return new Array(numEmpty).fill(0);
+		return numEmpty >= 0 ? new Array(numEmpty).fill(0) : [];
 	}
 
 	function incomingStreams() {
 		return Object.keys(streams).filter((streamName) => streamName !== 'local');
 	}
 
+	//Turn of audio of local stream
 	function localStream(){
 		const localStream = streams['local'] && streams['local'].stream;
 		if(localStream){
@@ -31,15 +32,11 @@ function Game({ streams, game, socket }) {
 
 	return (
 		<>
-			{(game.gamePhase === gamePhases.joining ||
-				game.gamePhase === gamePhases.settingNames) && (
-				<GameSetup socket={socket} />
-			)}
+			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
 			<div className="videos-container">
 				<h2>In room: {game.name}</h2>
 				<Video
 					id="local"
-					// stream={streams['local'] && streams['local'].stream}
 					stream={localStream()}
 				/>
 				{incomingStreams().map((streamName, i) => (

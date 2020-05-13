@@ -1,4 +1,4 @@
-import { NEW_GAME, ALL_PLAYERS_JOINED, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE } from '../actions/types';
+import { NEW_GAME, ALL_PLAYERS_JOINED, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME } from '../actions/types';
 import gamePhases from './gamePhases';
 
 const initialState = {};
@@ -16,6 +16,8 @@ export default function(state = initialState, action){
       return {...state, totalNamesSet: state.totalNamesSet + 1}
     case SETUP_COMPLETE:
       return {...state, gamePhase: gamePhases.playing}
+    case END_GAME:
+      return {};
     default:
       return state;
   }

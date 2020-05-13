@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
+import gamePhases from '../reducers/gamePhases';
 
 function GameSetup({game, socket}) {
   const [nameChosen, setNameChosen] = useState(false);
@@ -12,7 +13,7 @@ function GameSetup({game, socket}) {
 
   return (
     <>
-      {game.playersJoined === game.totalPlayers && (
+      {game.gamePhase === gamePhases.settingNames && (
         <div className="set-name">
           <input className="pass-name-input" type="text" onChange={(e) => setNameToGuess(e.target.value)} />
           <button className="pass-name-button" onClick={setName} disabled={nameChosen}>{nameChosen ? 'Waiting' : 'Set Name'}</button>

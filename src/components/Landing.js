@@ -4,17 +4,19 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createStream } from '../actions/streamActions'
 
-async function turnOnLocalMedia(createStream) {
-	//Setup media
-	const stream = await navigator.mediaDevices.getUserMedia({
-		audio: true,
-		video: true
-  });
-  
-  createStream({stream, socketId: 'local'})
+async function turnOnLocalMedia(createStream, streams) {
+  //Setup media
+  if(!streams['local']){
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: true
+    });
+    
+    createStream({stream, socketId: 'local'});
+  }
 }
 
-function Landing({ socket, createStream }) {
+function Landing({ socket, createStream, streams }) {
   //UI state for toggling making/joining game dropdowns
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
@@ -34,12 +36,12 @@ function Landing({ socket, createStream }) {
 
   async function makeRoom() {
     socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
-    turnOnLocalMedia(createStream)
+    turnOnLocalMedia(createStream, streams)
   }
 
 	async function joinRoom() {
 		//Tell server, wait
-		await turnOnLocalMedia(createStream);
+		await turnOnLocalMedia(createStream, streams);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 	}
 

@@ -5,3 +5,5 @@ export const GOT_NAMES = 'GOT_NAMES';
 export const ADD_PLAYER = "ADD_PLAYER";
 export const NAME_ADDED = "NAME_ADDED";
 export const SETUP_COMPLETE = "SETUP_COMPLETE";
+export const END_GAME = "END_GAME";
+export const CLEAR_STREAMS = "CLEAR_STREAMS";

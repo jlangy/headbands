@@ -1,5 +1,5 @@
 import store from '../store';
-import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE } from '../actions/types';
+import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS } from '../actions/types';
 import gamePhases from '../reducers/gamePhases';
 
 
@@ -15,7 +15,8 @@ const socketMessages = {
   roomNameOk: 'room name ok',
   joining: 'joining',
   xirres: 'xir response',
-  updateSetNames: 'update set names'
+  updateSetNames: 'update set names',
+  disconnection: 'host disconnection'
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -107,7 +108,12 @@ export default async function(msg, socket){
       return store.dispatch({type: ALL_PLAYERS_JOINED})
 
     case socketMessages.xirres:
-      console.log(msg.iceServers)
+      console.log(msg.iceServers);
+
+    case socketMessages.disconnection:
+      console.log('theres has been a disconnection')
+      store.dispatch({type: END_GAME})
+      return store.dispatch({type: CLEAR_STREAMS})
 
     case socketMessages.joining:{
       let {totalPlayers, name, playersJoined} = msg;
