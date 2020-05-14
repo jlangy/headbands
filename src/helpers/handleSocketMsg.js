@@ -21,6 +21,7 @@ const socketMessages = {
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
+//TODO: connections cleanup on new games
 const connections = {};
 
 //Add local stream to peer connection

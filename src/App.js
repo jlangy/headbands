@@ -34,7 +34,7 @@ function App({game}) {
       <div className="App">
         <main>
           <h1>Headbandz</h1>
-          <button onClick={() => socket.emit('xir test')}>log rooms</button>
+          {/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
           <Switch>
             
             <Route path="/game">
