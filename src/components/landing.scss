@@ -1,11 +1,4 @@
-.landing-button {
-  font-size: 52px;
-  font-family: StaatLiches;
-  padding: 20px;
-  background-color: orange;
-  border: 3px solid red;
-  width: 400px;
-}
+
 
 button:focus {
   outline: none;
@@ -14,6 +7,7 @@ button:focus {
 .container {
   display: flex;
   justify-content: space-around;
+  margin-bottom: 20px;
 }
 
 .input-slider {
@@ -67,7 +61,6 @@ button:focus {
   border-color: transparent transparent #fff transparent;
   top: 7px;
 }
-
 
 
 .game-name>input {

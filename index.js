@@ -1,16 +1,13 @@
 const express = require('express');
-// require('dotenv').config();
+require('dotenv').config();
 const socket = require('socket.io');
 const path = require('path');
-const axios = require('axios');
 const port = process.env.PORT || 3000;
 
 const app = express();
-// const server = app.listen(port, '0.0.0.0', () => console.log(`listening on port ${port}`));
 const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
-let names = [];
 let rooms = {};
 
 app.use(express.static(path.join(__dirname, 'build')));
@@ -63,8 +60,15 @@ io.on('connection', function (socket) {
       endGame(roomName);
     }
   });
+
+  socket.on('restart game', ({roomName}) => {
+    rooms[roomName].namesToGuess = [];
+    io.in(roomName).emit('message', {type: 'restart'})
+  })
   
-  // socket.on('end game')
+  socket.on('end game', ({roomName}) => {
+    socket.to(roomName).emit('message', {type: 'host disconnection'})
+  })
 
 	socket.on('xir test', () => {
     const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
@@ -75,8 +79,8 @@ io.on('connection', function (socket) {
 	socket.on('join room', async ({ roomName, fromId }) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-			const token = await client.tokens.create();
+			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			const token = {iceServers: null}//await client.tokens.create();
 			socket
 				.to(roomName)
 				.emit('message', {
@@ -98,8 +102,8 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('description', async ({ description, toId, fromId }) => {
-		const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-		const token = await client.tokens.create();
+		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+		const token = {iceServers: null} // await client.tokens.create();
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,

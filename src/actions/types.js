@@ -7,3 +7,5 @@ export const NAME_ADDED = "NAME_ADDED";
 export const SETUP_COMPLETE = "SETUP_COMPLETE";
 export const END_GAME = "END_GAME";
 export const CLEAR_STREAMS = "CLEAR_STREAMS";
+export const RESTART_GAME = "RESTART_GAME";
+export const CLEAR_STREAM_NAMES = "CLEAR_STREAM_NAMES";

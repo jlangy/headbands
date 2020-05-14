@@ -8,7 +8,7 @@ async function turnOnLocalMedia(createStream, streams) {
   //Setup media
   if(!streams['local']){
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: false,
       video: true
     });
     
@@ -49,7 +49,7 @@ function Landing({ socket, createStream, streams }) {
     <>
     <div className="container">
       <div>
-        <button className="landing-button" onClick={toggleMakeGame}>
+        <button className="button-large" onClick={toggleMakeGame}>
           Create Game
         </button>
         <div
@@ -77,12 +77,12 @@ function Landing({ socket, createStream, streams }) {
               }}
               placeholder="Enter game name"
             />
-            <Link to='/game'><button className='start-game-button' onClick={makeRoom}>Go!</button></Link>
+            <Link to='/game'><button className='button-medium' onClick={makeRoom}>Go!</button></Link>
           </div>
         </div>
       </div>
       <div>
-        <button className="landing-button" onClick={toggleJoinGame}>
+        <button className="button-large" onClick={toggleJoinGame}>
           Join Game
         </button>
         <div
@@ -96,7 +96,7 @@ function Landing({ socket, createStream, streams }) {
                 setJoinRoomName(e.target.value);
               }}
             />
-            <Link to='/game'><button className='start-game-button' onClick={joinRoom}>Go!</button></Link>
+            <Link to='/game'><button className='button-medium' onClick={joinRoom}>Go!</button></Link>
           </div>
         </div>
       </div>

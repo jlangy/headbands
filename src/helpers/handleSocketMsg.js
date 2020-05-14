@@ -1,5 +1,5 @@
 import store from '../store';
-import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS } from '../actions/types';
+import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS, RESTART_GAME, CLEAR_STREAM_NAMES } from '../actions/types';
 import gamePhases from '../reducers/gamePhases';
 
 
@@ -16,7 +16,8 @@ const socketMessages = {
   joining: 'joining',
   xirres: 'xir response',
   updateSetNames: 'update set names',
-  disconnection: 'host disconnection'
+  disconnection: 'host disconnection',
+  restart: 'restart'
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -30,8 +31,8 @@ function feedLocalStream(stream, connectionId){
 }
 
 function createStreamConnection(socketId, iceServers){
-  connections[socketId] = new RTCPeerConnection({iceServers});
-  // connections[socketId] = new RTCPeerConnection(null);
+  // connections[socketId] = new RTCPeerConnection({iceServers});
+  connections[socketId] = new RTCPeerConnection(null);
   feedLocalStream(store.getState().streams['local'].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
@@ -101,11 +102,15 @@ export default async function(msg, socket){
 
     case socketMessages.roomNameOk:
       let {name, totalPlayers} = msg;
-      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, gamePhase: gamePhases.joining, playersJoined: 1}})
+      return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, gamePhase: gamePhases.joining, playersJoined: 1, host:true}})
 
     case socketMessages.ready:
       console.log('all ready boss')
       return store.dispatch({type: ALL_PLAYERS_JOINED})
+
+    case socketMessages.restart:
+      store.dispatch({type: CLEAR_STREAM_NAMES})
+      return store.dispatch({type: RESTART_GAME});
 
     case socketMessages.xirres:
       console.log(msg.iceServers);

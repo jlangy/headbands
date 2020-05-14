@@ -4,6 +4,7 @@ import Video from './Video';
 import './game.scss';
 import GameSetup from './GameSetup';
 import gamePhases from '../reducers/gamePhases';
+import HostMenu from './HostMenu';
 
 function Game({ streams, game, socket }) {
 	function emptyVideos() {
@@ -32,6 +33,7 @@ function Game({ streams, game, socket }) {
 
 	return (
 		<>
+			{game.host && <HostMenu socket={socket}/>}
 			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
 			<div className="videos-container">
 				<h2>In room: {game.name}</h2>

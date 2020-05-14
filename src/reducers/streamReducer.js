@@ -1,4 +1,4 @@
-import { NEW_STREAM, GOT_NAMES, CLEAR_STREAMS } from '../actions/types';
+import { NEW_STREAM, GOT_NAMES, CLEAR_STREAMS, CLEAR_STREAM_NAMES } from '../actions/types';
 
 const initialState = {};
 
@@ -17,6 +17,12 @@ export default function(state = initialState, action){
       return newState;
     case CLEAR_STREAMS:
       return {local: state.local};
+    case CLEAR_STREAM_NAMES:
+      const newStateWithoutNames = {};
+      for (const [key, value] of Object.entries(state)){
+        newStateWithoutNames[key] = {stream: value.stream}
+      }
+      return newStateWithoutNames;
     default:
       return state;
   }

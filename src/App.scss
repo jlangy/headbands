@@ -54,7 +54,24 @@ video#local, video#remote{
   border: 0;
   border-radius: 5px;
   height: 34px;
-  // background: url(./img/arrow.png) no-repeat right #ae690f;
+  background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat right #ae690f;
   -webkit-appearance: none;
   background-position-x: 35px;
+}
+
+.button-large {
+  font-size: 52px;
+  font-family: StaatLiches;
+  padding: 20px;
+  background-color: orange;
+  border: 3px solid red;
+  width: 400px;
+}
+
+.button-medium {
+  font-size: 32px;
+  font-family: StaatLiches;
+  padding: 0px 10px;
+  background-color: orange;
+  border: 3px solid red;
 }
