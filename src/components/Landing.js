@@ -2,21 +2,20 @@ import React, { useState } from 'react';
 import './landing.scss';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { createStream } from '../actions/streamActions'
+import { NEW_STREAM } from '../actions/types';
 
-async function turnOnLocalMedia(createStream, streams) {
+async function turnOnLocalMedia(streams, dispatch) {
   //Setup media
   if(!streams['local']){
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: true
     });
-    
-    createStream({stream, socketId: 'local'});
+    dispatch({type: NEW_STREAM, payload: {stream, socketId: 'local'}});
   }
 }
 
-function Landing({ socket, createStream, streams }) {
+function Landing({ socket, streams, dispatch }) {
   //UI state for toggling making/joining game dropdowns
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
@@ -36,12 +35,12 @@ function Landing({ socket, createStream, streams }) {
 
   async function makeRoom() {
     socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
-    turnOnLocalMedia(createStream, streams)
+    turnOnLocalMedia(streams, dispatch)
   }
 
 	async function joinRoom() {
 		//Tell server, wait
-		await turnOnLocalMedia(createStream, streams);
+		await turnOnLocalMedia(streams, dispatch);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 	}
 
@@ -109,4 +108,4 @@ const mapStateToProps = state => ({
   streams: state.streams
 });
 
-export default connect(mapStateToProps, { createStream })(Landing);
+export default connect(mapStateToProps)(Landing);

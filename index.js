@@ -80,9 +80,9 @@ io.on('connection', function (socket) {
 	socket.on('join room', async ({ roomName, fromId }) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-			// const token = {iceServers: null}//await client.tokens.create();
-			const token = await client.tokens.create();
+			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			// const token = await client.tokens.create();
+			const token = {iceServers: null}//await client.tokens.create();
 			socket
 				.to(roomName)
 				.emit('message', {
@@ -104,9 +104,9 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('description', async ({ description, toId, fromId }) => {
-		const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-		const token = await client.tokens.create();
-		// const token = {iceServers: null} // await client.tokens.create();
+		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+		// const token = await client.tokens.create();
+		const token = {iceServers: null} // await client.tokens.create();
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,

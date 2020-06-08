@@ -13,18 +13,18 @@ import './App.scss';
 import Landing from './components/Landing';
 import Game from './components/Game'
 
-function App({game}) {
+function App({game, dispatch}) {
   const [socket, setSocket] = useState();
   
   useEffect(() => {
     //connection for local
-    // let socket = io.connect("http://localhost:3000")
+    let socket = io.connect("http://localhost:3000")
     
     //connection for production
-    const socket = io.connect(window.location.hostname)
+    // const socket = io.connect(window.location.hostname)
 
     socket.on('message', msg => {
-      handleSocketMsg(msg, socket)
+      handleSocketMsg(msg, socket, dispatch)
     });
     setSocket(socket);
   }, []); 
@@ -57,4 +57,4 @@ const mapStateToProps = state => ({
   game: state.game
 })
 
-export default connect(mapStateToProps, null)(App);
+export default connect(mapStateToProps)(App);
