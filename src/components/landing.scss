@@ -1,74 +1,47 @@
-
-
 button:focus {
-  outline: none;
+	outline: none;
 }
 
 .container {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 20px;
+	display: flex;
+	justify-content: space-around;
+	margin-bottom: 20px;
 }
 
 .input-slider {
-  position: relative;
-  transition: height 0.5s;
-  overflow: hidden;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
+	position: relative;
+	transition: height 0.5s;
+	overflow: hidden;
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
 }
 
-.player-number>label {
-  font-family: StaatLiches;
-  font-size: 32px;
+.player-number > label {
+	font-family: StaatLiches;
+	font-size: 32px;
 }
-
-
 
 .game-name {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .start-game-button {
-  font-size: 32px;
-  font-family: StaatLiches;
-  padding: 0px 10px;
-  background-color: orange;
-  border: 3px solid red;
+	font-size: 32px;
+	font-family: StaatLiches;
+	padding: 0px 10px;
+	background-color: orange;
+	border: 3px solid red;
 }
 
-.select-selected {
-  background-color: DodgerBlue;
-}
-
-/* Style the arrow inside the select element: */
-.select-selected:after {
-  position: absolute;
-  content: "";
-  top: 14px;
-  right: 10px;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-  border-color: #fff transparent transparent transparent;
-}
-
-/* Point the arrow upwards when the select box is open (active): */
-.select-selected.select-arrow-active:after {
-  border-color: transparent transparent #fff transparent;
-  top: 7px;
-}
-
-
-.game-name>input {
-  border: none;
-  height: 100%;
-  background-color: #ae690f;
-  flex-grow: 1;
-  font-family: StaatLiches;
-  font-size: 1.5em;
-  padding: 0 10px
+.game-name > input {
+	border: none;
+	height: 100%;
+	background-color: #ae690f;
+	flex-grow: 1;
+	font-family: StaatLiches;
+	font-size: 1.5em;
+	padding: 0 10px;
 }

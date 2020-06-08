@@ -1,60 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
-
-import handleSocketMsg from "./helpers/handleSocketMsg";
+import handleSocketMsg from './helpers/handleSocketMsg';
 import './App.scss';
-
 import Landing from './components/Landing';
-import Game from './components/Game'
+import Game from './components/Game';
+import styled from 'styled-components';
 
-function App({game}) {
-  const [socket, setSocket] = useState();
-  
-  useEffect(() => {
-    //connection for local
-    // let socket = io.connect("http://localhost:3000")
-    
-    //connection for production
-    const socket = io.connect(window.location.hostname)
+const AppContainer = styled.div``;
 
-    socket.on('message', msg => {
-      handleSocketMsg(msg, socket)
-    });
-    setSocket(socket);
-  }, []); 
+function App({ game }) {
+	const [socket, setSocket] = useState();
 
-  return (
-    <Router>
-      <div className="App">
-        <main>
-          <h1>Headbandz</h1>
-          {/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
-          <Switch>
-            
-            <Route path="/game">
-              {game.gamePhase && <Game socket={socket}/>}
-            </Route>
+	useEffect(() => {
+		//connection for local
+		// let socket = io.connect("http://localhost:3000")
 
-            <Route path="/">
-              <Landing socket={socket}/>
-            </Route>
+		//connection for production
+		const socket = io.connect(window.location.hostname);
 
-          </Switch>
-          
-        </main>
-      </div>
-    </Router>
-  );
+		socket.on('message', (msg) => {
+			handleSocketMsg(msg, socket);
+		});
+		setSocket(socket);
+	}, []);
+
+	return (
+		<Router>
+			<div className="App">
+				<main>
+					<h1>Headbandz</h1>
+					{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
+					<Switch>
+						<Route path="/game">
+							{game.gamePhase && <Game socket={socket} />}
+						</Route>
+
+						<Route path="/">
+							<Landing socket={socket} />
+						</Route>
+					</Switch>
+				</main>
+			</div>
+		</Router>
+	);
 }
 
-const mapStateToProps = state => ({
-  game: state.game
-})
+const mapStateToProps = (state) => ({
+	game: state.game
+});
 
 export default connect(mapStateToProps, null)(App);
