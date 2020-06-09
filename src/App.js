@@ -4,11 +4,9 @@ import io from 'socket.io-client';
 import { connect } from 'react-redux';
 import handleSocketMsg from './helpers/handleSocketMsg';
 import './App.scss';
-import Landing from './components/Landing';
-import Game from './components/Game';
-import styled from 'styled-components';
-
-const AppContainer = styled.div``;
+import Navbar from './components/Navbar';
+import Landing from './pages/Landing';
+import Game from './pages/Game';
 
 function App({ game }) {
 	const [socket, setSocket] = useState();
@@ -29,19 +27,17 @@ function App({ game }) {
 	return (
 		<Router>
 			<div className="App">
-				<main>
-					<h1>Headbandz</h1>
-					{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
-					<Switch>
-						<Route path="/game">
-							{game.gamePhase && <Game socket={socket} />}
-						</Route>
+				<Navbar></Navbar>
+				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
+				<Switch>
+					<Route path="/game">
+						{game.gamePhase && <Game socket={socket} />}
+					</Route>
 
-						<Route path="/">
-							<Landing socket={socket} />
-						</Route>
-					</Switch>
-				</main>
+					<Route path="/">
+						<Landing socket={socket} />
+					</Route>
+				</Switch>
 			</div>
 		</Router>
 	);

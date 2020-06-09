@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Video from './Video';
+import Video from '../components/Video';
 import './game.scss';
-import GameSetup from './GameSetup';
+import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
-import HostMenu from './HostMenu';
+import HostMenu from '../components/HostMenu';
 
 function Game({ streams, game, socket }) {
 	function emptyVideos() {
@@ -19,12 +19,12 @@ function Game({ streams, game, socket }) {
 	}
 
 	//Turn of audio of local stream
-	function localStream(){
+	function localStream() {
 		const localStream = streams['local'] && streams['local'].stream;
-		if(localStream){
+		if (localStream) {
 			const removeAudioLocalStream = localStream.clone();
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
-			if(audioTrack.length > 0){
+			if (audioTrack.length > 0) {
 				removeAudioLocalStream.removeTrack(audioTrack[0]);
 			}
 			return removeAudioLocalStream;
@@ -33,14 +33,11 @@ function Game({ streams, game, socket }) {
 
 	return (
 		<>
-			{game.host && <HostMenu socket={socket}/>}
+			{game.host && <HostMenu socket={socket} />}
 			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
 			<div className="videos-container">
 				<h2>In room: {game.name}</h2>
-				<Video
-					id="local"
-					stream={localStream()}
-				/>
+				<Video id="local" stream={localStream()} />
 				{incomingStreams().map((streamName, i) => (
 					<div>
 						<Video
