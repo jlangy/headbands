@@ -1,4 +1,4 @@
-import { NEW_GAME, ALL_PLAYERS_JOINED, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, RESTART_GAME } from '../actions/types';
+import { NEW_GAME, ALL_PLAYERS_JOINED, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, RESTART_GAME, NEW_TURN } from './types';
 import gamePhases from './gamePhases';
 
 const initialState = {};
@@ -9,7 +9,15 @@ export default function(state = initialState, action){
       const {name, totalPlayers, afoot, playersJoined, host} = action.payload;
       return {name, totalPlayers, afoot, playersJoined, host, totalNamesSet:0, gamePhase: gamePhases.joining}
     case ALL_PLAYERS_JOINED:
-      return {...state, gamePhase: gamePhases.settingNames}
+      {
+        const { turn } = action.payload;
+        return {...state, gamePhase: gamePhases.settingNames, turn}
+      }
+    case NEW_TURN:
+      {
+        const {turn} = action.payload;
+        return {...state, turn}
+      }
     case ADD_PLAYER:
       return {...state, playersJoined: state.playersJoined + 1}
     case NAME_ADDED:

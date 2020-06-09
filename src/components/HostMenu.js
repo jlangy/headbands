@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../actions/types';
+import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 
 
 function HostMenu({socket, game, dispatch}) {

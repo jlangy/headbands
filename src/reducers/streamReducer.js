@@ -1,4 +1,4 @@
-import { NEW_STREAM, GOT_NAMES, CLEAR_STREAMS, CLEAR_STREAM_NAMES } from '../actions/types';
+import { NEW_STREAM, GOT_NAMES, CLEAR_STREAMS, CLEAR_STREAM_NAMES } from './types';
 
 const initialState = {};
 
@@ -9,10 +9,9 @@ export default function(state = initialState, action){
       return {...state, [socketId]: {stream}}
     case GOT_NAMES:
       const {names} = action.payload;
-      const newState = {};
-      Object.keys(state).forEach(streamName => {
-        const foundName = names.find(nameObj => nameObj.toId === streamName);
-        newState[streamName] = {...state[streamName], name: foundName && foundName.name}
+      const newState = {...state}
+      Object.entries(names).forEach(([id, playerInformation]) => {
+        newState[id] = {...newState[id], ...playerInformation}
       });
       return newState;
     case CLEAR_STREAMS:

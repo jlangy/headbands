@@ -1,5 +1,5 @@
 import store from '../store';
-import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS, RESTART_GAME, CLEAR_STREAM_NAMES } from '../actions/types';
+import { NEW_TURN, NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
 
 
@@ -17,7 +17,8 @@ const socketMessages = {
   xirres: 'xir response',
   updateSetNames: 'update set names',
   disconnection: 'host disconnection',
-  restart: 'restart'
+  restart: 'restart',
+  newTurn: 'new turn'
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -30,10 +31,10 @@ function feedLocalStream(stream, connectionId){
   });   
 }
 
-function createStreamConnection(socketId, iceServers){
+function createStreamConnection(socketId, iceServers, localId){
   // connections[socketId] = new RTCPeerConnection({iceServers});
   connections[socketId] = new RTCPeerConnection(null);
-  feedLocalStream(store.getState().streams['local'].stream, socketId);
+  feedLocalStream(store.getState().streams[localId].stream, socketId);
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
 
@@ -47,7 +48,7 @@ export default async function(msg, socket){
 
     //Received join request, create connection and attach stream, create offer, set and send description
     case socketMessages.joinRequest: 
-      createStreamConnection(msg.fromId, msg.iceServers)
+      createStreamConnection(msg.fromId, msg.iceServers, socket.id)
       const offer = await connections[msg.fromId].createOffer();
       await connections[msg.fromId].setLocalDescription(offer);
       connections[msg.fromId].onicecandidate = function(event){
@@ -66,9 +67,12 @@ export default async function(msg, socket){
         room: store.getState().game.name  
       });
     
+    case socketMessages.newTurn:
+      return store.dispatch({type: NEW_TURN, payload: {turn: msg.turn}});
+
     //recieved offer, create connection, add candidate handler, set description, set and send answer
     case socketMessages.offer:
-      createStreamConnection(msg.fromId, msg.iceServers)
+      createStreamConnection(msg.fromId, msg.iceServers, socket.id)
       connections[msg.fromId].onicecandidate = function(event){
         if(event.candidate){
           socket.emit('iceCandidate', {candidate: event.candidate, fromId: msg.toId, toId: msg.fromId})
@@ -85,7 +89,7 @@ export default async function(msg, socket){
     
     //received answer, set description
     case socketMessages.answer:
-      socket.emit('ready', store.getState().game.name)
+      socket.emit('ready', {roomName: store.getState().game.name, joinerId: msg.fromId})
       //Set players joined here
       store.dispatch({type: ADD_PLAYER})
       return await connections[msg.fromId].setRemoteDescription(msg.answer);
@@ -105,8 +109,7 @@ export default async function(msg, socket){
       return store.dispatch({type: NEW_GAME, payload: {name, totalPlayers, gamePhase: gamePhases.joining, playersJoined: 1, host:true}})
 
     case socketMessages.ready:
-      console.log('all ready boss')
-      return store.dispatch({type: ALL_PLAYERS_JOINED})
+      return store.dispatch({type: ALL_PLAYERS_JOINED, payload: {turn: msg.turn}})
 
     case socketMessages.restart:
       store.dispatch({type: CLEAR_STREAM_NAMES})

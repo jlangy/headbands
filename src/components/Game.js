@@ -15,12 +15,12 @@ function Game({ streams, game, socket }) {
 	}
 
 	function incomingStreams() {
-		return Object.keys(streams).filter((streamName) => streamName !== 'local');
+		return Object.keys(streams).filter((streamName) => streamName !== socket.id);
 	}
 
 	//Turn of audio of local stream
 	function localStream(){
-		const localStream = streams['local'] && streams['local'].stream;
+		const localStream = streams[socket.id] && streams[socket.id].stream;
 		if(localStream){
 			const removeAudioLocalStream = localStream.clone();
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
@@ -48,7 +48,7 @@ function Game({ streams, game, socket }) {
 							key={i}
 							id={`stream${i}`}
 						/>
-						<h3>{streams[streamName].name}</h3>
+						<h3>{streams[streamName].nameToGuess}</h3>
 					</div>
 				))}
 				{emptyVideos().map((a, i) => (
@@ -57,6 +57,7 @@ function Game({ streams, game, socket }) {
 					</div>
 				))}
 			</div>
+			<button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button>
 		</>
 	);
 }

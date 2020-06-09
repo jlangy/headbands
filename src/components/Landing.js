@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import './landing.scss';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { NEW_STREAM } from '../actions/types';
+import { NEW_STREAM } from '../reducers/types';
 
-async function turnOnLocalMedia(streams, dispatch) {
+async function turnOnLocalMedia(streams, dispatch, socket) {
   //Setup media
-  if(!streams['local']){
+  if(!streams[socket.id]){
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: true
     });
-    dispatch({type: NEW_STREAM, payload: {stream, socketId: 'local'}});
+    dispatch({type: NEW_STREAM, payload: {stream, socketId: socket.id}});
   }
 }
 
@@ -35,12 +35,12 @@ function Landing({ socket, streams, dispatch }) {
 
   async function makeRoom() {
     socket.emit("make room", { name: makeRoomName, totalPlayers: numPlayers });
-    turnOnLocalMedia(streams, dispatch)
+    turnOnLocalMedia(streams, dispatch, socket)
   }
 
 	async function joinRoom() {
 		//Tell server, wait
-		await turnOnLocalMedia(streams, dispatch);
+		await turnOnLocalMedia(streams, dispatch, socket);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 	}
 
