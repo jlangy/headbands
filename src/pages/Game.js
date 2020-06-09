@@ -6,20 +6,19 @@ import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
 import HostMenu from '../components/HostMenu';
 
-function Game({ streams, game, socket }) {
-	function emptyVideos() {
+const Game = ({ streams, game, socket }) => {
+	const emptyVideos = () => {
 		//Initializes to 1 to prevent jumpy render after loading local stream
 		const activeStreams = Object.keys(streams).length || 1;
 		const numEmpty = game.totalPlayers - activeStreams;
 		return numEmpty >= 0 ? new Array(numEmpty).fill(0) : [];
-	}
+	};
 
-	function incomingStreams() {
-		return Object.keys(streams).filter((streamName) => streamName !== 'local');
-	}
+	const incomingStreams = () =>
+		Object.keys(streams).filter((streamName) => streamName !== 'local');
 
-	//Turn of audio of local stream
-	function localStream() {
+	//Turn off audio of local stream
+	const localStream = () => {
 		const localStream = streams['local'] && streams['local'].stream;
 		if (localStream) {
 			const removeAudioLocalStream = localStream.clone();
@@ -29,7 +28,7 @@ function Game({ streams, game, socket }) {
 			}
 			return removeAudioLocalStream;
 		}
-	}
+	};
 
 	return (
 		<>
@@ -56,7 +55,7 @@ function Game({ streams, game, socket }) {
 			</div>
 		</>
 	);
-}
+};
 
 const mapStateToProps = (state) => ({
 	streams: state.streams,

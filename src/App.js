@@ -8,7 +8,7 @@ import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Game from './pages/Game';
 
-function App({ game }) {
+const App = ({ game }) => {
 	const [socket, setSocket] = useState();
 
 	useEffect(() => {
@@ -41,7 +41,7 @@ function App({ game }) {
 			</div>
 		</Router>
 	);
-}
+};
 
 const mapStateToProps = (state) => ({
 	game: state.game

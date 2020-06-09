@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { createStream } from '../actions/streamActions';
 import Card from '../styled_components/Card';
 
-async function turnOnLocalMedia(createStream, streams) {
+const turnOnLocalMedia = async (createStream, streams) => {
 	//Setup media
 	if (!streams['local']) {
 		const stream = await navigator.mediaDevices.getUserMedia({
@@ -15,9 +15,9 @@ async function turnOnLocalMedia(createStream, streams) {
 
 		createStream({ stream, socketId: 'local' });
 	}
-}
+};
 
-function Landing({ socket, createStream, streams }) {
+const Landing = ({ socket, createStream, streams }) => {
 	//UI state for toggling making/joining game dropdowns
 	const [makingGame, setMakingGame] = useState(false);
 	const [joiningGame, setJoiningGame] = useState(false);
@@ -27,24 +27,24 @@ function Landing({ socket, createStream, streams }) {
 	const [makeRoomName, setMakeRoomName] = useState('');
 	const [numPlayers, setNumPlayers] = useState(2);
 
-	function toggleMakeGame() {
+	const toggleMakeGame = () => {
 		setMakingGame((prev) => !prev);
-	}
+	};
 
-	function toggleJoinGame() {
+	const toggleJoinGame = () => {
 		setJoiningGame((prev) => !prev);
-	}
+	};
 
-	async function makeRoom() {
+	const makeRoom = async () => {
 		socket.emit('make room', { name: makeRoomName, totalPlayers: numPlayers });
 		turnOnLocalMedia(createStream, streams);
-	}
+	};
 
-	async function joinRoom() {
+	const joinRoom = async () => {
 		//Tell server, wait
 		await turnOnLocalMedia(createStream, streams);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
-	}
+	};
 
 	return (
 		<main class="page">
@@ -113,7 +113,7 @@ function Landing({ socket, createStream, streams }) {
 			</Card>
 		</main>
 	);
-}
+};
 
 const mapStateToProps = (state) => ({
 	streams: state.streams

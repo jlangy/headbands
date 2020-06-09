@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './controls.scss';
 
-async function turnOnLocalMedia(addStreams, name, setRoom) {
+const turnOnLocalMedia = async (addStreams, name, setRoom) => {
 	//Setup media
 	const stream = await navigator.mediaDevices.getUserMedia({
 		audio: false,
@@ -10,9 +10,9 @@ async function turnOnLocalMedia(addStreams, name, setRoom) {
 
 	//Connect stream to html and notify server
 	addStreams(stream, 'local');
-}
+};
 
-function Controls({ addStreams, socket, setRoom }) {
+const Controls = ({ addStreams, socket, setRoom }) => {
 	const [begin, setBegin] = useState(false);
 	const [numPlayers, setNumPlayers] = useState(0);
 	const [joinRoomName, setJoinRoomName] = useState('');
@@ -26,7 +26,7 @@ function Controls({ addStreams, socket, setRoom }) {
 		});
 	}, []);
 
-	async function makeRoom() {
+	const makeRoom = async () => {
 		//Verify number of players set
 		if (!numPlayers) {
 			return console.log('Need to add players');
@@ -37,21 +37,21 @@ function Controls({ addStreams, socket, setRoom }) {
 			await turnOnLocalMedia(addStreams, 'local');
 			setRoom(makeRoomName);
 		});
-	}
+	};
 
-	async function joinRoom() {
+	const joinRoom = async () => {
 		//Tell server, wait
 		await turnOnLocalMedia(addStreams);
 		setRoom(joinRoomName);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
-	}
+	};
 
-	function setGameName(event) {
+	const setGameName = (event) => {
 		socket.emit('setName', {
 			nameToGuess,
 			roomName: makeRoomName || joinRoomName
 		});
-	}
+	};
 
 	return (
 		<div className="controls-container">
@@ -100,6 +100,6 @@ function Controls({ addStreams, socket, setRoom }) {
 			</div>
 		</div>
 	);
-}
+};
 
 export default Controls;

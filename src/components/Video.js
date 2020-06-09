@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './video.scss';
 
-function Video({ stream, id }) {
+const Video = ({ stream, id }) => {
 	useEffect(() => {
 		document.getElementById(id).srcObject = stream;
 	}, [stream]);
@@ -11,6 +11,6 @@ function Video({ stream, id }) {
 			<video id={id} autoPlay playsInline></video>
 		</div>
 	);
-}
+};
 
 export default Video;
