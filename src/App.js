@@ -15,10 +15,10 @@ function App({ game }) {
 
 	useEffect(() => {
 		//connection for local
-		// let socket = io.connect("http://localhost:3000")
+		const socket = io.connect('http://localhost:3000');
 
 		//connection for production
-		const socket = io.connect(window.location.hostname);
+		// const socket = io.connect(window.location.hostname);
 
 		socket.on('message', (msg) => {
 			handleSocketMsg(msg, socket);
