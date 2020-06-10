@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-const StyledNav = styled.nav`
+const SNav = styled.nav`
 	position: relative;
 	top: 0;
 	right: 0;
@@ -13,53 +13,52 @@ const StyledNav = styled.nav`
 	justify-content: space-between;
 	padding: 2vh 5vw;
 	height: 5vh;
+	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
 
 	> a:first-child {
 		width: 30vw;
 	}
 `;
 
-const StyledBrand = styled.span`
+const SBrand = styled.span`
 	max-height: 6vh;
 	max-width: 40vw;
 	font-size: 1.5rem;
 `;
 
-const StyledLinks = styled.ul`
+const SLinks = styled.ul`
 	display: flex;
 	justify-content: space-around;
 	width: 50vw;
 `;
 
-const StyledLink = styled(Link)`
+const SLink = styled(Link)`
 	display: block;
-	text-transform: uppercase;
 	font-size: 1.25rem;
 	font-weight: 300;
 	text-decoration: none;
-	color: white;
 `;
 
 const Navbar = () => {
 	return (
-		<StyledNav>
+		<SNav>
 			<Link to="/">
-				<StyledBrand>
-					Headbands <i class="fas fa-sticky-note"></i>
-				</StyledBrand>
+				<SBrand>
+					Headbands <i className="fas fa-sticky-note"></i>
+				</SBrand>
 			</Link>
-			<StyledLinks>
+			<SLinks>
 				<li>
-					<StyledLink to="/instructions">How to Play</StyledLink>
+					<SLink to="/instructions">How to Play</SLink>
 				</li>
 				<li>
-					<StyledLink to="/donate">Donate</StyledLink>
+					<SLink to="/donate">Donate</SLink>
 				</li>
 				<li>
-					<StyledLink to="/contact">Contact</StyledLink>
+					<SLink to="/contact">Contact</SLink>
 				</li>
-			</StyledLinks>
-		</StyledNav>
+			</SLinks>
+		</SNav>
 	);
 };
 

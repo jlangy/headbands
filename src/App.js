@@ -3,10 +3,13 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
 import handleSocketMsg from './helpers/handleSocketMsg';
-import './App.scss';
+import './global_scss/App.scss';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Game from './pages/Game';
+import Donate from './pages/Donate';
+import Contact from './pages/Contact';
+import Instructions from './pages/Instructions';
 
 const App = ({ game }) => {
 	const [socket, setSocket] = useState();
@@ -26,19 +29,24 @@ const App = ({ game }) => {
 
 	return (
 		<Router>
-			<div className="App">
-				<Navbar></Navbar>
-				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
-				<Switch>
-					<Route path="/game">
-						{game.gamePhase && <Game socket={socket} />}
-					</Route>
+			<Navbar></Navbar>
+			{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
+			<Switch>
+				<Route path="/game">{game.gamePhase && <Game socket={socket} />}</Route>
 
-					<Route path="/">
-						<Landing socket={socket} />
-					</Route>
-				</Switch>
-			</div>
+				<Route path="/">
+					<Landing socket={socket} />
+				</Route>
+				<Route path="/instructions">
+					<Instructions />
+				</Route>
+				<Route path="/donate">
+					<Donate />
+				</Route>
+				<Route path="/contact">
+					<Contact />
+				</Route>
+			</Switch>
 		</Router>
 	);
 };
