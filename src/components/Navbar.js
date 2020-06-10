@@ -12,6 +12,7 @@ const StyledNav = styled.nav`
 	align-items: center;
 	justify-content: space-between;
 	padding: 2vh 5vw;
+	height: 5vh;
 
 	> a:first-child {
 		width: 30vw;

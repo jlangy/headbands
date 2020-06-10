@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './landing.scss';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { createStream } from '../actions/streamActions';
+import Page from '../styled_components/Page';
 import Card from '../styled_components/Card';
 
 const turnOnLocalMedia = async (createStream, streams) => {
@@ -47,7 +47,7 @@ const Landing = ({ socket, createStream, streams }) => {
 	};
 
 	return (
-		<main class="page">
+		<Page>
 			<Card>
 				<button className="button-large" onClick={toggleMakeGame}>
 					Create Game
@@ -111,7 +111,7 @@ const Landing = ({ socket, createStream, streams }) => {
 					</div>
 				</div>
 			</Card>
-		</main>
+		</Page>
 	);
 };
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Video from '../components/Video';
-import './game.scss';
 import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
 import HostMenu from '../components/HostMenu';

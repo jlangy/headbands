@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import './video.scss';
 
 const Video = ({ stream, id }) => {
 	useEffect(() => {
