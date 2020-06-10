@@ -10,3 +10,4 @@ export const CLEAR_STREAMS = "CLEAR_STREAMS";
 export const RESTART_GAME = "RESTART_GAME";
 export const CLEAR_STREAM_NAMES = "CLEAR_STREAM_NAMES";
 export const NEW_TURN = "NEW_TURN"
+export const REMOVE_STREAM = "REMOVE_STREAM"

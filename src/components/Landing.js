@@ -15,7 +15,7 @@ async function turnOnLocalMedia(streams, dispatch, socket) {
   }
 }
 
-function Landing({ socket, streams, dispatch }) {
+function Landing({ socket, streams, dispatch, game }) {
   //UI state for toggling making/joining game dropdowns
   const [makingGame, setMakingGame] = useState(false);
   const [joiningGame, setJoiningGame] = useState(false);
@@ -47,6 +47,7 @@ function Landing({ socket, streams, dispatch }) {
   return (
     <>
     <div className="container">
+      {game.disconnected && <h1>HOST DISCONNECTED</h1>}
       <div>
         <button className="button-large" onClick={toggleMakeGame}>
           Create Game
@@ -105,7 +106,8 @@ function Landing({ socket, streams, dispatch }) {
 }
 
 const mapStateToProps = state => ({
-  streams: state.streams
+  streams: state.streams,
+  game: state.game
 });
 
 export default connect(mapStateToProps)(Landing);

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
+  Redirect
 } from "react-router-dom";
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
@@ -12,9 +13,11 @@ import './App.scss';
 
 import Landing from './components/Landing';
 import Game from './components/Game'
+import { JobInstance } from 'twilio/lib/rest/bulkexports/v1/export/job';
 
-function App({game, dispatch}) {
+function App({game, dispatch, history}) {
   const [socket, setSocket] = useState();
+  const [redirect, setRedirect] = useState(false);
   
   useEffect(() => {
     //connection for local
@@ -24,7 +27,7 @@ function App({game, dispatch}) {
     // const socket = io.connect(window.location.hostname)
 
     socket.on('message', msg => {
-      handleSocketMsg(msg, socket, dispatch)
+      handleSocketMsg(msg, socket, setRedirect)
     });
     setSocket(socket);
   }, []); 
@@ -32,6 +35,7 @@ function App({game, dispatch}) {
   return (
     <Router>
       <div className="App">
+        {redirect && <Redirect to='/' />}
         <main>
           <h1>Headbandz</h1>
           <button onClick={() => socket.emit('xir test')}>log rooms</button>
@@ -58,3 +62,4 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps)(App);
+

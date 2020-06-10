@@ -25,7 +25,7 @@ export default function(state = initialState, action){
     case SETUP_COMPLETE:
       return {...state, gamePhase: gamePhases.playing}
     case END_GAME:
-      return {};
+      return {disconnected: true};
     case RESTART_GAME:
       return {...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0};
     default:

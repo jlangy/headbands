@@ -1,7 +1,6 @@
 import store from '../store';
-import { NEW_TURN, NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
+import { REMOVE_STREAM, NEW_TURN, NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
-
 
 const socketMessages = {
   iceCandidate: 'iceCandidate',
@@ -16,13 +15,14 @@ const socketMessages = {
   joining: 'joining',
   xirres: 'xir response',
   updateSetNames: 'update set names',
-  disconnection: 'host disconnection',
+  disconnection: 'disconnection',
+  hostDisconnection: 'host disconnection',
   restart: 'restart',
   newTurn: 'new turn'
 }
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
-const connections = {};
+let connections = {};
 
 //Add local stream to peer connection
 function feedLocalStream(stream, connectionId){
@@ -38,7 +38,7 @@ function createStreamConnection(socketId, iceServers, localId){
   connections[socketId].ontrack = e => store.dispatch({type: NEW_STREAM, payload: {stream: e.streams[0], socketId}});
 }
 
-export default async function(msg, socket){
+export default async function(msg, socket, setRedirect){
   console.log(msg)
   switch (msg.type) {
     //Server sending ICE candidate, add to connection
@@ -119,9 +119,25 @@ export default async function(msg, socket){
       console.log(msg.iceServers);
 
     case socketMessages.disconnection:
-      console.log('theres has been a disconnection')
-      store.dispatch({type: END_GAME})
-      return store.dispatch({type: CLEAR_STREAMS})
+      {
+        const socketId = msg.id;
+        return store.dispatch({type: REMOVE_STREAM, socketId})
+      }
+    
+    case socketMessages.hostDisconnection:
+      store.dispatch({type: END_GAME});
+      setRedirect(true);
+      //Stop local media 
+      store.getState().streams[socket.id].stream.getTracks()[0].stop()
+      Object.values(connections).forEach(peerConn => {
+        console.log(peerConn)
+        peerConn.close()
+      });
+      connections = {};
+      setTimeout(() => {
+        return store.dispatch({type: CLEAR_STREAMS})
+      }, 50);
+      break;
 
     case socketMessages.joining:{
       let {totalPlayers, name, playersJoined} = msg;

@@ -1,4 +1,4 @@
-import { NEW_STREAM, GOT_NAMES, CLEAR_STREAMS, CLEAR_STREAM_NAMES } from './types';
+import { REMOVE_STREAM, NEW_STREAM, GOT_NAMES, CLEAR_STREAMS, CLEAR_STREAM_NAMES } from './types';
 
 const initialState = {};
 
@@ -14,8 +14,18 @@ export default function(state = initialState, action){
         newState[id] = {...newState[id], ...playerInformation}
       });
       return newState;
+    case REMOVE_STREAM:
+      {
+        const idToRemove = action.socketId;
+        const newState = {...state};
+        console.log(idToRemove, newState);
+        delete newState[idToRemove];
+        console.log(newState)
+        return newState
+
+      }
     case CLEAR_STREAMS:
-      return {local: state.local};
+      return {};
     case CLEAR_STREAM_NAMES:
       const newStateWithoutNames = {};
       for (const [key, value] of Object.entries(state)){

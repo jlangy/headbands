@@ -15,6 +15,7 @@ function Game({ streams, game, socket }) {
 	}
 
 	function incomingStreams() {
+		console.log(streams, Object.keys(streams).filter((streamName) => streamName !== socket.id))
 		return Object.keys(streams).filter((streamName) => streamName !== socket.id);
 	}
 
@@ -44,11 +45,11 @@ function Game({ streams, game, socket }) {
 				{incomingStreams().map((streamName, i) => (
 					<div>
 						<Video
-							stream={streams[streamName].stream}
+							stream={streams[streamName] && streams[streamName].stream}
 							key={i}
 							id={`stream${i}`}
 						/>
-						<h3>{streams[streamName].nameToGuess}</h3>
+						<h3>{streams[streamName] && streams[streamName].nameToGuess}</h3>
 					</div>
 				))}
 				{emptyVideos().map((a, i) => (

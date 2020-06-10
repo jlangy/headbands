@@ -56,6 +56,9 @@ io.on('connection', function (socket) {
     if(rooms[roomName] && rooms[roomName].host == socket.id){
       io.in(roomName).emit('message', {type: 'host disconnection'});
       endGame(roomName);
+    } else if(rooms[roomName]){
+      io.in(roomName).emit('message', {type: 'disconnection', id: socket.id});
+      rooms[roomName].playersJoined -= 1;
     }
   });
 
