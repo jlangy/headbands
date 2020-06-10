@@ -36,13 +36,13 @@ const socketMessages = {
 const connections = {};
 
 //Add local stream to peer connection
-function feedLocalStream(stream, connectionId) {
+const feedLocalStream = (stream, connectionId) => {
 	stream.getTracks().forEach((track) => {
 		connections[connectionId].addTrack(track, stream);
 	});
-}
+};
 
-function createStreamConnection(socketId, iceServers) {
+const createStreamConnection = (socketId, iceServers) => {
 	connections[socketId] = new RTCPeerConnection({ iceServers });
 	// connections[socketId] = new RTCPeerConnection(null);
 	feedLocalStream(store.getState().streams['local'].stream, socketId);
@@ -51,9 +51,9 @@ function createStreamConnection(socketId, iceServers) {
 			type: NEW_STREAM,
 			payload: { stream: e.streams[0], socketId }
 		});
-}
+};
 
-export default async function (msg, socket) {
+const handleSocketMsg = async (msg, socket) => {
 	console.log(msg);
 	switch (msg.type) {
 		//Server sending ICE candidate, add to connection
@@ -176,4 +176,6 @@ export default async function (msg, socket) {
 		default:
 			console.log('no handling for server socket emit: ');
 	}
-}
+};
+
+export default handleSocketMsg;

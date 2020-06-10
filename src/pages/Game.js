@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Page from '../styled_components/Page';
 import Video from '../components/Video';
 import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
@@ -30,7 +31,7 @@ const Game = ({ streams, game, socket }) => {
 	};
 
 	return (
-		<>
+		<Page>
 			{game.host && <HostMenu socket={socket} />}
 			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
 			<div className="videos-container">
@@ -52,7 +53,7 @@ const Game = ({ streams, game, socket }) => {
 					</div>
 				))}
 			</div>
-		</>
+		</Page>
 	);
 };
 
