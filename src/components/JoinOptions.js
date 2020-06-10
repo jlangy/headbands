@@ -9,7 +9,6 @@ const JoinOptions = ({ socket, streams }) => {
 	const [joinRoomName, setJoinRoomName] = useState('');
 
 	const joinRoom = async () => {
-		// Tell server, wait
 		await turnOnLocalMedia(createStream, streams);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 	};
