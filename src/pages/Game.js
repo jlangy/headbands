@@ -8,7 +8,7 @@ import HostMenu from '../components/HostMenu';
 
 const Game = ({ streams, game, socket }) => {
 	const emptyVideos = () => {
-		//Initializes to 1 to prevent jumpy render after loading local stream
+		// Initializes to 1 to prevent jumpy render after loading local stream
 		const activeStreams = Object.keys(streams).length || 1;
 		const numEmpty = game.totalPlayers - activeStreams;
 		return numEmpty >= 0 ? new Array(numEmpty).fill(0) : [];
