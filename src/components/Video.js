@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 const Video = ({ stream, id }) => {
 	useEffect(() => {
 		document.getElementById(id).srcObject = stream;
-	}, [stream]);
+	}, [stream, id]);
 
 	return (
 		<div className="video-container">
