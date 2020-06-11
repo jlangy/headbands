@@ -7,6 +7,7 @@ import SBreak from '../styled_components/SBreak';
 import SInputGroup from '../styled_components/SInputGroup';
 import SInput from '../styled_components/SInput';
 import SButton from '../styled_components/SButton';
+import SLabel from '../styled_components/SLabel';
 
 const JoinOptions = ({ socket, streams }) => {
 	const [joinRoomName, setJoinRoomName] = useState('');
@@ -22,14 +23,16 @@ const JoinOptions = ({ socket, streams }) => {
 			<SBreak></SBreak>
 			<SForm>
 				<SInputGroup>
+					<SLabel>Name of lobby:</SLabel>
 					<SInput
 						type="text"
 						onChange={(e) => {
 							setJoinRoomName(e.target.value);
 						}}
+						placeholder="Enter a lobby name"
 					/>
-					<SButton label={'Go?'} to="/game" onClick={joinRoom}></SButton>
 				</SInputGroup>
+				<SButton label={'Join Game'} to="/game" onClick={joinRoom}></SButton>
 			</SForm>
 		</>
 	);

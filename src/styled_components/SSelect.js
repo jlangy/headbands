@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const SInput = styled.input`
+const SSelect = styled.select`
 	display: flex;
 	background: #f1f2f1;
 	font-family: inherit;
@@ -16,6 +16,19 @@ const SInput = styled.input`
 		border: none;
 		outline: none;
 	}
+
+	option {
+		font-family: inherit;
+		background: transparent;
+
+		:hover,
+		:focus-within,
+		:focus {
+			background: transparent;
+			border: none;
+			outline: none;
+		}
+	}
 `;
 
-export default SInput;
+export default SSelect;

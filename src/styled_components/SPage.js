@@ -5,7 +5,11 @@ const SPage = styled.main`
 	height: 100vh;
 	display: flex;
 	justify-content: center;
-	/* align-items: center; */
+
+	@media (max-width: 768px) {
+		flex-direction: column;
+		align-items: center;
+	}
 `;
 
 export default SPage;

@@ -5,6 +5,7 @@ const SBreak = styled.hr`
 	width: 80%;
 	height: 0.25rem;
 	border: none;
+	margin-top: 0;
 `;
 
 export default SBreak;

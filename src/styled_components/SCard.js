@@ -13,6 +13,12 @@ const SCard = styled.article`
 	:hover {
 		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 	}
+
+	@media (max-width: 768px) {
+		width: 80%;
+		height: auto;
+		padding: 1rem;
+	}
 `;
 
 export default SCard;
