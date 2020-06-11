@@ -52,7 +52,7 @@ const Game = ({ streams, game, socket }) => {
 
 	return (
 		<SGamePage>
-			<Info socket={socket} nameChosen={nameChosen} nameToGuess={nameToGuess} />
+			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
 			<SVideos>
 				<SVideo>
 					<Video id="local" stream={localStream()} />
