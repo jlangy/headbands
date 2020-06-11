@@ -6,6 +6,7 @@ import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
 import HostMenu from '../components/HostMenu';
 import SVideos from '../styled_components/SVideos';
+import SVideo from '../styled_components/SVideo';
 
 const Game = ({ streams, game, socket }) => {
 	const emptyVideos = () => {
@@ -37,14 +38,18 @@ const Game = ({ streams, game, socket }) => {
 			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
 			<SVideos>
 				<h2>In room: {game.name}</h2>
-				<Video id="local" stream={localStream()} />
+				<SVideo>
+					<Video id="local" stream={localStream()} />
+				</SVideo>
 				{incomingStreams().map((streamName, i) => (
 					<div>
-						<Video
-							stream={streams[streamName] && streams[streamName].stream}
-							key={i}
-							id={`stream${i}`}
-						/>
+						<SVideo>
+							<Video
+								stream={streams[streamName] && streams[streamName].stream}
+								key={i}
+								id={`stream${i}`}
+							/>
+						</SVideo>
 						<h3>{streams[streamName] && streams[streamName].nameToGuess}</h3>
 					</div>
 				))}
