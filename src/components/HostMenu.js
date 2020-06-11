@@ -2,19 +2,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 
-function HostMenu({ socket, game, dispatch }) {
-	function stopGame() {
+const HostMenu = ({ socket, game, dispatch }) => {
+	const stopGame = () => {
 		const roomName = game.name;
 		dispatch({ type: END_GAME });
 		socket.emit('end game', { roomName });
-	}
+	};
 
-	function restartGame() {
+	const restartGame = () => {
 		const roomName = game.name;
 		dispatch({ type: RESTART_GAME });
 		dispatch({ type: CLEAR_STREAM_NAMES });
 		socket.emit('restart game', { roomName });
-	}
+	};
 
 	return (
 		<div className="container">
@@ -26,7 +26,7 @@ function HostMenu({ socket, game, dispatch }) {
 			</button>
 		</div>
 	);
-}
+};
 
 const mapStateToProps = (state) => ({
 	game: state.game

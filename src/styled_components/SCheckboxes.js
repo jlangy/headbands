@@ -9,10 +9,10 @@ const SCheckboxes = styled(SInputGroup)`
 		display: flex;
 		align-items: center;
 		max-width: 45%;
-		justify-content: space-between;
 
 		> * {
 			display: flex;
+			padding-right: 1rem;
 		}
 	}
 `;

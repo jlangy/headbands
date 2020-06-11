@@ -6,8 +6,9 @@ const SCard = styled.article`
 	flex-direction: column;
 	align-items: center;
 	transition: 0.3s;
-	width: 30%;
-	height: 50%;
+	min-width: 40%;
+	max-width: 70%;
+	max-height: 70%;
 	margin: 1.5rem;
 
 	:hover {
