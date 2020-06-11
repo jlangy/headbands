@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
+import SButton from '../styled_components/SButton';
+import SHostButtons from '../styled_components/SHostButtons';
 
 const HostMenu = ({ socket, game, dispatch }) => {
-	const stopGame = () => {
+	const endGame = () => {
 		const roomName = game.name;
 		dispatch({ type: END_GAME });
 		socket.emit('end game', { roomName });
@@ -17,14 +19,10 @@ const HostMenu = ({ socket, game, dispatch }) => {
 	};
 
 	return (
-		<div className="container">
-			<button className="button-medium" onClick={stopGame}>
-				Kill Game
-			</button>
-			<button className="button-medium" onClick={restartGame}>
-				New Game
-			</button>
-		</div>
+		<SHostButtons>
+			<SButton onClick={endGame} label={'End Game'}></SButton>
+			<SButton onClick={restartGame} label={'Restart Game'}></SButton>
+		</SHostButtons>
 	);
 };
 

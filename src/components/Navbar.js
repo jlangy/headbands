@@ -38,11 +38,11 @@ const SIcon = styled.img`
 
 const SLinks = styled.ul`
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-between;
 	width: 50vw;
 
 	@media (max-width: 768px) {
-		width: 35vw;
+		width: 45vw;
 	}
 `;
 
@@ -54,6 +54,10 @@ const SLink = styled(Link)`
 
 	:hover {
 		text-shadow: 1px 1px 1px rgba(150, 150, 150, 0.75);
+	}
+
+	@media (max-width: 768px) {
+		font-size: 1.5rem;
 	}
 `;
 

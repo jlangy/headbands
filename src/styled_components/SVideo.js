@@ -2,12 +2,12 @@ import styled from 'styled-components';
 
 // Contains video svg element
 const SVideo = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
 	width: 320px;
-	height: 280px;
+	height: 250px;
 	margin: 1rem 0;
+	position: relative;
+	overflow: hidden;
+	border-radius: 5px;
 `;
 
 export default SVideo;

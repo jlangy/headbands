@@ -54,10 +54,7 @@ const App = ({ game }) => {
 				<Route path="/contact">
 					<Contact />
 				</Route>
-				<Route path="/game">
-					{window.console.log(game)}
-					{game.gamePhase && <Game socket={socket} />}
-				</Route>
+				<Route path="/game">{game.gamePhase && <Game socket={socket} />}</Route>
 			</Switch>
 		</Router>
 	);

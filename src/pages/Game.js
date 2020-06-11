@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import SPage from '../styled_components/SPage';
 import Video from '../components/Video';
-import GameSetup from '../components/GameSetup';
-import gamePhases from '../reducers/gamePhases';
-import HostMenu from '../components/HostMenu';
 import SVideos from '../styled_components/SVideos';
 import SVideo from '../styled_components/SVideo';
+import SVideoLabel from '../styled_components/SVideoLabel';
+import Info from '../components/Info';
+import Menu from '../components/Menu';
+import styled from 'styled-components';
+
+const SGamePage = styled(SPage)`
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+`;
 
 const Game = ({ streams, game, socket }) => {
+	const [nameChosen, setNameChosen] = useState(false);
+	const [nameToGuess, setNameToGuess] = useState();
+
+	const setName = () => {
+		setNameChosen(true);
+		socket.emit('setName', { nameToGuess, roomName: game.name });
+	};
+
 	const emptyVideos = () => {
 		// Initializes to 1 to prevent jumpy render after loading local stream
 		const activeStreams = Object.keys(streams).length || 1;
@@ -33,34 +51,46 @@ const Game = ({ streams, game, socket }) => {
 	};
 
 	return (
-		<SPage>
-			{game.host && <HostMenu socket={socket} />}
-			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
+		<SGamePage>
+			<Info socket={socket} nameChosen={nameChosen} nameToGuess={nameToGuess} />
 			<SVideos>
-				<h2>In room: {game.name}</h2>
 				<SVideo>
 					<Video id="local" stream={localStream()} />
+					<SVideoLabel>
+						<i className="fas fa-crown"></i>
+						<p>?</p>
+						<p></p>
+					</SVideoLabel>
 				</SVideo>
 				{incomingStreams().map((streamName, i) => (
-					<div>
-						<SVideo>
-							<Video
-								stream={streams[streamName] && streams[streamName].stream}
-								key={i}
-								id={`stream${i}`}
-							/>
-						</SVideo>
-						<h3>{streams[streamName] && streams[streamName].nameToGuess}</h3>
-					</div>
+					<SVideo key={i}>
+						<Video
+							stream={streams[streamName] && streams[streamName].stream}
+							id={`stream${i}`}
+						/>
+						<SVideoLabel>
+							{streams[streamName] && streams[streamName].nameToGuess}
+						</SVideoLabel>
+					</SVideo>
 				))}
 				{emptyVideos().map((a, i) => (
-					<div className="video-container" key={i}>
-						Waiting for player
-					</div>
+					<SVideo key={i}>
+						<Video id={`stream${i}`} />
+						<SVideoLabel>
+							<p>Waiting for player...</p>
+						</SVideoLabel>
+					</SVideo>
 				))}
 			</SVideos>
+			<Menu
+				socket={socket}
+				nameChosen={nameChosen}
+				nameToGuess={nameToGuess}
+				setNameToGuess={setNameToGuess}
+				setName={setName}
+			/>
 			{/* <button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button> */}
-		</SPage>
+		</SGamePage>
 	);
 };
 
