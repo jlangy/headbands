@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import {
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Redirect
+} from 'react-router-dom';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
 import handleSocketMsg from './helpers/handleSocketMsg';
@@ -14,16 +19,17 @@ import './global_scss/App.scss';
 
 const App = ({ game }) => {
 	const [socket, setSocket] = useState();
+	const [redirect, setRedirect] = useState(false);
 
 	useEffect(() => {
-		//connection for local
+		// connection for local
 		const socket = io.connect('http://localhost:3000');
 
-		//connection for production
+		// connection for production
 		// const socket = io.connect(window.location.hostname);
 
 		socket.on('message', (msg) => {
-			handleSocketMsg(msg, socket);
+			handleSocketMsg(msg, socket, setRedirect);
 		});
 		setSocket(socket);
 	}, []);
@@ -31,7 +37,10 @@ const App = ({ game }) => {
 	return (
 		<Router>
 			<Navbar></Navbar>
+			{game.disconnected && <h1>HOST DISCONNECTED</h1>}
+			{redirect && <Redirect to="/" />}
 			<Switch>
+				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
 				<Route path="/">
 					<Landing socket={socket} />
 				</Route>
@@ -54,4 +63,4 @@ const mapStateToProps = (state) => ({
 	game: state.game
 });
 
-export default connect(mapStateToProps, null)(App);
+export default connect(mapStateToProps)(App);

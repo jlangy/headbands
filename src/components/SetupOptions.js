@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Heading from '../styled_components/Heading';
+import SHeading from '../styled_components/SHeading';
 import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
-import { createStream } from '../actions/streamActions';
 
 const SetupOptions = ({ socket, createStream, streams }) => {
 	const [makeRoomName, setMakeRoomName] = useState('');
@@ -11,12 +10,12 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 
 	const makeRoom = async () => {
 		socket.emit('make room', { name: makeRoomName, totalPlayers: numPlayers });
-		turnOnLocalMedia(createStream, streams);
+		turnOnLocalMedia(streams, socket);
 	};
 
 	return (
 		<>
-			<Heading>Create Game</Heading>
+			<SHeading>Create Game</SHeading>
 
 			<div className="player-number">
 				<label htmlFor="players-number">Total Players: </label>
@@ -55,4 +54,4 @@ const mapStateToProps = (state) => ({
 	streams: state.streams
 });
 
-export default connect(mapStateToProps, { createStream })(SetupOptions);
+export default connect(mapStateToProps)(SetupOptions);

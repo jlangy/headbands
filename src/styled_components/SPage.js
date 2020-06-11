@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Page = styled.main`
+const SPage = styled.main`
 	width: 100vw;
 	height: 100vh;
 	display: flex;
@@ -8,4 +8,4 @@ const Page = styled.main`
 	/* align-items: center; */
 `;
 
-export default Page;
+export default SPage;

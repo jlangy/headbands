@@ -1,33 +1,36 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Heading from '../styled_components/Heading';
+import SHeading from '../styled_components/SHeading';
 import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
-import { createStream } from '../actions/streamActions';
+import SForm from '../styled_components/SForm';
+import SBreak from '../styled_components/SBreak';
+import SInputGroup from '../styled_components/SInputGroup';
+import SInput from '../styled_components/SInput';
+import SButton from '../styled_components/SButton';
 
 const JoinOptions = ({ socket, streams }) => {
 	const [joinRoomName, setJoinRoomName] = useState('');
 
 	const joinRoom = async () => {
-		await turnOnLocalMedia(createStream, streams);
+		await turnOnLocalMedia(streams, socket);
 		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 	};
 
 	return (
 		<>
-			<Heading>Join Game</Heading>
-
-			<div>
-				<input
-					type="text"
-					onChange={(e) => {
-						setJoinRoomName(e.target.value);
-					}}
-				/>
-				<Link to="/game">
-					<button onClick={joinRoom}>Go!</button>
-				</Link>
-			</div>
+			<SHeading>Join Game</SHeading>
+			<SBreak></SBreak>
+			<SForm>
+				<SInputGroup>
+					<SInput
+						type="text"
+						onChange={(e) => {
+							setJoinRoomName(e.target.value);
+						}}
+					/>
+					<SButton label={'Go?'} to="/game" onClick={joinRoom}></SButton>
+				</SInputGroup>
+			</SForm>
 		</>
 	);
 };
@@ -36,4 +39,4 @@ const mapStateToProps = (state) => ({
 	streams: state.streams
 });
 
-export default connect(mapStateToProps, { createStream })(JoinOptions);
+export default connect(mapStateToProps)(JoinOptions);

@@ -5,8 +5,9 @@ import {
 	NAME_ADDED,
 	SETUP_COMPLETE,
 	END_GAME,
-	RESTART_GAME
-} from '../actions/types';
+	RESTART_GAME,
+	NEW_TURN
+} from './types';
 import gamePhases from './gamePhases';
 
 const initialState = {};
@@ -24,8 +25,14 @@ const gameReducer = (state = initialState, action) => {
 				totalNamesSet: 0,
 				gamePhase: gamePhases.joining
 			};
-		case ALL_PLAYERS_JOINED:
-			return { ...state, gamePhase: gamePhases.settingNames };
+		case ALL_PLAYERS_JOINED: {
+			const { turn } = action.payload;
+			return { ...state, gamePhase: gamePhases.settingNames, turn };
+		}
+		case NEW_TURN: {
+			const { turn } = action.payload;
+			return { ...state, turn };
+		}
 		case ADD_PLAYER:
 			return { ...state, playersJoined: state.playersJoined + 1 };
 		case NAME_ADDED:
@@ -33,7 +40,7 @@ const gameReducer = (state = initialState, action) => {
 		case SETUP_COMPLETE:
 			return { ...state, gamePhase: gamePhases.playing };
 		case END_GAME:
-			return {};
+			return { disconnected: true };
 		case RESTART_GAME:
 			return { ...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0 };
 		default:

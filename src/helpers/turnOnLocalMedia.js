@@ -1,11 +1,17 @@
-const turnOnLocalMedia = async (createStream, streams) => {
-	if (!streams['local']) {
+import store from '../store';
+import { NEW_STREAM } from '../reducers/types';
+
+const turnOnLocalMedia = async (streams, socket) => {
+	//Setup media
+	if (!streams[socket.id]) {
 		const stream = await navigator.mediaDevices.getUserMedia({
-			audio: true,
+			audio: false,
 			video: true
 		});
-
-		createStream({ stream, socketId: 'local' });
+		store.dispatch({
+			type: NEW_STREAM,
+			payload: { stream, socketId: socket.id }
+		});
 	}
 };
 

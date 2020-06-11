@@ -20,19 +20,17 @@ function endGame(roomName){
   });
 }
 
-function shiftNames(names) {
-	const shiftedNames = [];
-	names.forEach((name, i) => {
-		if (i === names.length - 1) {
-			shiftedNames[0] = { toId: names[0].fromId, name: name.nameToGuess };
+function shiftNames(players) {
+	Object.keys(players).forEach((id, i,keys) => {
+		if(i === Object.keys(players).length - 1){
+			players[id].nameToGuess = players[keys[0]].sentName;
+			players[id].receivedNameFrom = keys[0]
 		} else {
-			shiftedNames[i + 1] = {
-				toId: names[i + 1].fromId,
-				name: name.nameToGuess
-			};
+			players[id].receivedNameFrom = keys[i+1]
+			players[id].nameToGuess = players[keys[i+1]].sentName
 		}
 	});
-	return shiftedNames;
+	return players;
 }
 
 io.on('connection', function (socket) {
@@ -47,7 +45,7 @@ io.on('connection', function (socket) {
 			totalPlayers,
 			name,
 			playersJoined: 1,
-			namesToGuess: [],
+			players: {[socket.id]: {nameToGuess: null, sentName: null}},
 			host: socket.id
 		};
 		socket.join(name);
@@ -58,11 +56,16 @@ io.on('connection', function (socket) {
     if(rooms[roomName] && rooms[roomName].host == socket.id){
       io.in(roomName).emit('message', {type: 'host disconnection'});
       endGame(roomName);
+    } else if(rooms[roomName]){
+      io.in(roomName).emit('message', {type: 'disconnection', id: socket.id});
+      rooms[roomName].playersJoined -= 1;
     }
   });
 
   socket.on('restart game', ({roomName}) => {
-    rooms[roomName].namesToGuess = [];
+    Object.keys(rooms[roomName].players).forEach(key => {
+			rooms[roomName].players[key] = {};
+		})
     io.in(roomName).emit('message', {type: 'restart'})
   })
   
@@ -80,9 +83,9 @@ io.on('connection', function (socket) {
 	socket.on('join room', async ({ roomName, fromId }) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-			// const token = {iceServers: null}//await client.tokens.create();
-			const token = await client.tokens.create();
+			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			// const token = await client.tokens.create();
+			const token = {iceServers: null}//await client.tokens.create();
 			socket
 				.to(roomName)
 				.emit('message', {
@@ -104,9 +107,9 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('description', async ({ description, toId, fromId }) => {
-		const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-		const token = await client.tokens.create();
-		// const token = {iceServers: null} // await client.tokens.create();
+		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+		// const token = await client.tokens.create();
+		const token = {iceServers: null} // await client.tokens.create();
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,
@@ -133,11 +136,9 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('setName', ({ nameToGuess, roomName }) => {
-		// names.push({fromId: socket.id, name: msg.name});
-		const namesToGuess = rooms[roomName].namesToGuess;
-		namesToGuess.push({ fromId: socket.id, nameToGuess });
-		if (namesToGuess.length === rooms[roomName].totalPlayers) {
-			const shiftedNames = shiftNames(namesToGuess);
+		rooms[roomName].players[socket.id].sentName = nameToGuess;
+		if (Object.values(rooms[roomName].players).every(val => val.sentName)) {
+			const shiftedNames = shiftNames(rooms[roomName].players);
 			io.in(roomName).emit('message', {
 				type: 'give names',
 				names: shiftedNames
@@ -145,19 +146,28 @@ io.on('connection', function (socket) {
 		} else {
 			io.in(roomName).emit('message', {
 				type: 'update set names',
-				totalNamesSet: namesToGuess.length
+				totalNamesSet: Object.values(rooms[roomName].players).filter(player => player.sentName).length
 			});
 		}
 	});
 
-	socket.on('ready', (roomName) => {
+	socket.on('ready', ({roomName, joinerId}) => {
 		const room = rooms[roomName];
 		//There will be n-1 answers from nth joiner, so add 1/n-1.
 		room.playersJoined += 1 / Math.floor(room.playersJoined);
+		room.players[joinerId] = {nameToGuess: null, sentName: null}
 		if (Math.round(room.playersJoined) == room.totalPlayers) {
-			io.in(roomName).emit('message', { type: 'gameReady' });
+			room.turn = 0;
+			room.turnOrder = Object.keys(room.players);
+			io.in(roomName).emit('message', { type: 'gameReady', turn: room.turnOrder[room.turn] });
 		}
 	});
+
+	socket.on('next turn', ({roomName}) => {
+		const room = rooms[roomName];
+		room.turn = room.turn == room.totalPlayers - 1 ? 0 : room.turn + 1;
+		io.in(roomName).emit('message', {type: 'new turn', turn: room.turnOrder[room.turn]})
+	})
 });
 
 app.get('*', (req, res) => {

@@ -1,5 +1,7 @@
 import store from '../store';
 import {
+	REMOVE_STREAM,
+	NEW_TURN,
 	NEW_GAME,
 	NEW_STREAM,
 	ALL_PLAYERS_JOINED,
@@ -11,7 +13,7 @@ import {
 	CLEAR_STREAMS,
 	RESTART_GAME,
 	CLEAR_STREAM_NAMES
-} from '../actions/types';
+} from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
 
 const socketMessages = {
@@ -27,13 +29,14 @@ const socketMessages = {
 	joining: 'joining',
 	xirres: 'xir response',
 	updateSetNames: 'update set names',
-	disconnection: 'host disconnection',
-	restart: 'restart'
+	disconnection: 'disconnection',
+	hostDisconnection: 'host disconnection',
+	restart: 'restart',
+	newTurn: 'new turn'
 };
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
-//TODO: connections cleanup on new games
-const connections = {};
+let connections = {};
 
 //Add local stream to peer connection
 const feedLocalStream = (stream, connectionId) => {
@@ -42,10 +45,10 @@ const feedLocalStream = (stream, connectionId) => {
 	});
 };
 
-const createStreamConnection = (socketId, iceServers) => {
-	connections[socketId] = new RTCPeerConnection({ iceServers });
-	// connections[socketId] = new RTCPeerConnection(null);
-	feedLocalStream(store.getState().streams['local'].stream, socketId);
+const createStreamConnection = (socketId, iceServers, localId) => {
+	// connections[socketId] = new RTCPeerConnection({iceServers});
+	connections[socketId] = new RTCPeerConnection(null);
+	feedLocalStream(store.getState().streams[localId].stream, socketId);
 	connections[socketId].ontrack = (e) =>
 		store.dispatch({
 			type: NEW_STREAM,
@@ -53,19 +56,18 @@ const createStreamConnection = (socketId, iceServers) => {
 		});
 };
 
-const handleSocketMsg = async (msg, socket) => {
-	console.log(msg);
+const handleSocketMsg = async (msg, socket, setRedirect) => {
 	switch (msg.type) {
-		//Server sending ICE candidate, add to connection
+		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
 			return connections[msg.fromId].addIceCandidate(
 				new RTCIceCandidate(msg.candidate)
 			);
 		// return connections[msg.fromId].addIceCandidate(msg.candidate)
 
-		//Received join request, create connection and attach stream, create offer, set and send description
+		// Received join request, create connection and attach stream, create offer, set and send description
 		case socketMessages.joinRequest:
-			createStreamConnection(msg.fromId, msg.iceServers);
+			createStreamConnection(msg.fromId, msg.iceServers, socket.id);
 			const offer = await connections[msg.fromId].createOffer();
 			await connections[msg.fromId].setLocalDescription(offer);
 			connections[msg.fromId].onicecandidate = function (event) {
@@ -76,7 +78,7 @@ const handleSocketMsg = async (msg, socket) => {
 						toId: msg.fromId
 					});
 				} else {
-					//TODO: might need some cleanup here if candidate null
+					// TODO: might need some cleanup here if candidate null
 					console.log('ice candidates finished');
 				}
 			};
@@ -87,9 +89,12 @@ const handleSocketMsg = async (msg, socket) => {
 				room: store.getState().game.name
 			});
 
-		//recieved offer, create connection, add candidate handler, set description, set and send answer
+		case socketMessages.newTurn:
+			return store.dispatch({ type: NEW_TURN, payload: { turn: msg.turn } });
+
+		// recieved offer, create connection, add candidate handler, set description, set and send answer
 		case socketMessages.offer:
-			createStreamConnection(msg.fromId, msg.iceServers);
+			createStreamConnection(msg.fromId, msg.iceServers, socket.id);
 			connections[msg.fromId].onicecandidate = function (event) {
 				if (event.candidate) {
 					socket.emit('iceCandidate', {
@@ -98,7 +103,7 @@ const handleSocketMsg = async (msg, socket) => {
 						toId: msg.fromId
 					});
 				} else {
-					//TODO: might need some cleanup here if candidate null
+					// TODO: might need some cleanup here if candidate null
 					console.log('ice candidates finished');
 				}
 			};
@@ -111,10 +116,13 @@ const handleSocketMsg = async (msg, socket) => {
 				fromId: socket.id
 			});
 
-		//received answer, set description
+		// received answer, set description
 		case socketMessages.answer:
-			socket.emit('ready', store.getState().game.name);
-			//Set players joined here
+			socket.emit('ready', {
+				roomName: store.getState().game.name,
+				joinerId: msg.fromId
+			});
+			// Set players joined here
 			store.dispatch({ type: ADD_PLAYER });
 			return await connections[msg.fromId].setRemoteDescription(msg.answer);
 
@@ -142,20 +150,38 @@ const handleSocketMsg = async (msg, socket) => {
 			});
 
 		case socketMessages.ready:
-			console.log('all ready boss');
-			return store.dispatch({ type: ALL_PLAYERS_JOINED });
+			return store.dispatch({
+				type: ALL_PLAYERS_JOINED,
+				payload: { turn: msg.turn }
+			});
 
 		case socketMessages.restart:
 			store.dispatch({ type: CLEAR_STREAM_NAMES });
 			return store.dispatch({ type: RESTART_GAME });
 
 		case socketMessages.xirres:
-			return console.log(msg.iceServers);
+			console.log(msg.iceServers);
+			break;
 
-		case socketMessages.disconnection:
-			console.log('theres has been a disconnection');
+		case socketMessages.disconnection: {
+			const socketId = msg.id;
+			return store.dispatch({ type: REMOVE_STREAM, socketId });
+		}
+
+		case socketMessages.hostDisconnection:
 			store.dispatch({ type: END_GAME });
-			return store.dispatch({ type: CLEAR_STREAMS });
+			setRedirect(true);
+			// Stop local media
+			store.getState().streams[socket.id].stream.getTracks()[0].stop();
+			Object.values(connections).forEach((peerConn) => {
+				console.log(peerConn);
+				peerConn.close();
+			});
+			connections = {};
+			setTimeout(() => {
+				return store.dispatch({ type: CLEAR_STREAMS });
+			}, 50);
+			break;
 
 		case socketMessages.joining: {
 			let { totalPlayers, name, playersJoined } = msg;

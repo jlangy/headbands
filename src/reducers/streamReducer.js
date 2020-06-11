@@ -1,9 +1,10 @@
 import {
+	REMOVE_STREAM,
 	NEW_STREAM,
 	GOT_NAMES,
 	CLEAR_STREAMS,
 	CLEAR_STREAM_NAMES
-} from '../actions/types';
+} from './types';
 
 const initialState = {};
 
@@ -14,17 +15,21 @@ const streamReducer = (state = initialState, action) => {
 			return { ...state, [socketId]: { stream } };
 		case GOT_NAMES:
 			const { names } = action.payload;
-			const newState = {};
-			Object.keys(state).forEach((streamName) => {
-				const foundName = names.find((nameObj) => nameObj.toId === streamName);
-				newState[streamName] = {
-					...state[streamName],
-					name: foundName && foundName.name
-				};
+			const newState = { ...state };
+			Object.entries(names).forEach(([id, playerInformation]) => {
+				newState[id] = { ...newState[id], ...playerInformation };
 			});
 			return newState;
+		case REMOVE_STREAM: {
+			const idToRemove = action.socketId;
+			const newState = { ...state };
+			console.log(idToRemove, newState);
+			delete newState[idToRemove];
+			console.log(newState);
+			return newState;
+		}
 		case CLEAR_STREAMS:
-			return { local: state.local };
+			return {};
 		case CLEAR_STREAM_NAMES:
 			const newStateWithoutNames = {};
 			for (const [key, value] of Object.entries(state)) {

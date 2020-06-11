@@ -1,21 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createStream } from '../actions/streamActions';
-import Page from '../styled_components/Page';
-import Card from '../styled_components/Card';
+import SPage from '../styled_components/SPage';
+import SCard from '../styled_components/SCard';
 import SetupOptions from '../components/SetupOptions';
 import JoinOptions from '../components/JoinOptions';
 
-const Landing = ({ socket, createStream, streams }) => {
+const Landing = ({ socket, streams }) => {
 	return (
-		<Page>
-			<Card>
-				<SetupOptions socket createStream streams />
-			</Card>
-			<Card>
-				<JoinOptions socket createStream streams />
-			</Card>
-		</Page>
+		<SPage>
+			<SCard>
+				<SetupOptions socket={socket} streams={streams} />
+			</SCard>
+			<SCard>
+				<JoinOptions socket={socket} streams={streams} />
+			</SCard>
+		</SPage>
 	);
 };
 
@@ -23,4 +22,4 @@ const mapStateToProps = (state) => ({
 	streams: state.streams
 });
 
-export default connect(mapStateToProps, { createStream })(Landing);
+export default connect(mapStateToProps)(Landing);

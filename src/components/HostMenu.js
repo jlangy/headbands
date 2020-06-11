@@ -1,21 +1,20 @@
 import React from 'react';
-import { endGame, restart } from '../actions/gameActions';
-import { clearStreamNames } from '../actions/streamActions';
 import { connect } from 'react-redux';
+import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 
-const HostMenu = ({ endGame, restart, socket, game, clearStreamNames }) => {
-	const stopGame = () => {
+function HostMenu({ socket, game, dispatch }) {
+	function stopGame() {
 		const roomName = game.name;
-		endGame();
+		dispatch({ type: END_GAME });
 		socket.emit('end game', { roomName });
-	};
+	}
 
-	const restartGame = () => {
+	function restartGame() {
 		const roomName = game.name;
-		restart();
-		clearStreamNames();
+		dispatch({ type: RESTART_GAME });
+		dispatch({ type: CLEAR_STREAM_NAMES });
 		socket.emit('restart game', { roomName });
-	};
+	}
 
 	return (
 		<div className="container">
@@ -27,12 +26,10 @@ const HostMenu = ({ endGame, restart, socket, game, clearStreamNames }) => {
 			</button>
 		</div>
 	);
-};
+}
 
 const mapStateToProps = (state) => ({
 	game: state.game
 });
 
-export default connect(mapStateToProps, { endGame, restart, clearStreamNames })(
-	HostMenu
-);
+export default connect(mapStateToProps)(HostMenu);

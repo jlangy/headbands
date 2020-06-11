@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Page from '../styled_components/Page';
+import SPage from '../styled_components/SPage';
 import Video from '../components/Video';
 import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
@@ -15,11 +15,11 @@ const Game = ({ streams, game, socket }) => {
 	};
 
 	const incomingStreams = () =>
-		Object.keys(streams).filter((streamName) => streamName !== 'local');
+		Object.keys(streams).filter((streamName) => streamName !== socket.id);
 
 	//Turn off audio of local stream
 	const localStream = () => {
-		const localStream = streams['local'] && streams['local'].stream;
+		const localStream = streams[socket.id] && streams[socket.id].stream;
 		if (localStream) {
 			const removeAudioLocalStream = localStream.clone();
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
@@ -31,7 +31,7 @@ const Game = ({ streams, game, socket }) => {
 	};
 
 	return (
-		<Page>
+		<SPage>
 			{game.host && <HostMenu socket={socket} />}
 			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
 			<div className="videos-container">
@@ -40,11 +40,11 @@ const Game = ({ streams, game, socket }) => {
 				{incomingStreams().map((streamName, i) => (
 					<div>
 						<Video
-							stream={streams[streamName].stream}
+							stream={streams[streamName] && streams[streamName].stream}
 							key={i}
 							id={`stream${i}`}
 						/>
-						<h3>{streams[streamName].name}</h3>
+						<h3>{streams[streamName] && streams[streamName].nameToGuess}</h3>
 					</div>
 				))}
 				{emptyVideos().map((a, i) => (
@@ -53,7 +53,8 @@ const Game = ({ streams, game, socket }) => {
 					</div>
 				))}
 			</div>
-		</Page>
+			{/* <button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button> */}
+		</SPage>
 	);
 };
 
