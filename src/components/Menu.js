@@ -2,12 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
-import SButton from '../styled_components/SButton';
 import SHostButtons from '../styled_components/SHostButtons';
 import SCard from '../styled_components/SCard';
 import styled from 'styled-components';
 import SNameInputGroup from '../styled_components/SNameInputGroup';
-import SInput from '../styled_components/SInput';
+import SNameInput from '../styled_components/SNameInput';
+import SNameButton from '../styled_components/SNameButton';
 
 const SMenuCard = styled(SCard)`
 	padding: 1rem 0;
@@ -15,6 +15,13 @@ const SMenuCard = styled(SCard)`
 	margin: 0 auto;
 	max-width: 90%;
 	justify-content: space-evenly;
+
+	@media (max-width: 768px) {
+		flex-direction: column;
+		justify-content: start;
+		align-items: center;
+		width: 100%;
+	}
 `;
 
 const Menu = ({
@@ -42,18 +49,19 @@ const Menu = ({
 		<SMenuCard>
 			{game.host && (
 				<SHostButtons>
-					<SButton onClick={endGame} label={'End Game'}></SButton>
-					<SButton onClick={restartGame} label={'Restart Game'}></SButton>
+					<SNameButton onClick={endGame}>End Game</SNameButton>
+					<SNameButton onClick={restartGame}>Restart Game</SNameButton>
 				</SHostButtons>
 			)}
 			{game.gamePhase === gamePhases.settingNames && (
 				<SNameInputGroup>
-					<SInput onChange={(e) => setNameToGuess(e.target.value)}></SInput>
-					<SButton
-						onClick={setName}
-						disabled={nameChosen}
-						label={nameChosen ? 'Waiting' : 'Confirm'}
-					></SButton>
+					<SNameInput
+						placeholder="Enter a name..."
+						onChange={(e) => setNameToGuess(e.target.value)}
+					></SNameInput>
+					<SNameButton onClick={setName} disabled={nameChosen}>
+						{nameChosen ? 'Waiting' : 'Confirm'}
+					</SNameButton>
 				</SNameInputGroup>
 			)}
 		</SMenuCard>

@@ -18,7 +18,7 @@ const SInput = styled.input`
 	}
 
 	&[type='submit'] {
-		width: 100%;
+		width: 96%;
 		background-color: #3ca7d2;
 		color: white;
 		padding: 2%;
