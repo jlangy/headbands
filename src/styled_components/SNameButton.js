@@ -9,9 +9,8 @@ const SNameButton = styled.button`
 	border: none;
 	font-size: inherit;
 	flex-grow: 1;
-	margin: 0.5rem 0;
-	justify-content: space-around;
-	align-items: center;
+	margin: 0.5rem auto;
+	flex-basis: 20%;
 
 	:active,
 	:focus,
