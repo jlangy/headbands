@@ -8,7 +8,7 @@ const SPage = styled.main`
 
 	@media (max-width: 768px) {
 		flex-direction: column;
-		align-items: center;
+		justify-content: start;
 	}
 `;
 

@@ -10,6 +10,7 @@ import SButton from '../styled_components/SButton';
 import SLabel from '../styled_components/SLabel';
 import STextArea from '../styled_components/STextArea';
 
+// @TODO: Hook up for netlify
 const Contact = (props) => {
 	return (
 		<SPage>
@@ -19,17 +20,21 @@ const Contact = (props) => {
 				<SForm>
 					<SInputGroup>
 						<SLabel>Email: </SLabel>
-						<SInput type="email" value="" placeholder="Enter your email" />
+						<SInput
+							type="email"
+							defaultValue=""
+							placeholder="Enter your email"
+						/>
 					</SInputGroup>
 					<SInputGroup>
 						<SLabel>Subject:</SLabel>
-						<SInput type="text" value="" placeholder="Enter a subject" />
+						<SInput type="text" defaultValue="" placeholder="Enter a subject" />
 					</SInputGroup>
 					<SInputGroup>
 						<SLabel>Message:</SLabel>
-						<STextArea value="" placeholder="Say hello!" />
+						<STextArea defaultValue="" placeholder="Say hello!" />
 					</SInputGroup>
-					<SButton type="submit" label="Submit"></SButton>
+					<SButton type="submit" to="/" label="Submit"></SButton>
 				</SForm>
 			</SCard>
 		</SPage>

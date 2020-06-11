@@ -4,12 +4,6 @@ import SPage from '../styled_components/SPage';
 import SHeading from '../styled_components/SHeading';
 import SCard from '../styled_components/SCard';
 import SBreak from '../styled_components/SBreak';
-import SForm from '../styled_components/SForm';
-import SInputGroup from '../styled_components/SInputGroup';
-import SInput from '../styled_components/SInput';
-import SButton from '../styled_components/SButton';
-import SLabel from '../styled_components/SLabel';
-import STextArea from '../styled_components/STextArea';
 import SPara from '../styled_components/SPara';
 import styled from 'styled-components';
 

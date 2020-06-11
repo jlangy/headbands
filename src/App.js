@@ -37,8 +37,9 @@ const App = ({ game }) => {
 	return (
 		<Router>
 			<Navbar></Navbar>
-			{/* {game.disconnected && <h1>HOST DISCONNECTED</h1>}
-			{redirect && <Redirect to="/" />} */}
+			{game.disconnected && <h1>HOST DISCONNECTED</h1>}
+			{redirect && <Redirect to="/" />}
+
 			<Switch>
 				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
 				<Route exact path="/">
@@ -53,7 +54,10 @@ const App = ({ game }) => {
 				<Route path="/contact">
 					<Contact />
 				</Route>
-				<Route path="/game">{game.gamePhase && <Game socket={socket} />}</Route>
+				<Route path="/game">
+					{window.console.log(game)}
+					{game.gamePhase && <Game socket={socket} />}
+				</Route>
 			</Switch>
 		</Router>
 	);

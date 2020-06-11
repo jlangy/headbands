@@ -9,6 +9,8 @@ const STextArea = styled.textarea`
 	border: none;
 	border-radius: 3px;
 	box-shadow: inset 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+	resize: none;
+	min-height: 10vh;
 
 	:active,
 	:focus,

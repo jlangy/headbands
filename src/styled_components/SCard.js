@@ -9,7 +9,7 @@ const SCard = styled.article`
 	min-width: 40%;
 	max-width: 70%;
 	max-height: 70%;
-	margin: 1.5rem;
+	margin: 1.5rem auto;
 
 	:hover {
 		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);

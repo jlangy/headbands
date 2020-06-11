@@ -13,10 +13,30 @@ const SLink = styled(Link)`
 	:hover {
 		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 	}
+
+	> button {
+		width: 100%;
+		height: 100%;
+		color: inherit;
+		background: inherit;
+		border: none;
+		font-size: inherit;
+
+		:active,
+		:focus,
+		:focus-within {
+			border: none;
+			outline: none;
+		}
+	}
 `;
 
-const SButton = ({ label, to }) => {
-	return <SLink to={to}>{label}</SLink>;
+const SButton = ({ label, to, onClick }) => {
+	return (
+		<SLink to={to}>
+			<button onClick={onClick}>{label}</button>
+		</SLink>
+	);
 };
 
 export default SButton;

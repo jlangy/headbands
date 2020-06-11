@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import SVideo from '../styled_components/SVideo';
 
 const Video = ({ stream, id }) => {
 	useEffect(() => {
@@ -6,9 +7,9 @@ const Video = ({ stream, id }) => {
 	}, [stream, id]);
 
 	return (
-		<div className="video-container">
+		<SVideo>
 			<video id={id} autoPlay playsInline></video>
-		</div>
+		</SVideo>
 	);
 };
 

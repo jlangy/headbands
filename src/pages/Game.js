@@ -5,6 +5,7 @@ import Video from '../components/Video';
 import GameSetup from '../components/GameSetup';
 import gamePhases from '../reducers/gamePhases';
 import HostMenu from '../components/HostMenu';
+import SVideos from '../styled_components/SVideos';
 
 const Game = ({ streams, game, socket }) => {
 	const emptyVideos = () => {
@@ -19,9 +20,9 @@ const Game = ({ streams, game, socket }) => {
 
 	//Turn off audio of local stream
 	const localStream = () => {
-		const localStream = streams[socket.id] && streams[socket.id].stream;
-		if (localStream) {
-			const removeAudioLocalStream = localStream.clone();
+		const local = streams[socket.id] && streams[socket.id].stream;
+		if (local) {
+			const removeAudioLocalStream = local.clone();
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
 			if (audioTrack.length > 0) {
 				removeAudioLocalStream.removeTrack(audioTrack[0]);
@@ -34,7 +35,7 @@ const Game = ({ streams, game, socket }) => {
 		<SPage>
 			{game.host && <HostMenu socket={socket} />}
 			{game.gamePhase !== gamePhases.playing && <GameSetup socket={socket} />}
-			<div className="videos-container">
+			<SVideos>
 				<h2>In room: {game.name}</h2>
 				<Video id="local" stream={localStream()} />
 				{incomingStreams().map((streamName, i) => (
@@ -52,7 +53,7 @@ const Game = ({ streams, game, socket }) => {
 						Waiting for player
 					</div>
 				))}
-			</div>
+			</SVideos>
 			{/* <button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button> */}
 		</SPage>
 	);
@@ -63,4 +64,4 @@ const mapStateToProps = (state) => ({
 	game: state.game
 });
 
-export default connect(mapStateToProps, null)(Game);
+export default connect(mapStateToProps)(Game);
