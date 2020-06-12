@@ -57,6 +57,7 @@ const Game = ({ streams, totalPlayers, socket }) => {
 					<SVideo key={i}>
 						<Video
 							stream={streams[streamName] && streams[streamName].stream}
+							streamName={streamName}
 							id={`stream${i}`}
 						/>
 						<SVideoLabel>
