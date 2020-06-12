@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react';
-import './video.scss';
 
-function Video({ stream, id }) {
+const Video = ({ stream, id }) => {
 	useEffect(() => {
 		document.getElementById(id).srcObject = stream;
-	}, [stream]);
+	}, [stream, id]);
 
 	return (
-		<div className="video-container">
-			<video id={id} autoPlay playsInline></video>
-		</div>
+		<video id={id} autoPlay playsInline poster="/tv-color-bars.gif"></video>
 	);
-}
+};
 
 export default Video;

@@ -1,65 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect
-} from "react-router-dom";
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Redirect
+} from 'react-router-dom';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
+import handleSocketMsg from './helpers/handleSocketMsg';
+import Navbar from './components/Navbar';
+import Landing from './pages/Landing';
+import Game from './pages/Game';
+import Donate from './pages/Donate';
+import Contact from './pages/Contact';
+import Instructions from './pages/Instructions';
 
-import handleSocketMsg from "./helpers/handleSocketMsg";
-import './App.scss';
+import './global_scss/App.scss';
 
-import Landing from './components/Landing';
-import Game from './components/Game'
-import { JobInstance } from 'twilio/lib/rest/bulkexports/v1/export/job';
+const App = ({ game }) => {
+	const [socket, setSocket] = useState();
+	const [redirect, setRedirect] = useState(false);
 
-function App({game, dispatch, history}) {
-  const [socket, setSocket] = useState();
-  const [redirect, setRedirect] = useState(false);
-  
-  useEffect(() => {
-    //connection for local
-    let socket = io.connect("http://localhost:3000")
-    
-    //connection for production
-    // const socket = io.connect(window.location.hostname)
+	useEffect(() => {
+		// connection for local
+		const socket = io.connect('http://localhost:3000');
 
-    socket.on('message', msg => {
-      handleSocketMsg(msg, socket, setRedirect)
-    });
-    setSocket(socket);
-  }, []); 
+		// connection for production
+		// const socket = io.connect(window.location.hostname);
 
-  return (
-    <Router>
-      <div className="App">
-        {redirect && <Redirect to='/' />}
-        <main>
-          <h1>Headbandz</h1>
-          <button onClick={() => socket.emit('xir test')}>log rooms</button>
-          <Switch>
-            
-            <Route path="/game">
-              {game.gamePhase && <Game socket={socket}/>}
-            </Route>
+		socket.on('message', (msg) => {
+			handleSocketMsg(msg, socket, setRedirect);
+		});
+		setSocket(socket);
+	}, []);
 
-            <Route path="/">
-              <Landing socket={socket}/>
-            </Route>
+	return (
+		<Router>
+			<Navbar></Navbar>
+			{game.disconnected && <h1>HOST DISCONNECTED</h1>}
+			{redirect && <Redirect to="/" />}
 
-          </Switch>
-          
-        </main>
-      </div>
-    </Router>
-  );
-}
+			<Switch>
+				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
+				<Route exact path="/">
+					<Landing socket={socket} />
+				</Route>
+				<Route path="/instructions">
+					<Instructions />
+				</Route>
+				<Route path="/donate">
+					<Donate />
+				</Route>
+				<Route path="/contact">
+					<Contact />
+				</Route>
+				<Route path="/game">{game.gamePhase && <Game socket={socket} />}</Route>
+			</Switch>
+		</Router>
+	);
+};
 
-const mapStateToProps = state => ({
-  game: state.game
-})
+const mapStateToProps = (state) => ({
+	game: state.game
+});
 
 export default connect(mapStateToProps)(App);
-

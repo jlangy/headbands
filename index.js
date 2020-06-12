@@ -12,30 +12,35 @@ let rooms = {};
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-function endGame(roomName){
-  delete rooms[roomName];
-  io.of('/').in(roomName).clients((error, socketIds) => {
-    if (error) throw error;
-    socketIds.forEach(socketId => io.sockets.sockets[socketId] && io.sockets.sockets[socketId].leave(roomName));
-  });
+function endGame(roomName) {
+	delete rooms[roomName];
+	io.of('/')
+		.in(roomName)
+		.clients((error, socketIds) => {
+			if (error) throw error;
+			socketIds.forEach(
+				(socketId) =>
+					io.sockets.sockets[socketId] &&
+					io.sockets.sockets[socketId].leave(roomName)
+			);
+		});
 }
 
 function shiftNames(players) {
-	Object.keys(players).forEach((id, i,keys) => {
-		if(i === Object.keys(players).length - 1){
+	Object.keys(players).forEach((id, i, keys) => {
+		if (i === Object.keys(players).length - 1) {
 			players[id].nameToGuess = players[keys[0]].sentName;
-			players[id].receivedNameFrom = keys[0]
+			players[id].receivedNameFrom = keys[0];
 		} else {
-			players[id].receivedNameFrom = keys[i+1]
-			players[id].nameToGuess = players[keys[i+1]].sentName
+			players[id].receivedNameFrom = keys[i + 1];
+			players[id].nameToGuess = players[keys[i + 1]].sentName;
 		}
 	});
 	return players;
 }
 
 io.on('connection', function (socket) {
-
-	socket.on('make room', ({ name, totalPlayers }) => {
+	socket.on('make room', ({ name, totalPlayers, useCategories }) => {
 		totalPlayers = Number(totalPlayers);
 		if (rooms[name]) {
 			return socket.emit('message', { type: 'name taken' });
@@ -45,39 +50,43 @@ io.on('connection', function (socket) {
 			totalPlayers,
 			name,
 			playersJoined: 1,
-			players: {[socket.id]: {nameToGuess: null, sentName: null}},
+			players: { [socket.id]: { nameToGuess: null, sentName: null } },
 			host: socket.id
 		};
 		socket.join(name);
 	});
 
 	socket.on('disconnecting', () => {
-    const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
-    if(rooms[roomName] && rooms[roomName].host == socket.id){
-      io.in(roomName).emit('message', {type: 'host disconnection'});
-      endGame(roomName);
-    } else if(rooms[roomName]){
-      io.in(roomName).emit('message', {type: 'disconnection', id: socket.id});
-      rooms[roomName].playersJoined -= 1;
-    }
-  });
+		const roomName = Object.keys(socket.rooms).filter(
+			(name) => name != socket.id
+		)[0];
+		if (rooms[roomName] && rooms[roomName].host == socket.id) {
+			io.in(roomName).emit('message', { type: 'host disconnection' });
+			endGame(roomName);
+		} else if (rooms[roomName]) {
+			io.in(roomName).emit('message', { type: 'disconnection', id: socket.id });
+			rooms[roomName].playersJoined -= 1;
+		}
+	});
 
-  socket.on('restart game', ({roomName}) => {
-    Object.keys(rooms[roomName].players).forEach(key => {
+	socket.on('restart game', ({ roomName }) => {
+		Object.keys(rooms[roomName].players).forEach((key) => {
 			rooms[roomName].players[key] = {};
-		})
-    io.in(roomName).emit('message', {type: 'restart'})
-  })
-  
-  socket.on('end game', ({roomName}) => {
-    endGame(roomName);
-    socket.to(roomName).emit('message', {type: 'host disconnection'})
-  })
+		});
+		io.in(roomName).emit('message', { type: 'restart' });
+	});
+
+	socket.on('end game', ({ roomName }) => {
+		endGame(roomName);
+		socket.to(roomName).emit('message', { type: 'host disconnection' });
+	});
 
 	socket.on('xir test', () => {
-    const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
-    console.log(Object.keys(io.sockets.adapter.rooms))
-    console.log(rooms);
+		const roomName = Object.keys(socket.rooms).filter(
+			(name) => name != socket.id
+		)[0];
+		console.log(Object.keys(io.sockets.adapter.rooms));
+		console.log(rooms);
 	});
 
 	socket.on('join room', async ({ roomName, fromId }) => {
@@ -85,15 +94,13 @@ io.on('connection', function (socket) {
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 			// const token = await client.tokens.create();
-			const token = {iceServers: null}//await client.tokens.create();
-			socket
-				.to(roomName)
-				.emit('message', {
-					type: 'joinRequest',
-					roomName,
-					fromId,
-					iceServers: token.iceServers
-				});
+			const token = { iceServers: null }; //await client.tokens.create();
+			socket.to(roomName).emit('message', {
+				type: 'joinRequest',
+				roomName,
+				fromId,
+				iceServers: token.iceServers
+			});
 			socket.emit('message', {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
@@ -109,7 +116,7 @@ io.on('connection', function (socket) {
 	socket.on('description', async ({ description, toId, fromId }) => {
 		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 		// const token = await client.tokens.create();
-		const token = {iceServers: null} // await client.tokens.create();
+		const token = { iceServers: null }; // await client.tokens.create();
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,
@@ -137,7 +144,7 @@ io.on('connection', function (socket) {
 
 	socket.on('setName', ({ nameToGuess, roomName }) => {
 		rooms[roomName].players[socket.id].sentName = nameToGuess;
-		if (Object.values(rooms[roomName].players).every(val => val.sentName)) {
+		if (Object.values(rooms[roomName].players).every((val) => val.sentName)) {
 			const shiftedNames = shiftNames(rooms[roomName].players);
 			io.in(roomName).emit('message', {
 				type: 'give names',
@@ -146,28 +153,36 @@ io.on('connection', function (socket) {
 		} else {
 			io.in(roomName).emit('message', {
 				type: 'update set names',
-				totalNamesSet: Object.values(rooms[roomName].players).filter(player => player.sentName).length
+				totalNamesSet: Object.values(rooms[roomName].players).filter(
+					(player) => player.sentName
+				).length
 			});
 		}
 	});
 
-	socket.on('ready', ({roomName, joinerId}) => {
+	socket.on('ready', ({ roomName, joinerId }) => {
 		const room = rooms[roomName];
 		//There will be n-1 answers from nth joiner, so add 1/n-1.
 		room.playersJoined += 1 / Math.floor(room.playersJoined);
-		room.players[joinerId] = {nameToGuess: null, sentName: null}
+		room.players[joinerId] = { nameToGuess: null, sentName: null };
 		if (Math.round(room.playersJoined) == room.totalPlayers) {
 			room.turn = 0;
 			room.turnOrder = Object.keys(room.players);
-			io.in(roomName).emit('message', { type: 'gameReady', turn: room.turnOrder[room.turn] });
+			io.in(roomName).emit('message', {
+				type: 'gameReady',
+				turn: room.turnOrder[room.turn]
+			});
 		}
 	});
 
-	socket.on('next turn', ({roomName}) => {
+	socket.on('next turn', ({ roomName }) => {
 		const room = rooms[roomName];
 		room.turn = room.turn == room.totalPlayers - 1 ? 0 : room.turn + 1;
-		io.in(roomName).emit('message', {type: 'new turn', turn: room.turnOrder[room.turn]})
-	})
+		io.in(roomName).emit('message', {
+			type: 'new turn',
+			turn: room.turnOrder[room.turn]
+		});
+	});
 });
 
 app.get('*', (req, res) => {
