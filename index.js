@@ -186,7 +186,8 @@ io.on('connection', function (socket) {
 		room.turn = room.turn == room.totalPlayers - 1 ? 0 : room.turn + 1;
 		io.in(roomName).emit('message', {
 			type: 'new turn',
-			turn: room.turnOrder[room.turn]
+			turn: room.turnOrder[room.turn],
+			revealed: room.turnOrder.slice(0,room.turn)
 		});
 	});
 });

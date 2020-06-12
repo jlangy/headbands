@@ -91,7 +91,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			});
 
 		case socketMessages.newTurn:
-			return store.dispatch({ type: NEW_TURN, payload: { turn: msg.turn } });
+			return store.dispatch({ type: NEW_TURN, payload: { turn: msg.turn, revealed: msg.revealed } });
 
 		// recieved offer, create connection, add candidate handler, set description, set and send answer
 		case socketMessages.offer:

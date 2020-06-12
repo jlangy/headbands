@@ -23,14 +23,15 @@ const gameReducer = (state = initialState, action) => {
 				playersJoined,
 				host,
 				totalNamesSet: 0,
-				gamePhase: gamePhases.joining
+				gamePhase: gamePhases.joining,
+				revealed: []
 			};
 		case ALL_PLAYERS_JOINED: {
 			return { ...state, gamePhase: gamePhases.settingNames };
 		}
 		case NEW_TURN: {
-			const { turn } = action.payload;
-			return { ...state, turn };
+			const { turn, revealed } = action.payload;
+			return { ...state, turn, revealed };
 		}
 		case ADD_PLAYER:
 			return { ...state, playersJoined: state.playersJoined + 1 };
