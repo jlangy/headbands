@@ -42,7 +42,10 @@ const gameReducer = (state = initialState, action) => {
 				return { ...state, gamePhase: gamePhases.playing, turn };
 			}
 		case END_GAME:
-			return { disconnected: true };
+			{
+				const {disconnection} = action.payload;
+				return disconnection ? { disconnected: true } : {};
+			}
 		case RESTART_GAME:
 			return { ...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0 };
 		default:

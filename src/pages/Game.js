@@ -19,13 +19,6 @@ const SGamePage = styled(SPage)`
 `;
 
 const Game = ({ streams, totalPlayers, socket }) => {
-	// const [nameChosen, setNameChosen] = useState(false);
-	// const [nameToGuess, setNameToGuess] = useState();
-
-	// const setName = () => {
-	// 	setNameChosen(true);
-	// 	socket.emit('setName', { nameToGuess, roomName: game.name });
-	// };
 
 	const emptyVideos = () => {
 		// Initializes to 1 to prevent jumpy render after loading local stream
@@ -83,7 +76,6 @@ const Game = ({ streams, totalPlayers, socket }) => {
 			<Menu
 				socket={socket}
 			/>
-			{/* <button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button> */}
 		</SGamePage>
 	);
 };

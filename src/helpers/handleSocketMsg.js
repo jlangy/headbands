@@ -32,7 +32,8 @@ const socketMessages = {
 	disconnection: 'disconnection',
 	hostDisconnection: 'host disconnection',
 	restart: 'restart',
-	newTurn: 'new turn'
+	newTurn: 'new turn',
+	gameOver: 'game over'
 };
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -116,6 +117,9 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				fromId: socket.id
 			});
 
+		case socketMessages.gameOver:
+			return store.dispatch({type: END_GAME, payload: {disconnection: false}})
+
 		// received answer, set description
 		case socketMessages.answer:
 			socket.emit('ready', {
@@ -168,7 +172,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 		}
 
 		case socketMessages.hostDisconnection:
-			store.dispatch({ type: END_GAME });
+			store.dispatch({ type: END_GAME, payload: {disconnection: true} });
 			setRedirect(true);
 			// Stop local media
 			store.getState().streams[socket.id].stream.getTracks()[0].stop();
