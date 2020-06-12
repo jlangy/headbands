@@ -143,17 +143,20 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('setName', ({ nameToGuess, roomName }) => {
-		rooms[roomName].players[socket.id].sentName = nameToGuess;
-		if (Object.values(rooms[roomName].players).every((val) => val.sentName)) {
-			const shiftedNames = shiftNames(rooms[roomName].players);
+		const room = rooms[roomName];
+		room.players[socket.id].sentName = nameToGuess;
+		console.log(room)
+		if (Object.values(room.players).every((val) => val.sentName)) {
+			const shiftedNames = shiftNames(room.players);
 			io.in(roomName).emit('message', {
 				type: 'give names',
-				names: shiftedNames
+				names: shiftedNames,
+				turn: room.turnOrder[room.turn]
 			});
 		} else {
 			io.in(roomName).emit('message', {
 				type: 'update set names',
-				totalNamesSet: Object.values(rooms[roomName].players).filter(
+				totalNamesSet: Object.values(room.players).filter(
 					(player) => player.sentName
 				).length
 			});
@@ -169,8 +172,7 @@ io.on('connection', function (socket) {
 			room.turn = 0;
 			room.turnOrder = Object.keys(room.players);
 			io.in(roomName).emit('message', {
-				type: 'gameReady',
-				turn: room.turnOrder[room.turn]
+				type: 'gameReady'
 			});
 		}
 	});

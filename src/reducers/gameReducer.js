@@ -26,8 +26,7 @@ const gameReducer = (state = initialState, action) => {
 				gamePhase: gamePhases.joining
 			};
 		case ALL_PLAYERS_JOINED: {
-			const { turn } = action.payload;
-			return { ...state, gamePhase: gamePhases.settingNames, turn };
+			return { ...state, gamePhase: gamePhases.settingNames };
 		}
 		case NEW_TURN: {
 			const { turn } = action.payload;
@@ -38,7 +37,10 @@ const gameReducer = (state = initialState, action) => {
 		case NAME_ADDED:
 			return { ...state, totalNamesSet: state.totalNamesSet + 1 };
 		case SETUP_COMPLETE:
-			return { ...state, gamePhase: gamePhases.playing };
+			{
+				const { turn } = action.payload;
+				return { ...state, gamePhase: gamePhases.playing, turn };
+			}
 		case END_GAME:
 			return { disconnected: true };
 		case RESTART_GAME:

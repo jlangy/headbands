@@ -5,7 +5,7 @@ import Video from '../components/Video';
 import SVideos from '../styled_components/SVideos';
 import SVideo from '../styled_components/SVideo';
 import SVideoLabel from '../styled_components/SVideoLabel';
-import Info from '../components/Info';
+import LocalLabel from '../components/LocalLabel';
 import Menu from '../components/Menu';
 import styled from 'styled-components';
 
@@ -58,11 +58,7 @@ const Game = ({ streams, totalPlayers, socket }) => {
 			<SVideos>
 				<SVideo>
 					<Video id="local" stream={localStream()} />
-					<SVideoLabel>
-						<i className="fas fa-crown"></i>
-						<p>?</p>
-						<p></p>
-					</SVideoLabel>
+					<LocalLabel socket={socket}/>
 				</SVideo>
 				{incomingStreams().map((streamName, i) => (
 					<SVideo key={i}>
@@ -94,7 +90,8 @@ const Game = ({ streams, totalPlayers, socket }) => {
 
 const mapStateToProps = (state) => ({
 	streams: state.streams,
-	totalPlayers: state.game.totalPlayers
+	totalPlayers: state.game.totalPlayers,
+	gameName: state.game.name
 });
 
 export default connect(mapStateToProps)(Game);

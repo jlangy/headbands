@@ -131,7 +131,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.gotNames:
 			store.dispatch({ type: GOT_NAMES, payload: { names: msg.names } });
-			return store.dispatch({ type: SETUP_COMPLETE });
+			return store.dispatch({ type: SETUP_COMPLETE, payload: { turn: msg.turn } });
 
 		case socketMessages.nameTaken:
 			return console.log('name taken');
@@ -151,8 +151,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.ready:
 			return store.dispatch({
-				type: ALL_PLAYERS_JOINED,
-				payload: { turn: msg.turn }
+				type: ALL_PLAYERS_JOINED
 			});
 
 		case socketMessages.restart:
