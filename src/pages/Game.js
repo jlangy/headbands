@@ -18,27 +18,30 @@ const SGamePage = styled(SPage)`
 	align-items: center;
 `;
 
-const Game = ({ streams, game, socket }) => {
-	const [nameChosen, setNameChosen] = useState(false);
-	const [nameToGuess, setNameToGuess] = useState();
+const Game = ({ streams, totalPlayers, socket }) => {
+	// const [nameChosen, setNameChosen] = useState(false);
+	// const [nameToGuess, setNameToGuess] = useState();
 
-	const setName = () => {
-		setNameChosen(true);
-		socket.emit('setName', { nameToGuess, roomName: game.name });
-	};
+	// const setName = () => {
+	// 	setNameChosen(true);
+	// 	socket.emit('setName', { nameToGuess, roomName: game.name });
+	// };
 
 	const emptyVideos = () => {
 		// Initializes to 1 to prevent jumpy render after loading local stream
 		const activeStreams = Object.keys(streams).length || 1;
-		const numEmpty = game.totalPlayers - activeStreams;
+		const numEmpty = totalPlayers - activeStreams;
 		return numEmpty >= 0 ? new Array(numEmpty).fill(0) : [];
 	};
 
-	const incomingStreams = () =>
-		Object.keys(streams).filter((streamName) => streamName !== socket.id);
+	const incomingStreams = () => {
+		console.log('incomiiiingggg!!!')
+		return Object.keys(streams).filter((streamName) => streamName !== socket.id);
+	}
 
 	//Turn off audio of local stream
 	const localStream = () => {
+		console.log('I am running local stream lalalla')
 		const local = streams[socket.id] && streams[socket.id].stream;
 		if (local) {
 			const removeAudioLocalStream = local.clone();
@@ -52,7 +55,6 @@ const Game = ({ streams, game, socket }) => {
 
 	return (
 		<SGamePage>
-			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
 			<SVideos>
 				<SVideo>
 					<Video id="local" stream={localStream()} />
@@ -84,10 +86,6 @@ const Game = ({ streams, game, socket }) => {
 			</SVideos>
 			<Menu
 				socket={socket}
-				nameChosen={nameChosen}
-				nameToGuess={nameToGuess}
-				setNameToGuess={setNameToGuess}
-				setName={setName}
 			/>
 			{/* <button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button> */}
 		</SGamePage>
@@ -96,7 +94,7 @@ const Game = ({ streams, game, socket }) => {
 
 const mapStateToProps = (state) => ({
 	streams: state.streams,
-	game: state.game
+	totalPlayers: state.game.totalPlayers
 });
 
 export default connect(mapStateToProps)(Game);

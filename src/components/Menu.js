@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import SNameInputGroup from '../styled_components/SNameInputGroup';
 import SNameInput from '../styled_components/SNameInput';
 import SNameButton from '../styled_components/SNameButton';
+import Info from './Info';
 
 const SMenuCard = styled(SCard)`
 	padding: 1rem 0;
@@ -27,11 +28,16 @@ const SMenuCard = styled(SCard)`
 const Menu = ({
 	socket,
 	game,
-	dispatch,
-	setNameToGuess,
-	nameChosen,
-	setName
+	dispatch
 }) => {
+	const [nameChosen, setNameChosen] = useState(false);
+	const [nameToGuess, setNameToGuess] = useState();
+
+	const setName = () => {
+		setNameChosen(true);
+		socket.emit('setName', { nameToGuess, roomName: game.name });
+	};
+
 	const endGame = () => {
 		const roomName = game.name;
 		dispatch({ type: END_GAME });
@@ -47,6 +53,7 @@ const Menu = ({
 
 	return (
 		<SMenuCard>
+			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
 			{game.host && (
 				<SHostButtons>
 					<SNameButton onClick={endGame}>End Game</SNameButton>
