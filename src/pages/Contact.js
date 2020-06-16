@@ -1,14 +1,14 @@
 import React from 'react';
-import SPage from '../styled_components/SPage';
-import SHeading from '../styled_components/SHeading';
-import SCard from '../styled_components/SCard';
-import SBreak from '../styled_components/SBreak';
-import SForm from '../styled_components/SForm';
-import SInputGroup from '../styled_components/SInputGroup';
-import SInput from '../styled_components/SInput';
-import SButton from '../styled_components/SButton';
-import SLabel from '../styled_components/SLabel';
-import STextArea from '../styled_components/STextArea';
+import SPage from '../styled_components/layout/SPage';
+import SHeading from '../styled_components/layout/SHeading';
+import SCard from '../styled_components/layout/SCard';
+import SBreak from '../styled_components/layout/SBreak';
+import SForm from '../styled_components/forms/SForm';
+import SInputGroup from '../styled_components/forms/SInputGroup';
+import SInput from '../styled_components/forms/SInput';
+import Button from '../components/Button';
+import SLabel from '../styled_components/forms/SLabel';
+import STextArea from '../styled_components/forms/STextArea';
 
 // @TODO: Hook up for netlify
 const Contact = (props) => {
@@ -34,7 +34,7 @@ const Contact = (props) => {
 						<SLabel>Message:</SLabel>
 						<STextArea defaultValue="" placeholder="Say hello!" />
 					</SInputGroup>
-					<SButton type="submit" to="/" label="Submit"></SButton>
+					<Button type="submit" to="/" label="Submit"></Button>
 				</SForm>
 			</SCard>
 		</SPage>

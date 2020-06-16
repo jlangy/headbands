@@ -13,7 +13,7 @@ const SVideoLabel = styled.div`
 	align-items: center;
 	padding: 1rem;
 
-	* {
+	> * {
 		color: #222;
 		font-size: 1rem;
 	}

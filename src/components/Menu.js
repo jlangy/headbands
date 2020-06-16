@@ -2,34 +2,14 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { END_GAME, RESTART_GAME, CLEAR_STREAM_NAMES } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
-import SHostButtons from '../styled_components/SHostButtons';
-import SCard from '../styled_components/SCard';
-import styled from 'styled-components';
-import SNameInputGroup from '../styled_components/SNameInputGroup';
-import SNameInput from '../styled_components/SNameInput';
-import SNameButton from '../styled_components/SNameButton';
+import SHostButtons from '../styled_components/controls/SHostButtons';
+import SNameInputGroup from '../styled_components/controls/SNameInputGroup';
+import SNameInput from '../styled_components/controls/SNameInput';
+import SNameButton from '../styled_components/controls/SNameButton';
+import SMenuCard from '../styled_components/layout/SMenuCard';
 import Info from './Info';
 
-const SMenuCard = styled(SCard)`
-	padding: 1rem 0;
-	width: 90%;
-	margin: 0 auto;
-	max-width: 90%;
-	justify-content: space-evenly;
-
-	@media (max-width: 768px) {
-		flex-direction: column;
-		justify-content: start;
-		align-items: center;
-		width: 100%;
-	}
-`;
-
-const Menu = ({
-	socket,
-	game,
-	dispatch
-}) => {
+const Menu = ({ socket, game, dispatch }) => {
 	const [nameChosen, setNameChosen] = useState(false);
 	const [nameToGuess, setNameToGuess] = useState();
 

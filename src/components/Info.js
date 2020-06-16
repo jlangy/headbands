@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import gamePhases from '../reducers/gamePhases';
-import SStatus from '../styled_components/SStatus';
+import SStatus from '../styled_components/controls/SStatus';
 import formatTime from '../helpers/formatTime';
 
 const Info = ({ game, nameChosen, nameToGuess }) => {

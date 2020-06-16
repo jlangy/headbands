@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import SCard from './SCard';
+import SCard from '../layout/SCard';
 
 // Contains all video containers
 const SVideos = styled(SCard)`

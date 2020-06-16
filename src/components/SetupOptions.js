@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
-import SHeading from '../styled_components/SHeading';
-import SForm from '../styled_components/SForm';
-import SBreak from '../styled_components/SBreak';
-import SInputGroup from '../styled_components/SInputGroup';
-import SCheckboxes from '../styled_components/SCheckboxes';
-import SInput from '../styled_components/SInput';
-import SButton from '../styled_components/SButton';
-import SLabel from '../styled_components/SLabel';
-import SSelect from '../styled_components/SSelect';
+import SHeading from '../styled_components/layout/SHeading';
+import SForm from '../styled_components/forms/SForm';
+import SBreak from '../styled_components/layout/SBreak';
+import SInputGroup from '../styled_components/forms/SInputGroup';
+import SCheckboxes from '../styled_components/forms/SCheckboxes';
+import SInput from '../styled_components/forms/SInput';
+import Button from '../components/Button';
+import SLabel from '../styled_components/forms/SLabel';
+import SSelect from '../styled_components/forms/SSelect';
 
 const SetupOptions = ({ socket, createStream, streams }) => {
 	const [makeRoomName, setMakeRoomName] = useState('');
@@ -81,7 +81,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 						placeholder="Enter a lobby name"
 					/>
 				</SInputGroup>
-				<SButton label={'Create Game'} to="/game" onClick={makeRoom}></SButton>
+				<Button label={'Create Game'} to="/game" onClick={makeRoom}></Button>
 			</SForm>
 		</>
 	);

@@ -11,9 +11,9 @@ import handleSocketMsg from './helpers/handleSocketMsg';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Game from './pages/Game';
-import Donate from './pages/Donate';
 import Contact from './pages/Contact';
-import Instructions from './pages/Instructions';
+import About from './pages/About';
+import SAlert from './styled_components/layout/SAlert';
 
 import './global_scss/App.scss';
 
@@ -37,19 +37,15 @@ const App = ({ game }) => {
 	return (
 		<Router>
 			<Navbar></Navbar>
-			{game.disconnected && <h1>HOST DISCONNECTED</h1>}
+			{game.disconnected && <SAlert>HOST DISCONNECTED</SAlert>}
 			{redirect && <Redirect to="/" />}
 
 			<Switch>
-				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}
 				<Route exact path="/">
 					<Landing socket={socket} />
 				</Route>
-				<Route path="/instructions">
-					<Instructions />
-				</Route>
-				<Route path="/donate">
-					<Donate />
+				<Route path="/about">
+					<About />
 				</Route>
 				<Route path="/contact">
 					<Contact />

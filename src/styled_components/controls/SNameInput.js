@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import SInput from './SInput';
+import SInput from '../forms/SInput';
 
 const SNameInput = styled(SInput)`
 	padding: 0.5rem;
