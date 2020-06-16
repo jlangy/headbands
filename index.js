@@ -182,9 +182,10 @@ io.on('connection', function (socket) {
 		const room = rooms[roomName];
 		//Last turn over check
 		if(room.turn === room.turnOrder.length - 1){
-			return io.in(roomName).emit('message', {type: 'game over'})
+			room.turn = 0;
+			return io.in(roomName).emit('message', {type: 'game end', revealed: room.turnOrder, turn: room.turnOrder[0]})
 		}
-		room.turn = room.turn == room.totalPlayers - 1 ? 0 : room.turn + 1;
+		room.turn += 1;
 		io.in(roomName).emit('message', {
 			type: 'new turn',
 			turn: room.turnOrder[room.turn],

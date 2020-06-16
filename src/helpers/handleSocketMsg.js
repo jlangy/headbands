@@ -12,7 +12,8 @@ import {
 	END_GAME,
 	CLEAR_STREAMS,
 	RESTART_GAME,
-	CLEAR_STREAM_NAMES
+	CLEAR_STREAM_NAMES,
+	GAME_END
 } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
 import addAlert from '../helpers/addAlert';
@@ -33,7 +34,8 @@ const socketMessages = {
 	hostDisconnection: 'host disconnection',
 	restart: 'restart',
 	newTurn: 'new turn',
-	gameOver: 'game over'
+	gameOver: 'game over',
+	gameEnd: 'game end'
 };
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -89,6 +91,10 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				fromId: socket.id,
 				room: store.getState().game.name
 			});
+		
+		case socketMessages.gameEnd:
+			addAlert('Game Over. Host can restart round')
+			return store.dispatch({type: GAME_END, payload: { revealed: msg.revealed, turn: msg.turn }})
 
 		case socketMessages.newTurn:
 			return store.dispatch({
@@ -182,7 +188,6 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.hostDisconnection:
 			addAlert('Host disconnected');
-			setRedirect(true);
 			store.dispatch({ type: END_GAME, payload: { disconnection: true } });
 			// Stop local media
 			store

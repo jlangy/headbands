@@ -17,7 +17,8 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 	const [numPlayers, setNumPlayers] = useState(2);
 	const [useCategories, setUseCategories] = useState(false);
 
-	const makeRoom = async () => {
+	const makeRoom = async (e) => {
+		e.preventDefault();
 		if (makeRoomName.trim().length > 0) {
 			socket.emit('make room', {
 				name: makeRoomName,
@@ -86,7 +87,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 						placeholder="Enter a lobby name"
 					/>
 				</SInputGroup>
-				<Button label={'Create Game'} to="/game" onClick={makeRoom}></Button>
+				<Button label={'Create Game'} onClick={makeRoom}></Button>
 			</SForm>
 		</>
 	);

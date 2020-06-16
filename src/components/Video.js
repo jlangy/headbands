@@ -8,7 +8,7 @@ const Video = ({ stream, id, revealed, streamName }) => {
 
 	return (
 		//TODO: just a lazy example. Styling revealed videos needs to be improved
-		<video id={id} autoPlay playsInline poster="/tv-color-bars.gif" style={{border: revealed.includes(streamName) ? '10px solid gold' : ''}}></video>
+		<video id={id} autoPlay playsInline poster="/tv-color-bars.gif" style={{filter: revealed.includes(streamName) ? 'grayscale(100%)' : ''}}></video>
 	);
 };
 

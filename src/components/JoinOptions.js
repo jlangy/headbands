@@ -13,7 +13,8 @@ import addAlert from '../helpers/addAlert';
 const JoinOptions = ({ socket, streams }) => {
 	const [joinRoomName, setJoinRoomName] = useState('');
 
-	const joinRoom = async () => {
+	const joinRoom = async (e) => {
+		e.preventDefault();
 		if (joinRoomName.trim().length > 0) {
 			await turnOnLocalMedia(streams, socket);
 			socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
@@ -39,7 +40,7 @@ const JoinOptions = ({ socket, streams }) => {
 						placeholder="Enter a lobby name"
 					/>
 				</SInputGroup>
-				<Button label={'Join Game'} to="/game" onClick={joinRoom}></Button>
+				<Button label={'Join Game'} onClick={joinRoom}></Button>
 			</SForm>
 		</>
 	);

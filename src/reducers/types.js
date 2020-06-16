@@ -13,3 +13,4 @@ export const NEW_TURN = 'NEW_TURN';
 export const REMOVE_STREAM = 'REMOVE_STREAM';
 export const ADD_ALERT = 'ADD_ALERT';
 export const REMOVE_ALERT = 'REMOVE_ALERT';
+export const GAME_END = 'GAME_END';

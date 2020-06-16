@@ -37,8 +37,8 @@ const App = ({ game }) => {
 		<Router>
 			<Navbar></Navbar>
 			<Alert />
-			{game.redirect && <Redirect to="/" />}
-
+			{game.goToHome && <Redirect to="/" />}
+			{game.goToGame && <Redirect to="/game" />}
 			<Switch>
 				<Route exact path="/">
 					<Landing socket={socket} />

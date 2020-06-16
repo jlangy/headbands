@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	END_GAME,
@@ -18,6 +18,11 @@ import addAlert from '../helpers/addAlert';
 const Menu = ({ socket, game, dispatch, streams }) => {
 	const [nameChosen, setNameChosen] = useState(false);
 	const [nameToGuess, setNameToGuess] = useState('');
+
+	useEffect(() => {
+		setNameChosen(false);
+		setNameToGuess('');
+	}, [game.gameEnd])
 
 	const setName = () => {
 		if (nameToGuess.trim().length > 1) {

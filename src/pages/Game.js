@@ -43,14 +43,8 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 		<SPage>
 			<SVideos>
 				<SVideo>
-					<Video id="local" stream={localStream()} />
-					<SVideoLabel>
-						{(game.host === socket.id && (
-							<SIcon src="host.png" alt="this player is the host"></SIcon>
-						)) || <p></p>}
-						<p>?</p>
-						<i></i>
-					</SVideoLabel>
+					<Video id="local" stream={localStream()} streamName={socket.id} />
+					<SVideoLabel />
 					<LocalLabel socket={socket} />
 				</SVideo>
 				{incomingStreams().map((streamName, i) => (
