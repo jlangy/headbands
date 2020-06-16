@@ -17,6 +17,7 @@ import {
 } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
 import addAlert from '../helpers/addAlert';
+import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
 
 const socketMessages = {
 	iceCandidate: 'iceCandidate',
@@ -35,7 +36,8 @@ const socketMessages = {
 	restart: 'restart',
 	newTurn: 'new turn',
 	gameOver: 'game over',
-	gameEnd: 'game end'
+	gameEnd: 'game end',
+	roomDNE: 'room DNE'
 };
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -51,6 +53,7 @@ const feedLocalStream = (stream, connectionId) => {
 const createStreamConnection = (socketId, iceServers, localId) => {
 	// connections[socketId] = new RTCPeerConnection({iceServers});
 	connections[socketId] = new RTCPeerConnection(null);
+	console.log(store.getState())
 	feedLocalStream(store.getState().streams[localId].stream, socketId);
 	connections[socketId].ontrack = (e) =>
 		store.dispatch({
@@ -60,6 +63,7 @@ const createStreamConnection = (socketId, iceServers, localId) => {
 };
 
 const handleSocketMsg = async (msg, socket, setRedirect) => {
+	console.log(msg)
 	switch (msg.type) {
 		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
@@ -142,8 +146,8 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			store.dispatch({ type: ADD_PLAYER });
 			return await connections[msg.fromId].setRemoteDescription(msg.answer);
 
-		case socketMessages.badRoomName:
-			return console.log('handle room name here');
+		case socketMessages.roomDNE:
+			return addAlert('Room Does Not Exist')
 
 		case socketMessages.gotNames:
 			store.dispatch({ type: GOT_NAMES, payload: { names: msg.names } });
@@ -204,7 +208,9 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			break;
 
 		case socketMessages.joining: {
+			await turnOnLocalMedia(store.getState().streams, socket)
 			let { totalPlayers, name, playersJoined, host } = msg;
+			socket.emit('media on', {roomName: name, fromId: socket.id})
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {

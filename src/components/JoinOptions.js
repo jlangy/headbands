@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import SHeading from '../styled_components/layout/SHeading';
-import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
 import SForm from '../styled_components/forms/SForm';
 import SBreak from '../styled_components/layout/SBreak';
 import SInputGroup from '../styled_components/forms/SInputGroup';
@@ -16,7 +15,6 @@ const JoinOptions = ({ socket, streams }) => {
 	const joinRoom = async (e) => {
 		e.preventDefault();
 		if (joinRoomName.trim().length > 0) {
-			await turnOnLocalMedia(streams, socket);
 			socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 		} else {
 			addAlert('Please enter a valid lobby name');
