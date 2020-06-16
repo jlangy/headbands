@@ -75,6 +75,7 @@ const Menu = ({
 					<SNameInput
 						placeholder="Enter a name..."
 						onChange={(e) => setNameToGuess(e.target.value)}
+						maxLength="50"
 					></SNameInput>
 					<SNameButton onClick={setName} disabled={nameChosen}>
 						{nameChosen ? 'Waiting' : 'Confirm'}
