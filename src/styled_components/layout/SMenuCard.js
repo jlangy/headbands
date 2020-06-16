@@ -4,7 +4,6 @@ import SCard from './SCard';
 const SMenuCard = styled(SCard)`
 	padding: 1rem 0;
 	width: 90%;
-	margin: 0 auto;
 	max-width: 90%;
 	justify-content: space-evenly;
 

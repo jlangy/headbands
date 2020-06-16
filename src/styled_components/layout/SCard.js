@@ -9,7 +9,7 @@ const SCard = styled.article`
 	width: 80%;
 	max-width: 800px;
 	max-height: 70%;
-	margin: 1.5rem auto;
+	margin: 2rem auto;
 	padding: 1rem 0 2rem 0;
 
 	:hover {
@@ -18,7 +18,7 @@ const SCard = styled.article`
 
 	@media (max-width: 768px) {
 		width: 80%;
-		height: auto;
+		/* height: auto; */
 	}
 `;
 

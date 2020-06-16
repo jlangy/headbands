@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const SNameButton = styled.button`
+const SMenuButton = styled.button`
 	background-color: #3ca7d2;
 	color: white;
 	padding: 6px;
@@ -24,9 +24,9 @@ const SNameButton = styled.button`
 	}
 
 	@media (max-width: 768px) {
-		width: 100%;
+		width: 90%;
 		margin: 0.5rem auto;
 	}
 `;
 
-export default SNameButton;
+export default SMenuButton;

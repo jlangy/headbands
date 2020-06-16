@@ -3,7 +3,6 @@ import uuid from 'uuid';
 import store from '../store';
 
 const addAlert = (msg) => {
-	window.console.log('WE RAN!');
 	const id = uuid.v4();
 	store.dispatch({
 		type: ADD_ALERT,
@@ -13,7 +12,7 @@ const addAlert = (msg) => {
 		}
 	});
 
-	setTimeout(() => store.dispatch({ type: REMOVE_ALERT, payload: id }), 5000);
+	setTimeout(() => store.dispatch({ type: REMOVE_ALERT, payload: id }), 4000);
 };
 
 export default addAlert;

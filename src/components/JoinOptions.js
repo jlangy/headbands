@@ -8,13 +8,18 @@ import SInputGroup from '../styled_components/forms/SInputGroup';
 import SInput from '../styled_components/forms/SInput';
 import Button from '../components/Button';
 import SLabel from '../styled_components/forms/SLabel';
+import addAlert from '../helpers/addAlert';
 
 const JoinOptions = ({ socket, streams }) => {
 	const [joinRoomName, setJoinRoomName] = useState('');
 
 	const joinRoom = async () => {
-		await turnOnLocalMedia(streams, socket);
-		socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
+		if (joinRoomName.trim().length > 0) {
+			await turnOnLocalMedia(streams, socket);
+			socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
+		} else {
+			addAlert('Please enter a valid lobby name');
+		}
 	};
 
 	return (
@@ -29,6 +34,8 @@ const JoinOptions = ({ socket, streams }) => {
 						onChange={(e) => {
 							setJoinRoomName(e.target.value);
 						}}
+						minlength="1"
+						maxlength="20"
 						placeholder="Enter a lobby name"
 					/>
 				</SInputGroup>

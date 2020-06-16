@@ -5,9 +5,10 @@ import Video from '../components/Video';
 import SVideos from '../styled_components/video/SVideos';
 import SVideo from '../styled_components/video/SVideo';
 import SVideoLabel from '../styled_components/video/SVideoLabel';
+import SIcon from '../styled_components/video/SIcon';
 import Menu from '../components/Menu';
 
-const Game = ({ streams, totalPlayers, socket }) => {
+const Game = ({ streams, totalPlayers, socket, game }) => {
 	// const [nameChosen, setNameChosen] = useState(false);
 	// const [nameToGuess, setNameToGuess] = useState();
 
@@ -24,7 +25,6 @@ const Game = ({ streams, totalPlayers, socket }) => {
 	};
 
 	const incomingStreams = () => {
-		console.log('incomiiiingggg!!!');
 		return Object.keys(streams).filter(
 			(streamName) => streamName !== socket.id
 		);
@@ -32,7 +32,6 @@ const Game = ({ streams, totalPlayers, socket }) => {
 
 	//Turn off audio of local stream
 	const localStream = () => {
-		console.log('I am running local stream lalalla');
 		const local = streams[socket.id] && streams[socket.id].stream;
 		if (local) {
 			const removeAudioLocalStream = local.clone();
@@ -50,7 +49,12 @@ const Game = ({ streams, totalPlayers, socket }) => {
 				<SVideo>
 					<Video id="local" stream={localStream()} />
 					<SVideoLabel>
-						<i className="fas fa-crown"></i>
+						{(game.host && (
+							<SIcon src="host.png" alt="this player is the host"></SIcon>
+						)) || <p></p>}
+						{/* {(game.host === socket.id && (
+							<SIcon src="host.png" alt="this player is the host"></SIcon>
+						)) || <p></p>} */}
 						<p>?</p>
 						<i></i>
 					</SVideoLabel>
@@ -62,7 +66,9 @@ const Game = ({ streams, totalPlayers, socket }) => {
 							id={`stream${i}`}
 						/>
 						<SVideoLabel>
-							<p></p>
+							{/* {game.host === streamName && (
+							<SIcon src="host.png" alt="this player is the host"></SIcon>
+						) || <p></p>} */}
 							<p>{streams[streamName] && streams[streamName].nameToGuess}</p>
 							<i></i>
 						</SVideoLabel>
@@ -72,20 +78,22 @@ const Game = ({ streams, totalPlayers, socket }) => {
 					<SVideo key={i}>
 						<Video id={`stream${i}`} />
 						<SVideoLabel>
+							<p></p>
 							<p>Waiting for player...</p>
+							<p></p>
 						</SVideoLabel>
 					</SVideo>
 				))}
 			</SVideos>
 			<Menu socket={socket} />
-			{/* <button onClick={() => socket.emit('next turn', {roomName: game.name})}>NEXT TURN</button> */}
 		</SPage>
 	);
 };
 
 const mapStateToProps = (state) => ({
 	streams: state.streams,
-	totalPlayers: state.game.totalPlayers
+	totalPlayers: state.game.totalPlayers,
+	game: state.game
 });
 
 export default connect(mapStateToProps)(Game);

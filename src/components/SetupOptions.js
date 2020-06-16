@@ -10,6 +10,7 @@ import SInput from '../styled_components/forms/SInput';
 import Button from '../components/Button';
 import SLabel from '../styled_components/forms/SLabel';
 import SSelect from '../styled_components/forms/SSelect';
+import addAlert from '../helpers/addAlert';
 
 const SetupOptions = ({ socket, createStream, streams }) => {
 	const [makeRoomName, setMakeRoomName] = useState('');
@@ -17,12 +18,16 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 	const [useCategories, setUseCategories] = useState(false);
 
 	const makeRoom = async () => {
-		socket.emit('make room', {
-			name: makeRoomName,
-			totalPlayers: numPlayers,
-			useCategories
-		});
-		turnOnLocalMedia(streams, socket);
+		if (makeRoomName.trim().length > 0) {
+			socket.emit('make room', {
+				name: makeRoomName,
+				totalPlayers: numPlayers,
+				useCategories
+			});
+			turnOnLocalMedia(streams, socket);
+		} else {
+			addAlert('Please enter a valid lobby name');
+		}
 	};
 
 	return (

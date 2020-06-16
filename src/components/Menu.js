@@ -5,17 +5,22 @@ import gamePhases from '../reducers/gamePhases';
 import SHostButtons from '../styled_components/controls/SHostButtons';
 import SNameInputGroup from '../styled_components/controls/SNameInputGroup';
 import SNameInput from '../styled_components/controls/SNameInput';
-import SNameButton from '../styled_components/controls/SNameButton';
+import SMenuButton from '../styled_components/controls/SMenuButton';
 import SMenuCard from '../styled_components/layout/SMenuCard';
 import Info from './Info';
+import addAlert from '../helpers/addAlert';
 
 const Menu = ({ socket, game, dispatch }) => {
 	const [nameChosen, setNameChosen] = useState(false);
-	const [nameToGuess, setNameToGuess] = useState();
+	const [nameToGuess, setNameToGuess] = useState('');
 
 	const setName = () => {
-		setNameChosen(true);
-		socket.emit('setName', { nameToGuess, roomName: game.name });
+		if (nameToGuess.trim().length > 1) {
+			setNameChosen(true);
+			socket.emit('setName', { nameToGuess, roomName: game.name });
+		} else {
+			addAlert('Invalid name');
+		}
 	};
 
 	const endGame = () => {
@@ -36,8 +41,8 @@ const Menu = ({ socket, game, dispatch }) => {
 			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
 			{game.host && (
 				<SHostButtons>
-					<SNameButton onClick={endGame}>End Game</SNameButton>
-					<SNameButton onClick={restartGame}>Restart Game</SNameButton>
+					<SMenuButton onClick={endGame}>End Game</SMenuButton>
+					<SMenuButton onClick={restartGame}>Restart Game</SMenuButton>
 				</SHostButtons>
 			)}
 			{game.gamePhase === gamePhases.settingNames && (
@@ -45,10 +50,12 @@ const Menu = ({ socket, game, dispatch }) => {
 					<SNameInput
 						placeholder="Enter a name..."
 						onChange={(e) => setNameToGuess(e.target.value)}
+						minlength="2"
+						maxlength="24"
 					></SNameInput>
-					<SNameButton onClick={setName} disabled={nameChosen}>
+					<SMenuButton onClick={setName} disabled={nameChosen}>
 						{nameChosen ? 'Waiting' : 'Confirm'}
-					</SNameButton>
+					</SMenuButton>
 				</SNameInputGroup>
 			)}
 		</SMenuCard>
