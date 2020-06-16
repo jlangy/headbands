@@ -18,7 +18,6 @@ const SCard = styled.article`
 
 	@media (max-width: 768px) {
 		width: 80%;
-		/* height: auto; */
 	}
 `;
 

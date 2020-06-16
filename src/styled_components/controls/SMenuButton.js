@@ -8,9 +8,8 @@ const SMenuButton = styled.button`
 	text-align: center;
 	border: none;
 	font-size: inherit;
-	flex-grow: 1;
 	margin: 0.5rem auto;
-	flex-basis: 20%;
+	width: 40%;
 
 	:active,
 	:focus,
@@ -24,7 +23,7 @@ const SMenuButton = styled.button`
 	}
 
 	@media (max-width: 768px) {
-		width: 90%;
+		width: 100%;
 		margin: 0.5rem auto;
 	}
 `;

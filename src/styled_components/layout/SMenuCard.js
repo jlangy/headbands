@@ -2,16 +2,18 @@ import styled from 'styled-components';
 import SCard from './SCard';
 
 const SMenuCard = styled(SCard)`
-	padding: 1rem 0;
-	width: 90%;
-	max-width: 90%;
+	padding: 2.5%;
+	width: 85%;
 	justify-content: space-evenly;
+	max-height: none;
+	max-width: 800px;
 
 	@media (max-width: 768px) {
 		flex-direction: column;
 		justify-content: start;
 		align-items: center;
-		width: 100%;
+		width: 85%;
+		padding: 2.5%;
 	}
 `;
 
