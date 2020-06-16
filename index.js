@@ -89,7 +89,8 @@ io.on('connection', function (socket) {
 		console.log(rooms);
 	});
 
-	socket.on('join room', async ({ roomName, fromId }) => {
+	socket.on('media on', ({roomName, fromId}) => {
+		console.log('got here')
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
@@ -101,6 +102,21 @@ io.on('connection', function (socket) {
 				fromId,
 				iceServers: token.iceServers
 			});
+		}
+	});
+
+	socket.on('join room', async ({ roomName, fromId }) => {
+		let roomToJoin = rooms[roomName];
+		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
+			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			// const token = await client.tokens.create();
+			// const token = { iceServers: null }; //await client.tokens.create();
+			// socket.to(roomName).emit('message', {
+			// 	type: 'joinRequest',
+			// 	roomName,
+			// 	fromId,
+			// 	iceServers: token.iceServers
+			// });
 			socket.emit('message', {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
@@ -110,7 +126,7 @@ io.on('connection', function (socket) {
 			});
 			socket.join(roomName);
 		} else {
-			socket.emit('message', { type: 'cannot join' });
+			socket.emit('message', { type: 'room DNE' });
 		}
 	});
 
