@@ -45,7 +45,7 @@ const gameReducer = (state = initialState, action) => {
 		case END_GAME:
 			{
 				const {disconnection} = action.payload;
-				return disconnection ? { disconnected: true } : {};
+				return disconnection ? { disconnected: true, redirect: true } : {redirect: true};
 			}
 		case RESTART_GAME:
 			return { ...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0 };

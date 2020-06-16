@@ -29,7 +29,7 @@ const App = ({ game }) => {
 		// const socket = io.connect(window.location.hostname);
 
 		socket.on('message', (msg) => {
-			handleSocketMsg(msg, socket, setRedirect);
+			handleSocketMsg(msg, socket);
 		});
 		setSocket(socket);
 	}, []);
@@ -38,7 +38,7 @@ const App = ({ game }) => {
 		<Router>
 			<Navbar></Navbar>
 			{game.disconnected && <h1>HOST DISCONNECTED</h1>}
-			{redirect && <Redirect to="/" />}
+			{game.redirect && <Redirect to="/" />}
 
 			<Switch>
 				{/* <button onClick={() => socket.emit('xir test')}>log rooms</button> */}

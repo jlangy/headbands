@@ -105,7 +105,8 @@ io.on('connection', function (socket) {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
 				playersJoined: roomToJoin.playersJoined + 1,
-				name: roomName
+				name: roomName,
+				host: roomToJoin.host
 			});
 			socket.join(roomName);
 		} else {

@@ -15,7 +15,7 @@ import {
 	CLEAR_STREAM_NAMES
 } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
-
+	
 const socketMessages = {
 	iceCandidate: 'iceCandidate',
 	joinRequest: 'joinRequest',
@@ -118,7 +118,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			});
 
 		case socketMessages.gameOver:
-			return store.dispatch({type: END_GAME, payload: {disconnection: false}})
+			return store.dispatch({type: END_GAME, payload: {disconnection: false}});
 
 		// received answer, set description
 		case socketMessages.answer:
@@ -149,7 +149,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 					totalPlayers,
 					gamePhase: gamePhases.joining,
 					playersJoined: 1,
-					host: true
+					host: socket.id
 				}
 			});
 
@@ -173,13 +173,11 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.hostDisconnection:
 			store.dispatch({ type: END_GAME, payload: {disconnection: true} });
-			setRedirect(true);
 			// Stop local media
-			store.getState().streams[socket.id].stream.getTracks()[0].stop();
-			Object.values(connections).forEach((peerConn) => {
-				console.log(peerConn);
-				peerConn.close();
+			store.getState().streams[socket.id].stream.getTracks().forEach(function(track){
+				track.stop();
 			});
+			window.localClone.getTracks().forEach(track => track.stop())
 			connections = {};
 			setTimeout(() => {
 				return store.dispatch({ type: CLEAR_STREAMS });
@@ -187,14 +185,15 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			break;
 
 		case socketMessages.joining: {
-			let { totalPlayers, name, playersJoined } = msg;
+			let { totalPlayers, name, playersJoined, host } = msg;
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
 					name,
 					totalPlayers,
 					gamePhase: gamePhases.joining,
-					playersJoined
+					playersJoined,
+					host
 				}
 			});
 		}

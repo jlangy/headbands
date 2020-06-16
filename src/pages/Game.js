@@ -28,21 +28,22 @@ const Game = ({ streams, totalPlayers, socket }) => {
 	};
 
 	const incomingStreams = () => {
-		console.log('incomiiiingggg!!!')
 		return Object.keys(streams).filter((streamName) => streamName !== socket.id);
 	}
 
 	//Turn off audio of local stream
 	const localStream = () => {
-		console.log('I am running local stream lalalla')
 		const local = streams[socket.id] && streams[socket.id].stream;
-		if (local) {
+		if (local && !window.localClone) {
 			const removeAudioLocalStream = local.clone();
+			window.localClone = removeAudioLocalStream;
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
 			if (audioTrack.length > 0) {
 				removeAudioLocalStream.removeTrack(audioTrack[0]);
 			}
 			return removeAudioLocalStream;
+		} else {
+			return window.localClone;
 		}
 	};
 
