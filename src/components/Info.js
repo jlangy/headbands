@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import gamePhases from '../reducers/gamePhases';
 import SStatus from '../styled_components/controls/SStatus';
-import formatTime from '../helpers/formatTime';
+import Timer from './Timer';
 
 const Info = ({ game, nameChosen, nameToGuess }) => {
-	let [time, setTime] = useState(0);
-
-	useEffect(() => {
-		setTimeout(() => {
-			setTime(time + 1);
-		}, 1000);
-	}, [time]);
-
 	return (
 		<>
 			{game.gamePhase !== gamePhases.playing ? (
@@ -28,7 +20,7 @@ const Info = ({ game, nameChosen, nameToGuess }) => {
 					} players to choose a name.`}</SStatus>
 				)
 			) : (
-				<SStatus>{formatTime(time)}</SStatus>
+				<Timer />
 			)}
 		</>
 	);

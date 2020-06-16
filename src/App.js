@@ -13,11 +13,11 @@ import Landing from './pages/Landing';
 import Game from './pages/Game';
 import Contact from './pages/Contact';
 import About from './pages/About';
-import SAlert from './styled_components/layout/SAlert';
+import Alert from './components/Alert';
 
 import './global_scss/App.scss';
 
-const App = ({ game }) => {
+const App = ({ game, alerts }) => {
 	const [socket, setSocket] = useState();
 	const [redirect, setRedirect] = useState(false);
 
@@ -37,7 +37,7 @@ const App = ({ game }) => {
 	return (
 		<Router>
 			<Navbar></Navbar>
-			{game.disconnected && <SAlert>HOST DISCONNECTED</SAlert>}
+			<Alert />
 			{redirect && <Redirect to="/" />}
 
 			<Switch>
@@ -57,7 +57,8 @@ const App = ({ game }) => {
 };
 
 const mapStateToProps = (state) => ({
-	game: state.game
+	game: state.game,
+	alerts: state.alerts
 });
 
 export default connect(mapStateToProps)(App);

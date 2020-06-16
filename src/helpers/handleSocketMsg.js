@@ -15,13 +15,13 @@ import {
 	CLEAR_STREAM_NAMES
 } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
+import addAlert from '../helpers/addAlert';
 
 const socketMessages = {
 	iceCandidate: 'iceCandidate',
 	joinRequest: 'joinRequest',
 	offer: 'offer',
 	answer: 'answer',
-	badRoomName: 'cannot join',
 	ready: 'gameReady',
 	gotNames: 'give names',
 	nameTaken: 'name taken',
@@ -134,7 +134,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			return store.dispatch({ type: SETUP_COMPLETE });
 
 		case socketMessages.nameTaken:
-			return console.log('name taken');
+			return addAlert('Name already taken');
 
 		case socketMessages.roomNameOk:
 			let { name, totalPlayers } = msg;
@@ -170,8 +170,8 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.hostDisconnection:
 			store.dispatch({ type: END_GAME });
+			addAlert('Host disconnected');
 			setRedirect(true);
-			// Stop local media
 			store.getState().streams[socket.id].stream.getTracks()[0].stop();
 			Object.values(connections).forEach((peerConn) => {
 				console.log(peerConn);
