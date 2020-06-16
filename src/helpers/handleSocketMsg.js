@@ -32,7 +32,8 @@ const socketMessages = {
 	disconnection: 'disconnection',
 	hostDisconnection: 'host disconnection',
 	restart: 'restart',
-	newTurn: 'new turn'
+	newTurn: 'new turn',
+	gameOver: 'game over'
 };
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
@@ -90,7 +91,10 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			});
 
 		case socketMessages.newTurn:
-			return store.dispatch({ type: NEW_TURN, payload: { turn: msg.turn } });
+			return store.dispatch({
+				type: NEW_TURN,
+				payload: { turn: msg.turn, revealed: msg.revealed }
+			});
 
 		// recieved offer, create connection, add candidate handler, set description, set and send answer
 		case socketMessages.offer:
@@ -116,6 +120,12 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				fromId: socket.id
 			});
 
+		case socketMessages.gameOver:
+			return store.dispatch({
+				type: END_GAME,
+				payload: { disconnection: false }
+			});
+
 		// received answer, set description
 		case socketMessages.answer:
 			socket.emit('ready', {
@@ -131,7 +141,10 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.gotNames:
 			store.dispatch({ type: GOT_NAMES, payload: { names: msg.names } });
-			return store.dispatch({ type: SETUP_COMPLETE });
+			return store.dispatch({
+				type: SETUP_COMPLETE,
+				payload: { turn: msg.turn }
+			});
 
 		case socketMessages.nameTaken:
 			return addAlert('Name already taken');
@@ -145,14 +158,13 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 					totalPlayers,
 					gamePhase: gamePhases.joining,
 					playersJoined: 1,
-					host: true
+					host: socket.id
 				}
 			});
 
 		case socketMessages.ready:
 			return store.dispatch({
-				type: ALL_PLAYERS_JOINED,
-				payload: { turn: msg.turn }
+				type: ALL_PLAYERS_JOINED
 			});
 
 		case socketMessages.restart:
@@ -169,14 +181,17 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 		}
 
 		case socketMessages.hostDisconnection:
-			store.dispatch({ type: END_GAME });
 			addAlert('Host disconnected');
 			setRedirect(true);
-			store.getState().streams[socket.id].stream.getTracks()[0].stop();
-			Object.values(connections).forEach((peerConn) => {
-				console.log(peerConn);
-				peerConn.close();
-			});
+			store.dispatch({ type: END_GAME, payload: { disconnection: true } });
+			// Stop local media
+			store
+				.getState()
+				.streams[socket.id].stream.getTracks()
+				.forEach(function (track) {
+					track.stop();
+				});
+			window.localClone.getTracks().forEach((track) => track.stop());
 			connections = {};
 			setTimeout(() => {
 				return store.dispatch({ type: CLEAR_STREAMS });
@@ -184,14 +199,15 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			break;
 
 		case socketMessages.joining: {
-			let { totalPlayers, name, playersJoined } = msg;
+			let { totalPlayers, name, playersJoined, host } = msg;
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
 					name,
 					totalPlayers,
 					gamePhase: gamePhases.joining,
-					playersJoined
+					playersJoined,
+					host
 				}
 			});
 		}

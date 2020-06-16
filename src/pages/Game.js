@@ -6,17 +6,10 @@ import SVideos from '../styled_components/video/SVideos';
 import SVideo from '../styled_components/video/SVideo';
 import SVideoLabel from '../styled_components/video/SVideoLabel';
 import SIcon from '../styled_components/video/SIcon';
+import LocalLabel from '../components/LocalLabel';
 import Menu from '../components/Menu';
 
 const Game = ({ streams, totalPlayers, socket, game }) => {
-	// const [nameChosen, setNameChosen] = useState(false);
-	// const [nameToGuess, setNameToGuess] = useState();
-
-	// const setName = () => {
-	// 	setNameChosen(true);
-	// 	socket.emit('setName', { nameToGuess, roomName: game.name });
-	// };
-
 	const emptyVideos = () => {
 		// Initializes to 1 to prevent jumpy render after loading local stream
 		const activeStreams = Object.keys(streams).length || 1;
@@ -33,13 +26,16 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 	//Turn off audio of local stream
 	const localStream = () => {
 		const local = streams[socket.id] && streams[socket.id].stream;
-		if (local) {
+		if (local && !window.localClone) {
 			const removeAudioLocalStream = local.clone();
+			window.localClone = removeAudioLocalStream;
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
 			if (audioTrack.length > 0) {
 				removeAudioLocalStream.removeTrack(audioTrack[0]);
 			}
 			return removeAudioLocalStream;
+		} else {
+			return window.localClone;
 		}
 	};
 
@@ -49,26 +45,25 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 				<SVideo>
 					<Video id="local" stream={localStream()} />
 					<SVideoLabel>
-						{(game.host && (
+						{(game.host === socket.id && (
 							<SIcon src="host.png" alt="this player is the host"></SIcon>
 						)) || <p></p>}
-						{/* {(game.host === socket.id && (
-							<SIcon src="host.png" alt="this player is the host"></SIcon>
-						)) || <p></p>} */}
 						<p>?</p>
 						<i></i>
 					</SVideoLabel>
+					<LocalLabel socket={socket} />
 				</SVideo>
 				{incomingStreams().map((streamName, i) => (
 					<SVideo key={i}>
 						<Video
 							stream={streams[streamName] && streams[streamName].stream}
+							streamName={streamName}
 							id={`stream${i}`}
 						/>
 						<SVideoLabel>
-							{/* {game.host === streamName && (
-							<SIcon src="host.png" alt="this player is the host"></SIcon>
-						) || <p></p>} */}
+							{(game.host === streamName && (
+								<SIcon src="host.png" alt="this player is the host"></SIcon>
+							)) || <p></p>}
 							<p>{streams[streamName] && streams[streamName].nameToGuess}</p>
 							<i></i>
 						</SVideoLabel>

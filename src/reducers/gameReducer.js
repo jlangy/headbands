@@ -23,24 +23,30 @@ const gameReducer = (state = initialState, action) => {
 				playersJoined,
 				host,
 				totalNamesSet: 0,
-				gamePhase: gamePhases.joining
+				gamePhase: gamePhases.joining,
+				revealed: []
 			};
 		case ALL_PLAYERS_JOINED: {
-			const { turn } = action.payload;
-			return { ...state, gamePhase: gamePhases.settingNames, turn };
+			return { ...state, gamePhase: gamePhases.settingNames };
 		}
 		case NEW_TURN: {
-			const { turn } = action.payload;
-			return { ...state, turn };
+			const { turn, revealed } = action.payload;
+			return { ...state, turn, revealed };
 		}
 		case ADD_PLAYER:
 			return { ...state, playersJoined: state.playersJoined + 1 };
 		case NAME_ADDED:
 			return { ...state, totalNamesSet: state.totalNamesSet + 1 };
 		case SETUP_COMPLETE:
-			return { ...state, gamePhase: gamePhases.playing };
+			{
+				const { turn } = action.payload;
+				return { ...state, gamePhase: gamePhases.playing, turn };
+			}
 		case END_GAME:
-			return { disconnected: true };
+			{
+				const {disconnection} = action.payload;
+				return disconnection ? { disconnected: true, redirect: true } : {redirect: true};
+			}
 		case RESTART_GAME:
 			return { ...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0 };
 		default:

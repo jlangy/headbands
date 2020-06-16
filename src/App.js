@@ -17,9 +17,8 @@ import Alert from './components/Alert';
 
 import './global_scss/App.scss';
 
-const App = ({ game, alerts }) => {
+const App = ({ game }) => {
 	const [socket, setSocket] = useState();
-	const [redirect, setRedirect] = useState(false);
 
 	useEffect(() => {
 		// connection for local
@@ -29,7 +28,7 @@ const App = ({ game, alerts }) => {
 		// const socket = io.connect(window.location.hostname);
 
 		socket.on('message', (msg) => {
-			handleSocketMsg(msg, socket, setRedirect);
+			handleSocketMsg(msg, socket);
 		});
 		setSocket(socket);
 	}, []);
@@ -38,7 +37,7 @@ const App = ({ game, alerts }) => {
 		<Router>
 			<Navbar></Navbar>
 			<Alert />
-			{redirect && <Redirect to="/" />}
+			{game.redirect && <Redirect to="/" />}
 
 			<Switch>
 				<Route exact path="/">
@@ -57,8 +56,7 @@ const App = ({ game, alerts }) => {
 };
 
 const mapStateToProps = (state) => ({
-	game: state.game,
-	alerts: state.alerts
+	game: state.game
 });
 
 export default connect(mapStateToProps)(App);

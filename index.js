@@ -105,7 +105,8 @@ io.on('connection', function (socket) {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
 				playersJoined: roomToJoin.playersJoined + 1,
-				name: roomName
+				name: roomName,
+				host: roomToJoin.host
 			});
 			socket.join(roomName);
 		} else {
@@ -143,17 +144,20 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('setName', ({ nameToGuess, roomName }) => {
-		rooms[roomName].players[socket.id].sentName = nameToGuess;
-		if (Object.values(rooms[roomName].players).every((val) => val.sentName)) {
-			const shiftedNames = shiftNames(rooms[roomName].players);
+		const room = rooms[roomName];
+		room.players[socket.id].sentName = nameToGuess;
+		console.log(room)
+		if (Object.values(room.players).every((val) => val.sentName)) {
+			const shiftedNames = shiftNames(room.players);
 			io.in(roomName).emit('message', {
 				type: 'give names',
-				names: shiftedNames
+				names: shiftedNames,
+				turn: room.turnOrder[room.turn]
 			});
 		} else {
 			io.in(roomName).emit('message', {
 				type: 'update set names',
-				totalNamesSet: Object.values(rooms[roomName].players).filter(
+				totalNamesSet: Object.values(room.players).filter(
 					(player) => player.sentName
 				).length
 			});
@@ -169,18 +173,22 @@ io.on('connection', function (socket) {
 			room.turn = 0;
 			room.turnOrder = Object.keys(room.players);
 			io.in(roomName).emit('message', {
-				type: 'gameReady',
-				turn: room.turnOrder[room.turn]
+				type: 'gameReady'
 			});
 		}
 	});
 
 	socket.on('next turn', ({ roomName }) => {
 		const room = rooms[roomName];
+		//Last turn over check
+		if(room.turn === room.turnOrder.length - 1){
+			return io.in(roomName).emit('message', {type: 'game over'})
+		}
 		room.turn = room.turn == room.totalPlayers - 1 ? 0 : room.turn + 1;
 		io.in(roomName).emit('message', {
 			type: 'new turn',
-			turn: room.turnOrder[room.turn]
+			turn: room.turnOrder[room.turn],
+			revealed: room.turnOrder.slice(0,room.turn)
 		});
 	});
 });
