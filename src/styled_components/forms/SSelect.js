@@ -4,7 +4,7 @@ const SSelect = styled.select`
 	display: flex;
 	background: #f1f2f1;
 	font-family: inherit;
-	width: 96%;
+	width: 100%;
 	padding: 2%;
 	border: none;
 	border-radius: 3px;

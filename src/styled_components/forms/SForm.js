@@ -6,6 +6,10 @@ const SForm = styled.form`
 	align-items: center;
 	width: 80%;
 	margin: 1rem 0;
+
+	> button {
+		width: 100%;
+	}
 `;
 
 export default SForm;
