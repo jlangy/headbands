@@ -1,6 +1,7 @@
 import React from 'react';
 import SVideoLabel from '../styled_components/video/SVideoLabel';
 import SIcon from '../styled_components/video/SIcon';
+import SButton from '../styled_components/forms/SButton'
 import { connect } from 'react-redux';
 
 function LocalLabel({ turn, socket, gameName, revealed, streams, host, gameOver }) {
@@ -12,12 +13,12 @@ function LocalLabel({ turn, socket, gameName, revealed, streams, host, gameOver 
 			<p>
 				{revealed.includes(socket.id) ? streams[socket.id].nameToGuess : '?'}
 			</p>
-			<button
+			<SButton
 				onClick={() => socket.emit('next turn', { roomName: gameName })}
 				disabled={turn !== socket.id || gameOver}
 			>
 				REVEAL
-			</button>
+			</SButton>
 		</SVideoLabel>
 	);
 }

@@ -44,7 +44,6 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 			<SVideos>
 				<SVideo>
 					<Video id="local" stream={localStream()} streamName={socket.id} />
-					<SVideoLabel />
 					<LocalLabel socket={socket} />
 				</SVideo>
 				{incomingStreams().map((streamName, i) => (
