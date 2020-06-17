@@ -1,5 +1,4 @@
 const express = require('express');
-// require('dotenv').config();
 const socket = require('socket.io');
 const path = require('path');
 const port = process.env.PORT || 3000;
@@ -54,43 +53,49 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('disconnecting', () => {
-    const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
-    if(rooms[roomName] && rooms[roomName].host == socket.id){
-      io.in(roomName).emit('message', {type: 'host disconnection'});
-      endGame(roomName);
-    }
-  });
+		const roomName = Object.keys(socket.rooms).filter(
+			(name) => name != socket.id
+		)[0];
+		if (rooms[roomName] && rooms[roomName].host == socket.id) {
+			io.in(roomName).emit('message', { type: 'host disconnection' });
+			endGame(roomName);
+		} else if (rooms[roomName]) {
+			io.in(roomName).emit('message', { type: 'disconnection', id: socket.id });
+			rooms[roomName].playersJoined -= 1;
+		}
+	});
 
-  socket.on('restart game', ({roomName}) => {
-    rooms[roomName].namesToGuess = [];
-    io.in(roomName).emit('message', {type: 'restart'})
-  })
-  
-  socket.on('end game', ({roomName}) => {
-    endGame(roomName);
-    socket.to(roomName).emit('message', {type: 'host disconnection'})
-  })
+	socket.on('restart game', ({ roomName }) => {
+		rooms[roomName].turn = 0;
+		Object.keys(rooms[roomName].players).forEach((key) => {
+			rooms[roomName].players[key] = {};
+		});
+		io.in(roomName).emit('message', { type: 'restart' });
+	});
 
-	socket.on('xir test', () => {
-    const roomName = Object.keys(socket.rooms).filter(name => name != socket.id)[0];
-    console.log(Object.keys(io.sockets.adapter.rooms))
-    console.log(rooms);
+	socket.on('end game', ({ roomName }) => {
+		endGame(roomName);
+		socket.to(roomName).emit('message', { type: 'host disconnection' });
+	});
+
+	socket.on('media on', ({roomName, fromId}) => {
+		console.log('got here')
+		let roomToJoin = rooms[roomName];
+		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
+			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			const token = await client.tokens.create();
+			socket.to(roomName).emit('message', {
+				type: 'joinRequest',
+				roomName,
+				fromId,
+				iceServers: token.iceServers
+			});
+		}
 	});
 
 	socket.on('join room', async ({ roomName, fromId }) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-			// const token = {iceServers: null}//await client.tokens.create();
-			const token = await client.tokens.create();
-			socket
-				.to(roomName)
-				.emit('message', {
-					type: 'joinRequest',
-					roomName,
-					fromId,
-					iceServers: token.iceServers
-				});
 			socket.emit('message', {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
@@ -106,7 +111,6 @@ io.on('connection', function (socket) {
 	socket.on('description', async ({ description, toId, fromId }) => {
 		const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 		const token = await client.tokens.create();
-		// const token = {iceServers: null} // await client.tokens.create();
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,
