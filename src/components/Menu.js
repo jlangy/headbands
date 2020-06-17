@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
-	END_GAME,
 	RESTART_GAME,
-	CLEAR_STREAM_NAMES,
-	CLEAR_STREAMS
+	CLEAR_STREAM_NAMES
 } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
 import SHostButtons from '../styled_components/controls/SHostButtons';
@@ -14,6 +12,7 @@ import SMenuButton from '../styled_components/controls/SMenuButton';
 import SMenuCard from '../styled_components/layout/SMenuCard';
 import Info from './Info';
 import addAlert from '../helpers/addAlert';
+import endGame from '../helpers/endGame';
 
 const Menu = ({ socket, game, dispatch, streams }) => {
 	const [nameChosen, setNameChosen] = useState(false);
@@ -33,18 +32,9 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 		}
 	};
 
-	const endGame = () => {
+	const handleEndGame = () => {
 		const roomName = game.name;
-		streams[socket.id].stream.getTracks().forEach(function (track) {
-			track.stop();
-		});
-		window.localClone.getTracks().forEach((track) => {
-			track.stop();
-		});
-		dispatch({ type: END_GAME, payload: { disconnection: false } });
-		setTimeout(() => {
-			dispatch({ type: CLEAR_STREAMS });
-		}, 5000);
+		endGame(streams[socket.id].stream, dispatch)
 		socket.emit('end game', { roomName });
 	};
 
@@ -60,7 +50,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
 			{game.host && (
 				<SHostButtons>
-					<SMenuButton onClick={endGame}>End Game</SMenuButton>
+					<SMenuButton onClick={handleEndGame}>End Game</SMenuButton>
 					<SMenuButton onClick={restartGame}>Restart Game</SMenuButton>
 				</SHostButtons>
 			)}
