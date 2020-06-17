@@ -66,9 +66,7 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 					<SVideo key={i}>
 						<Video id={`stream${i}`} />
 						<SVideoLabel>
-							<p></p>
 							<p>Waiting for player...</p>
-							<p></p>
 						</SVideoLabel>
 					</SVideo>
 				))}
