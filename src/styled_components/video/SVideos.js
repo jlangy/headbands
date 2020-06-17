@@ -10,16 +10,17 @@ const SVideos = styled(SCard)`
 	align-items: center;
 	justify-content: space-evenly;
 	max-height: none;
-	width: 90%;
+	width: 85%;
 	margin: 2rem auto 0 auto;
 	max-width: 800px;
-	padding: 1rem 0 2rem 0;
+	padding: 2.5%;
 
 	@media (max-width: 768px) {
 		flex-direction: column;
 		justify-content: start;
 		align-items: center;
 		width: 90%;
+		padding: 1rem 0 2rem 0;
 	}
 `;
 
