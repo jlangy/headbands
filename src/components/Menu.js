@@ -71,6 +71,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 						onChange={(e) => setNameToGuess(e.target.value)}
 						minlength="2"
 						maxlength="24"
+						disabled={nameChosen}
 					></SNameInput>
 					<SMenuButton onClick={setName} disabled={nameChosen}>
 						{nameChosen ? 'Waiting' : 'Confirm'}
