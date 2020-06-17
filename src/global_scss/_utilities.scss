@@ -1,0 +1,14 @@
+*,
+html,
+body {
+	font-family: 'Lobster', Georgia, Times, serif;
+	color: #3ca7d2;
+}
+
+video {
+	max-height: 250px;
+
+	@media (max-width: 375px) {
+		max-height: 200px;
+	}
+}

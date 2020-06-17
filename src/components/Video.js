@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
-import './video.scss';
+import { connect } from 'react-redux';
 
-function Video({ stream, id }) {
+const Video = ({ stream, id, revealed, streamName }) => {
 	useEffect(() => {
 		document.getElementById(id).srcObject = stream;
-	}, [stream]);
+	}, [stream, id]);
 
 	return (
-		<div className="video-container">
-			<video id={id} autoPlay playsInline></video>
-		</div>
+		//TODO: just a lazy example. Styling revealed videos needs to be improved
+		<video id={id} autoPlay playsInline poster="/tv-color-bars.gif" style={{filter: revealed.includes(streamName) ? 'grayscale(100%)' : ''}}></video>
 	);
-}
+};
 
-export default Video;
+const mapStateToProps = state => ({
+	revealed: state.game.revealed
+})
+
+export default connect(mapStateToProps)(Video);

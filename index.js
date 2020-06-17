@@ -11,32 +11,35 @@ let rooms = {};
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-function endGame(roomName){
-  delete rooms[roomName];
-  io.of('/').in(roomName).clients((error, socketIds) => {
-    if (error) throw error;
-    socketIds.forEach(socketId => io.sockets.sockets[socketId] && io.sockets.sockets[socketId].leave(roomName));
-  });
+function endGame(roomName) {
+	delete rooms[roomName];
+	io.of('/')
+		.in(roomName)
+		.clients((error, socketIds) => {
+			if (error) throw error;
+			socketIds.forEach(
+				(socketId) =>
+					io.sockets.sockets[socketId] &&
+					io.sockets.sockets[socketId].leave(roomName)
+			);
+		});
 }
 
-function shiftNames(names) {
-	const shiftedNames = [];
-	names.forEach((name, i) => {
-		if (i === names.length - 1) {
-			shiftedNames[0] = { toId: names[0].fromId, name: name.nameToGuess };
+function shiftNames(players) {
+	Object.keys(players).forEach((id, i, keys) => {
+		if (i === Object.keys(players).length - 1) {
+			players[id].nameToGuess = players[keys[0]].sentName;
+			players[id].receivedNameFrom = keys[0];
 		} else {
-			shiftedNames[i + 1] = {
-				toId: names[i + 1].fromId,
-				name: name.nameToGuess
-			};
+			players[id].receivedNameFrom = keys[i + 1];
+			players[id].nameToGuess = players[keys[i + 1]].sentName;
 		}
 	});
-	return shiftedNames;
+	return players;
 }
 
 io.on('connection', function (socket) {
-
-	socket.on('make room', ({ name, totalPlayers }) => {
+	socket.on('make room', ({ name, totalPlayers, useCategories }) => {
 		totalPlayers = Number(totalPlayers);
 		if (rooms[name]) {
 			return socket.emit('message', { type: 'name taken' });
@@ -46,7 +49,7 @@ io.on('connection', function (socket) {
 			totalPlayers,
 			name,
 			playersJoined: 1,
-			namesToGuess: [],
+			players: { [socket.id]: { nameToGuess: null, sentName: null } },
 			host: socket.id
 		};
 		socket.join(name);
@@ -100,11 +103,12 @@ io.on('connection', function (socket) {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
 				playersJoined: roomToJoin.playersJoined + 1,
-				name: roomName
+				name: roomName,
+				host: roomToJoin.host
 			});
 			socket.join(roomName);
 		} else {
-			socket.emit('message', { type: 'cannot join' });
+			socket.emit('message', { type: 'room DNE' });
 		}
 	});
 
@@ -137,30 +141,53 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('setName', ({ nameToGuess, roomName }) => {
-		// names.push({fromId: socket.id, name: msg.name});
-		const namesToGuess = rooms[roomName].namesToGuess;
-		namesToGuess.push({ fromId: socket.id, nameToGuess });
-		if (namesToGuess.length === rooms[roomName].totalPlayers) {
-			const shiftedNames = shiftNames(namesToGuess);
+		const room = rooms[roomName];
+		room.players[socket.id].sentName = nameToGuess;
+		console.log(room)
+		if (Object.values(room.players).every((val) => val.sentName)) {
+			const shiftedNames = shiftNames(room.players);
 			io.in(roomName).emit('message', {
 				type: 'give names',
-				names: shiftedNames
+				names: shiftedNames,
+				turn: room.turnOrder[room.turn]
 			});
 		} else {
 			io.in(roomName).emit('message', {
 				type: 'update set names',
-				totalNamesSet: namesToGuess.length
+				totalNamesSet: Object.values(room.players).filter(
+					(player) => player.sentName
+				).length
 			});
 		}
 	});
 
-	socket.on('ready', (roomName) => {
+	socket.on('ready', ({ roomName, joinerId }) => {
 		const room = rooms[roomName];
 		//There will be n-1 answers from nth joiner, so add 1/n-1.
 		room.playersJoined += 1 / Math.floor(room.playersJoined);
+		room.players[joinerId] = { nameToGuess: null, sentName: null };
 		if (Math.round(room.playersJoined) == room.totalPlayers) {
-			io.in(roomName).emit('message', { type: 'gameReady' });
+			room.turn = 0;
+			room.turnOrder = Object.keys(room.players);
+			io.in(roomName).emit('message', {
+				type: 'gameReady'
+			});
 		}
+	});
+
+	socket.on('next turn', ({ roomName }) => {
+		const room = rooms[roomName];
+		//Last turn over check
+		if(room.turn === room.turnOrder.length - 1){
+			room.turn = 0;
+			return io.in(roomName).emit('message', {type: 'game end', revealed: room.turnOrder, turn: room.turnOrder[0]})
+		}
+		room.turn += 1;
+		io.in(roomName).emit('message', {
+			type: 'new turn',
+			turn: room.turnOrder[room.turn],
+			revealed: room.turnOrder.slice(0,room.turn)
+		});
 	});
 });
 

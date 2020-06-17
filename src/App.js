@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Redirect
+} from 'react-router-dom';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
 import handleSocketMsg from './helpers/handleSocketMsg';

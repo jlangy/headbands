@@ -1,4 +1,14 @@
-import { NEW_GAME, ALL_PLAYERS_JOINED, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, RESTART_GAME } from '../actions/types';
+import {
+	NEW_GAME,
+	ALL_PLAYERS_JOINED,
+	ADD_PLAYER,
+	NAME_ADDED,
+	SETUP_COMPLETE,
+	END_GAME,
+	RESTART_GAME,
+	NEW_TURN,
+	GAME_END
+} from './types';
 import gamePhases from './gamePhases';
 
 const initialState = {};

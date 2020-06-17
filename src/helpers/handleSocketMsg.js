@@ -1,28 +1,47 @@
 import store from '../store';
-import { NEW_GAME, NEW_STREAM, ALL_PLAYERS_JOINED, GOT_NAMES, ADD_PLAYER, NAME_ADDED, SETUP_COMPLETE, END_GAME, CLEAR_STREAMS, RESTART_GAME, CLEAR_STREAM_NAMES } from '../actions/types';
+import {
+	REMOVE_STREAM,
+	NEW_TURN,
+	NEW_GAME,
+	NEW_STREAM,
+	ALL_PLAYERS_JOINED,
+	GOT_NAMES,
+	ADD_PLAYER,
+	NAME_ADDED,
+	SETUP_COMPLETE,
+	END_GAME,
+	CLEAR_STREAMS,
+	RESTART_GAME,
+	CLEAR_STREAM_NAMES,
+	GAME_END
+} from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
-
+import addAlert from '../helpers/addAlert';
+import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
 
 const socketMessages = {
-  iceCandidate: 'iceCandidate',
-  joinRequest: 'joinRequest',
-  offer: 'offer',
-  answer: 'answer',
-  badRoomName: 'cannot join',
-  ready: 'gameReady',
-  gotNames: 'give names',
-  nameTaken: 'name taken',
-  roomNameOk: 'room name ok',
-  joining: 'joining',
-  xirres: 'xir response',
-  updateSetNames: 'update set names',
-  disconnection: 'host disconnection',
-  restart: 'restart'
-}
+	iceCandidate: 'iceCandidate',
+	joinRequest: 'joinRequest',
+	offer: 'offer',
+	answer: 'answer',
+	ready: 'gameReady',
+	gotNames: 'give names',
+	nameTaken: 'name taken',
+	roomNameOk: 'room name ok',
+	joining: 'joining',
+	xirres: 'xir response',
+	updateSetNames: 'update set names',
+	disconnection: 'disconnection',
+	hostDisconnection: 'host disconnection',
+	restart: 'restart',
+	newTurn: 'new turn',
+	gameOver: 'game over',
+	gameEnd: 'game end',
+	roomDNE: 'room DNE'
+};
 
 //Save peer connections in form {socketID: RTCPeerConnection instance}
-//TODO: connections cleanup on new games
-const connections = {};
+let connections = {};
 
 //Add local stream to peer connection
 const feedLocalStream = (stream, connectionId) => {
@@ -78,7 +97,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			});
 		
 		case socketMessages.gameEnd:
-			addAlert('Game Over. Click button below to restart round')
+			addAlert('Game Over. Host can restart round')
 			return store.dispatch({type: GAME_END, payload: { revealed: msg.revealed, turn: msg.turn }})
 
 		case socketMessages.newTurn:
