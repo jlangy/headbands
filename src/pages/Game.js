@@ -42,12 +42,12 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 	return (
 		<SPage>
 			<SVideos>
-				<SVideo>
+				<SVideo turn={game.turn === socket.id}>
 					<Video id="local" stream={localStream()} streamName={socket.id} />
 					<LocalLabel socket={socket} />
 				</SVideo>
 				{incomingStreams().map((streamName, i) => (
-					<SVideo key={i}>
+					<SVideo turn={game.turn === streamName} key={i}>
 						<Video
 							stream={streams[streamName] && streams[streamName].stream}
 							streamName={streamName}
