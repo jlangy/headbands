@@ -10,11 +10,11 @@ import {
 	NAME_ADDED,
 	SETUP_COMPLETE,
 	END_GAME,
-	CLEAR_STREAMS,
 	RESTART_GAME,
 	CLEAR_STREAM_NAMES,
 	GAME_END
 } from '../reducers/types';
+import endGame from '../helpers/endGame';
 import gamePhases from '../reducers/gamePhases';
 import addAlert from '../helpers/addAlert';
 import turnOnLocalMedia from '../helpers/turnOnLocalMedia';
@@ -191,19 +191,8 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.hostDisconnection:
 			addAlert('Host disconnected');
-			store.dispatch({ type: END_GAME, payload: { disconnection: true } });
-			// Stop local media
-			store
-				.getState()
-				.streams[socket.id].stream.getTracks()
-				.forEach(function (track) {
-					track.stop();
-				});
-			window.localClone.getTracks().forEach((track) => track.stop());
+			endGame(store.getState().streams[socket.id].stream, store.dispatch, true)
 			connections = {};
-			setTimeout(() => {
-				return store.dispatch({ type: CLEAR_STREAMS });
-			}, 50);
 			break;
 
 		case socketMessages.joining: {
