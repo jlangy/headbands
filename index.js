@@ -81,8 +81,7 @@ io.on('connection', function (socket) {
 		socket.to(roomName).emit('message', { type: 'host disconnection' });
 	});
 
-	socket.on('media on', ({roomName, fromId}) => {
-		console.log('got here')
+	socket.on('media on', async ({roomName, fromId}) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
