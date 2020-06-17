@@ -40,7 +40,8 @@ function shiftNames(players) {
 }
 
 io.on('connection', function (socket) {
-	socket.on('make room', ({ name, totalPlayers, useCategories }) => {
+	// turnMode === false ? consecutive (normal) : concurrent (back and forth);
+	socket.on('make room', ({ name, totalPlayers, useCategories, turnMode }) => {
 		totalPlayers = Number(totalPlayers);
 		if (rooms[name]) {
 			return socket.emit('message', { type: 'name taken' });
@@ -89,8 +90,8 @@ io.on('connection', function (socket) {
 		console.log(rooms);
 	});
 
-	socket.on('media on', ({roomName, fromId}) => {
-		console.log('got here')
+	socket.on('media on', ({ roomName, fromId }) => {
+		console.log('got here');
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
@@ -162,7 +163,7 @@ io.on('connection', function (socket) {
 	socket.on('setName', ({ nameToGuess, roomName }) => {
 		const room = rooms[roomName];
 		room.players[socket.id].sentName = nameToGuess;
-		console.log(room)
+		console.log(room);
 		if (Object.values(room.players).every((val) => val.sentName)) {
 			const shiftedNames = shiftNames(room.players);
 			io.in(roomName).emit('message', {
@@ -197,15 +198,21 @@ io.on('connection', function (socket) {
 	socket.on('next turn', ({ roomName }) => {
 		const room = rooms[roomName];
 		//Last turn over check
-		if(room.turn === room.turnOrder.length - 1){
+		if (room.turn === room.turnOrder.length - 1) {
 			room.turn = 0;
-			return io.in(roomName).emit('message', {type: 'game end', revealed: room.turnOrder, turn: room.turnOrder[0]})
+			return io
+				.in(roomName)
+				.emit('message', {
+					type: 'game end',
+					revealed: room.turnOrder,
+					turn: room.turnOrder[0]
+				});
 		}
 		room.turn += 1;
 		io.in(roomName).emit('message', {
 			type: 'new turn',
 			turn: room.turnOrder[room.turn],
-			revealed: room.turnOrder.slice(0,room.turn)
+			revealed: room.turnOrder.slice(0, room.turn)
 		});
 	});
 });
