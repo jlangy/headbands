@@ -29,7 +29,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 			});
 			turnOnLocalMedia(streams, socket);
 		} else {
-			addAlert('Please enter a valid lobby name');
+			addAlert('Invalid lobby name');
 		}
 	};
 

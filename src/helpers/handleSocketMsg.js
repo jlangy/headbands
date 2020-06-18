@@ -53,7 +53,7 @@ const feedLocalStream = (stream, connectionId) => {
 const createStreamConnection = (socketId, iceServers, localId) => {
 	// connections[socketId] = new RTCPeerConnection({iceServers});
 	connections[socketId] = new RTCPeerConnection(null);
-	console.log(store.getState())
+	console.log(store.getState());
 	feedLocalStream(store.getState().streams[localId].stream, socketId);
 	connections[socketId].ontrack = (e) =>
 		store.dispatch({
@@ -63,7 +63,7 @@ const createStreamConnection = (socketId, iceServers, localId) => {
 };
 
 const handleSocketMsg = async (msg, socket, setRedirect) => {
-	console.log(msg)
+	console.log(msg);
 	switch (msg.type) {
 		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
@@ -95,10 +95,13 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				fromId: socket.id,
 				room: store.getState().game.name
 			});
-		
+
 		case socketMessages.gameEnd:
-			addAlert('Game Over. Host can restart round')
-			return store.dispatch({type: GAME_END, payload: { revealed: msg.revealed, turn: msg.turn }})
+			addAlert('Game Over. Host can restart round');
+			return store.dispatch({
+				type: GAME_END,
+				payload: { revealed: msg.revealed, turn: msg.turn }
+			});
 
 		case socketMessages.newTurn:
 			return store.dispatch({
@@ -147,7 +150,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			return await connections[msg.fromId].setRemoteDescription(msg.answer);
 
 		case socketMessages.roomDNE:
-			return addAlert('Room Does Not Exist')
+			return addAlert('Lobby does not exist');
 
 		case socketMessages.gotNames:
 			store.dispatch({ type: GOT_NAMES, payload: { names: msg.names } });
@@ -157,7 +160,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			});
 
 		case socketMessages.nameTaken:
-			return addAlert('Name already taken');
+			return addAlert('Lobby name already taken');
 
 		case socketMessages.roomNameOk:
 			let { name, totalPlayers } = msg;
@@ -208,9 +211,9 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			break;
 
 		case socketMessages.joining: {
-			await turnOnLocalMedia(store.getState().streams, socket)
+			await turnOnLocalMedia(store.getState().streams, socket);
 			let { totalPlayers, name, playersJoined, host } = msg;
-			socket.emit('media on', {roomName: name, fromId: socket.id})
+			socket.emit('media on', { roomName: name, fromId: socket.id });
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
