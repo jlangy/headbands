@@ -19,7 +19,7 @@ const About = (props) => {
 				<SBreak></SBreak>
 				<SPara>
 					Content TBA, but here's a link to{' '}
-					<SInlineLink to="/">start playing</SInlineLink> in the meantime
+					{' '}<SInlineLink to="/">start playing</SInlineLink> in the meantime
 				</SPara>
 			</SCard>
 		</SPage>

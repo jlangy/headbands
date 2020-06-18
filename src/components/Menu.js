@@ -22,7 +22,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 	useEffect(() => {
 		setNameChosen(false);
 		setNameToGuess('');
-	}, [game.gameEnd]);
+	}, [game.gameEnd, game.gamePhase])
 
 	const setName = () => {
 		if (nameToGuess.trim().length > 1) {

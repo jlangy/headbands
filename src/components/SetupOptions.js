@@ -62,6 +62,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 								value="no"
 								defaultChecked
 								onClick={(e) => setUseCategories(false)}
+								disabled={true}
 							/>
 							<SLabel htmlFor="no-categories">No</SLabel>
 						</div>
@@ -73,6 +74,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 								name="categories"
 								value="yes"
 								onClick={(e) => setUseCategories(true)}
+								disabled={true}
 							/>
 							<SLabel htmlFor="categories">Yes</SLabel>
 						</div>

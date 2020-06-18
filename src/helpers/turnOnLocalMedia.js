@@ -6,7 +6,7 @@ const turnOnLocalMedia = async (streams, socket) => {
 	return new Promise( async (resolve, reject) => {
 		if (!streams[socket.id]) {
 			const stream = await navigator.mediaDevices.getUserMedia({
-				audio: false,
+				audio: true,
 				video: true
 			});
 			store.dispatch({

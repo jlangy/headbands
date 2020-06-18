@@ -31,6 +31,7 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 			window.localClone = removeAudioLocalStream;
 			const audioTrack = removeAudioLocalStream.getAudioTracks();
 			if (audioTrack.length > 0) {
+				audioTrack[0].stop();
 				removeAudioLocalStream.removeTrack(audioTrack[0]);
 			}
 			return removeAudioLocalStream;

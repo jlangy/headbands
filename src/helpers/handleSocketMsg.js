@@ -53,7 +53,6 @@ const feedLocalStream = (stream, connectionId) => {
 const createStreamConnection = (socketId, iceServers, localId) => {
 	// connections[socketId] = new RTCPeerConnection({iceServers});
 	connections[socketId] = new RTCPeerConnection(null);
-	console.log(store.getState());
 	feedLocalStream(store.getState().streams[localId].stream, socketId);
 	connections[socketId].ontrack = (e) =>
 		store.dispatch({
@@ -155,8 +154,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 		case socketMessages.gotNames:
 			store.dispatch({ type: GOT_NAMES, payload: { names: msg.names } });
 			return store.dispatch({
-				type: SETUP_COMPLETE,
-				payload: { turn: msg.turn }
+				type: SETUP_COMPLETE
 			});
 
 		case socketMessages.nameTaken:

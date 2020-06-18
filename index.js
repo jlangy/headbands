@@ -1,5 +1,4 @@
 const express = require('express');
-// require('dotenv').config();
 const socket = require('socket.io');
 const path = require('path');
 const port = process.env.PORT || 3000;
@@ -71,6 +70,7 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('restart game', ({ roomName }) => {
+		rooms[roomName].turn = 0;
 		Object.keys(rooms[roomName].players).forEach((key) => {
 			rooms[roomName].players[key] = {};
 		});
@@ -82,21 +82,12 @@ io.on('connection', function (socket) {
 		socket.to(roomName).emit('message', { type: 'host disconnection' });
 	});
 
-	socket.on('xir test', () => {
-		const roomName = Object.keys(socket.rooms).filter(
-			(name) => name != socket.id
-		)[0];
-		console.log(Object.keys(io.sockets.adapter.rooms));
-		console.log(rooms);
-	});
-
-	socket.on('media on', ({ roomName, fromId }) => {
-		console.log('got here');
+	socket.on('media on', async ({roomName, fromId}) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 			// const token = await client.tokens.create();
-			const token = { iceServers: null }; //await client.tokens.create();
+			const token = {iceServers: null};
 			socket.to(roomName).emit('message', {
 				type: 'joinRequest',
 				roomName,
@@ -109,15 +100,6 @@ io.on('connection', function (socket) {
 	socket.on('join room', async ({ roomName, fromId }) => {
 		let roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-			// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
-			// const token = await client.tokens.create();
-			// const token = { iceServers: null }; //await client.tokens.create();
-			// socket.to(roomName).emit('message', {
-			// 	type: 'joinRequest',
-			// 	roomName,
-			// 	fromId,
-			// 	iceServers: token.iceServers
-			// });
 			socket.emit('message', {
 				type: 'joining',
 				totalPlayers: roomToJoin.totalPlayers,
@@ -134,7 +116,7 @@ io.on('connection', function (socket) {
 	socket.on('description', async ({ description, toId, fromId }) => {
 		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 		// const token = await client.tokens.create();
-		const token = { iceServers: null }; // await client.tokens.create();
+		const token = {iceServers: null};
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,

@@ -36,8 +36,8 @@ const gameReducer = (state = initialState, action) => {
 			return { ...state, turn, revealed };
 		}
 		case GAME_END: {
-			const {revealed, turn} = action.payload;
-			return {...state, gameEnd: true, revealed, turn}
+			const {revealed} = action.payload;
+			return {...state, gameEnd: true, revealed, turn: null}
 		}
 		case ADD_PLAYER:
 			return { ...state, playersJoined: state.playersJoined + 1 };
@@ -45,8 +45,7 @@ const gameReducer = (state = initialState, action) => {
 			return { ...state, totalNamesSet: state.totalNamesSet + 1 };
 		case SETUP_COMPLETE:
 			{
-				const { turn } = action.payload;
-				return { ...state, gamePhase: gamePhases.playing, turn };
+				return { ...state, gamePhase: gamePhases.playing, turn: state.host };
 			}
 		case END_GAME:
 			{
@@ -54,7 +53,7 @@ const gameReducer = (state = initialState, action) => {
 				return disconnection ? { disconnected: true, goToHome: true } : {goToHome: true};
 			}
 		case RESTART_GAME:
-			return { ...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0, revealed: [], gameEnd: false };
+			return { ...state, gamePhase: gamePhases.settingNames, totalNamesSet: 0, revealed: [], gameEnd: false, turn: null };
 		default:
 			return state;
 	}
