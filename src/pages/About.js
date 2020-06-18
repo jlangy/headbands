@@ -18,8 +18,8 @@ const About = (props) => {
 				<SHeading id="how-to-play">How to Play</SHeading>
 				<SBreak></SBreak>
 				<SPara>
-					Content TBA, but here's a link to
-					<SInlineLink>start playing</SInlineLink> in the meantime
+					Content TBA, but here's a link to{' '}
+					<SInlineLink to="/">start playing</SInlineLink> in the meantime
 				</SPara>
 			</SCard>
 		</SPage>

@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import SCard from '../layout/SCard';
 
-// Contains all video containers
 const SVideos = styled(SCard)`
 	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 	display: flex;
@@ -10,9 +9,9 @@ const SVideos = styled(SCard)`
 	align-items: center;
 	justify-content: space-evenly;
 	max-height: none;
-	width: 85%;
+	max-width: none;
+	width: 90%;
 	margin: 2rem auto 0 auto;
-	max-width: 800px;
 	padding: 2.5%;
 
 	@media (max-width: 768px) {

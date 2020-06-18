@@ -5,6 +5,7 @@ const SNameInputGroup = styled.div`
 	display: flex;
 	flex-direction: row;
 	width: 90%;
+	max-width: 800px;
 	margin: 1rem auto;
 	justify-content: space-between;
 	align-items: center;

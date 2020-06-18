@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import SPage from '../styled_components/layout/SPage';
 import Video from '../components/Video';
 import SVideos from '../styled_components/video/SVideos';
-import SVideo from '../styled_components/video/SVideo';
+import SVideoContainer from '../styled_components/video/SVideoContainer';
 import SVideoLabel from '../styled_components/video/SVideoLabel';
 import SIcon from '../styled_components/video/SIcon';
 import LocalLabel from '../components/LocalLabel';
@@ -42,12 +42,12 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 	return (
 		<SPage>
 			<SVideos>
-				<SVideo turn={game.turn === socket.id}>
+				<SVideoContainer turn={game.turn === socket.id}>
 					<Video id="local" stream={localStream()} streamName={socket.id} />
 					<LocalLabel socket={socket} />
-				</SVideo>
+				</SVideoContainer>
 				{incomingStreams().map((streamName, i) => (
-					<SVideo turn={game.turn === streamName} key={i}>
+					<SVideoContainer turn={game.turn === streamName} key={i}>
 						<Video
 							stream={streams[streamName] && streams[streamName].stream}
 							streamName={streamName}
@@ -60,15 +60,15 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 							<p>{streams[streamName] && streams[streamName].nameToGuess}</p>
 							<i></i>
 						</SVideoLabel>
-					</SVideo>
+					</SVideoContainer>
 				))}
 				{emptyVideos().map((a, i) => (
-					<SVideo key={i}>
+					<SVideoContainer key={i}>
 						<Video id={`stream${i}`} />
 						<SVideoLabel>
 							<p>Waiting for player...</p>
 						</SVideoLabel>
-					</SVideo>
+					</SVideoContainer>
 				))}
 			</SVideos>
 			<Menu socket={socket} />

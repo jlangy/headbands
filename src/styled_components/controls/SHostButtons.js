@@ -6,6 +6,7 @@ const SHostButtons = styled.div`
 	justify-content: space-between;
 	padding: 0 1rem;
 	width: 90%;
+	max-width: 800px;
 
 	@media (max-width: 768px) {
 		flex-direction: column;
