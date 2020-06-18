@@ -17,7 +17,7 @@ const JoinOptions = ({ socket, streams }) => {
 		if (joinRoomName.trim().length > 0) {
 			socket.emit('join room', { roomName: joinRoomName, fromId: socket.id });
 		} else {
-			addAlert('Please enter a valid lobby name');
+			addAlert('Invalid lobby name');
 		}
 	};
 

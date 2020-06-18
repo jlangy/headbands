@@ -5,7 +5,7 @@ import SHeading from '../styled_components/layout/SHeading';
 import SForm from '../styled_components/forms/SForm';
 import SBreak from '../styled_components/layout/SBreak';
 import SInputGroup from '../styled_components/forms/SInputGroup';
-import SCheckboxes from '../styled_components/forms/SCheckboxes';
+import SRadioButtons from '../styled_components/forms/SRadioButtons';
 import SInput from '../styled_components/forms/SInput';
 import Button from '../components/Button';
 import SLabel from '../styled_components/forms/SLabel';
@@ -16,6 +16,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 	const [makeRoomName, setMakeRoomName] = useState('');
 	const [numPlayers, setNumPlayers] = useState(2);
 	const [useCategories, setUseCategories] = useState(false);
+	const [turnMode, setTurnMode] = useState(false);
 
 	const makeRoom = async (e) => {
 		e.preventDefault();
@@ -23,11 +24,12 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 			socket.emit('make room', {
 				name: makeRoomName,
 				totalPlayers: numPlayers,
-				useCategories
+				useCategories,
+				turnMode
 			});
 			turnOnLocalMedia(streams, socket);
 		} else {
-			addAlert('Please enter a valid lobby name');
+			addAlert('Invalid lobby name');
 		}
 	};
 
@@ -49,7 +51,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 						<option>6</option>
 					</SSelect>
 				</SInputGroup>
-				<SCheckboxes>
+				<SRadioButtons>
 					<SLabel>Pre-selected Categories: </SLabel>
 					<div>
 						<div>
@@ -75,7 +77,34 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 							<SLabel htmlFor="categories">Yes</SLabel>
 						</div>
 					</div>
-				</SCheckboxes>
+				</SRadioButtons>
+				<SRadioButtons>
+					<SLabel>Turn Mode: </SLabel>
+					<div>
+						<div>
+							<input
+								type="radio"
+								id="consecutive"
+								name="mode"
+								value="consecutive"
+								defaultChecked
+								onClick={(e) => setTurnMode(false)}
+							/>
+							<SLabel htmlFor="consecutive">Consecutive</SLabel>
+						</div>
+
+						<div>
+							<input
+								type="radio"
+								id="concurrent"
+								name="mode"
+								value="concurrent"
+								onClick={(e) => setTurnMode(true)}
+							/>
+							<SLabel htmlFor="concurrent">Concurrent</SLabel>
+						</div>
+					</div>
+				</SRadioButtons>
 				<SInputGroup>
 					<SLabel>Name of Lobby:</SLabel>
 					<SInput

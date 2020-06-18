@@ -10,6 +10,7 @@ import SNameInputGroup from '../styled_components/controls/SNameInputGroup';
 import SNameInput from '../styled_components/controls/SNameInput';
 import SMenuButton from '../styled_components/controls/SMenuButton';
 import SMenuCard from '../styled_components/layout/SMenuCard';
+import SHostButton from '../styled_components/controls/SHostButton';
 import Info from './Info';
 import addAlert from '../helpers/addAlert';
 import endGame from '../helpers/endGame';
@@ -21,7 +22,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 	useEffect(() => {
 		setNameChosen(false);
 		setNameToGuess('');
-	}, [game.gameEnd])
+	}, [game.gameEnd]);
 
 	const setName = () => {
 		if (nameToGuess.trim().length > 1) {
@@ -50,8 +51,8 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
 			{game.host && (
 				<SHostButtons>
-					<SMenuButton onClick={handleEndGame}>End Game</SMenuButton>
-					<SMenuButton onClick={restartGame}>Restart Game</SMenuButton>
+					<SHostButton onClick={handleEndGame}>End Game</SHostButton>
+					<SHostButton onClick={restartGame}>Restart Game</SHostButton>
 				</SHostButtons>
 			)}
 			{game.gamePhase === gamePhases.settingNames && (

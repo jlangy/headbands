@@ -21,10 +21,10 @@ const App = ({ game }) => {
 	const [socket, setSocket] = useState();
 
 	useEffect(() => {
-		// connection for local
+		// local
 		const socket = io.connect('http://localhost:3000');
 
-		// connection for production
+		// production
 		// const socket = io.connect(window.location.hostname);
 
 		socket.on('message', (msg) => {

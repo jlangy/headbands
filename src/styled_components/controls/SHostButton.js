@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const SMenuButton = styled.button`
+const SHostButton = styled.button`
 	background-color: #3ca7d2;
 	color: white;
 	padding: 6px;
@@ -8,7 +8,7 @@ const SMenuButton = styled.button`
 	text-align: center;
 	border: none;
 	font-size: inherit;
-	margin: 0.5rem auto;
+	margin: 0;
 	width: 49%;
 
 	:active,
@@ -28,4 +28,4 @@ const SMenuButton = styled.button`
 	}
 `;
 
-export default SMenuButton;
+export default SHostButton;

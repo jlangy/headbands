@@ -1,28 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import SPage from '../styled_components/layout/SPage';
-import SCard from '../styled_components/layout/SCard';
 import SetupOptions from '../components/SetupOptions';
 import JoinOptions from '../components/JoinOptions';
-import styled from 'styled-components';
-
-const SLandingPage = styled(SPage)`
-	justify-content: space-around;
-	flex-direction: row;
-	align-items: flex-start;
-`;
-
-const SLandingCard = styled(SCard)`
-	width: 40%;
-	margin-left: 0;
-	margin-right: 0;
-
-	@media (max-width: 768px) {
-		width: 80%;
-		margin-left: auto;
-		margin-right: auto;
-	}
-`;
+import SLandingPage from '../styled_components/layout/SLandingPage';
+import SLandingCard from '../styled_components/layout/SLandingCard';
 
 const Landing = ({ socket, streams }) => {
 	return (
