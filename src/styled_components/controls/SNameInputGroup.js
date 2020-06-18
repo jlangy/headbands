@@ -6,7 +6,7 @@ const SNameInputGroup = styled.div`
 	flex-direction: row;
 	width: 90%;
 	margin: 1rem auto;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
 
 	> button {

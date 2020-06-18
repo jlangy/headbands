@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 
-const SHostButtons = styled.aside`
+const SHostButtons = styled.div`
 	display: flex;
-	justify-content: space-evenly;
+	flex-direction: row;
+	justify-content: space-between;
 	padding: 0 1rem;
-	min-width: 50%;
+	width: 90%;
 
 	@media (max-width: 768px) {
 		flex-direction: column;

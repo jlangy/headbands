@@ -103,7 +103,7 @@ Bryce McMath – [bryce-mcmath](https://github.com/bryce-mcmath) – bryce.j.mcm
 
 - Bugs? What bugs?
 
-_To add an issue, start a new one [here.](https://github.com/bryce-mcmath/traderu/issues)_
+_To add an issue, start a new one [here.](https://github.com/jlangy/headbands/issues)_
 
 ## Feature roadmap
 
