@@ -35,7 +35,6 @@ const App = ({ game }) => {
 
 	return (
 		<>
-		<button onClick={() => {debugger}}>PAUSE</button>
 		<Router>
 			<Navbar socket={socket}></Navbar>
 			<Alert />
