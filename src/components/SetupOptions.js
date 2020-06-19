@@ -62,7 +62,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 								value="no"
 								defaultChecked
 								onClick={(e) => setUseCategories(false)}
-								disabled={true}
+								disabled
 							/>
 							<SLabel htmlFor="no-categories">No</SLabel>
 						</div>
@@ -74,7 +74,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 								name="categories"
 								value="yes"
 								onClick={(e) => setUseCategories(true)}
-								disabled={true}
+								disabled
 							/>
 							<SLabel htmlFor="categories">Yes</SLabel>
 						</div>
@@ -90,6 +90,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 								name="mode"
 								value="consecutive"
 								defaultChecked
+								disabled
 								onClick={(e) => setTurnMode(false)}
 							/>
 							<SLabel htmlFor="consecutive">Consecutive</SLabel>
@@ -101,6 +102,7 @@ const SetupOptions = ({ socket, createStream, streams }) => {
 								id="concurrent"
 								name="mode"
 								value="concurrent"
+								disabled
 								onClick={(e) => setTurnMode(true)}
 							/>
 							<SLabel htmlFor="concurrent">Concurrent</SLabel>
