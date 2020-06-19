@@ -5,10 +5,14 @@ import SLinks from '../styled_components/nav/SLinks';
 import SLink from '../styled_components/nav/SLink';
 import SBrand from '../styled_components/nav/SBrand';
 import SIcon from '../styled_components/nav/SIcon';
+import { connect } from 'react-redux';
+import endGame from '../helpers/endGame';
 
-const desktopLinks = () => (
+
+
+const desktopLinks = (handleRedirect) => (
 	<>
-		<Link to="/">
+		<Link to="/"  onClick={handleRedirect}>
 			<SBrand>
 				<SIcon src="/android-chrome-192x192.png"></SIcon>
 				Headbands
@@ -16,38 +20,38 @@ const desktopLinks = () => (
 		</Link>
 		<SLinks>
 			<li>
-				<SLink to="/about#how-to-play">How-to-Play</SLink>
+				<SLink to="/about#how-to-play" onClick={handleRedirect}>How-to-Play</SLink>
 			</li>
 			<li>
-				<SLink to="/about">About</SLink>
+				<SLink to="/about" onClick={handleRedirect}>About</SLink>
 			</li>
 			<li>
-				<SLink to="/contact">Contact</SLink>
+				<SLink to="/contact" onClick={handleRedirect}>Contact</SLink>
 			</li>
 		</SLinks>
 	</>
 );
 
-const mobileLinks = () => (
+const mobileLinks = (handleRedirect) => (
 	<>
-		<Link to="/">
+		<Link to="/" onClick={handleRedirect}>
 			<SBrand>
 				<SIcon src="/android-chrome-192x192.png"></SIcon>
 			</SBrand>
 		</Link>
 		<SLinks>
 			<li>
-				<SLink to="/about">
+				<SLink to="/about" onClick={handleRedirect}>
 					<i className="fas fa-question"></i>
 				</SLink>
 			</li>
 			<li>
-				<SLink to="/about#how-to-play">
+				<SLink to="/about#how-to-play" onClick={handleRedirect}>
 					<i className="fab fa-leanpub"></i>
 				</SLink>
 			</li>
 			<li>
-				<SLink to="/contact">
+				<SLink to="/contact" onClick={handleRedirect}>
 					<i className="fas fa-envelope"></i>
 				</SLink>
 			</li>
@@ -55,8 +59,18 @@ const mobileLinks = () => (
 	</>
 );
 
-const Navbar = () => {
+const Navbar = ({game, streams, dispatch, socket}) => {
 	let [screenWidth, setScreenWidth] = useState(1024);
+
+	const handleRedirect = () => {
+		try {
+			const roomName = game.name;
+			endGame(streams[socket.id].stream, dispatch)
+			socket.emit('leave game', { roomName });
+		} catch (e) {
+			console.log(e)
+		}
+	}
 
 	useEffect(() => {
 		updateWindowDimensions();
@@ -68,7 +82,12 @@ const Navbar = () => {
 
 	const updateWindowDimensions = () => setScreenWidth(window.innerWidth);
 
-	return <SNav>{screenWidth > 768 ? desktopLinks() : mobileLinks()}</SNav>;
+	return <SNav>{screenWidth > 768 ? desktopLinks(handleRedirect) : mobileLinks(handleRedirect)}</SNav>;
 };
 
-export default Navbar;
+const mapStateToProps = state => ({
+	game: state.game,
+	streams: state.streams
+})
+
+export default connect(mapStateToProps)(Navbar);

@@ -36,7 +36,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 	const handleEndGame = () => {
 		const roomName = game.name;
 		endGame(streams[socket.id].stream, dispatch)
-		socket.emit('end game', { roomName });
+		socket.emit('leave game', { roomName });
 	};
 
 	const restartGame = () => {
@@ -49,7 +49,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 	return (
 		<SMenuCard>
 			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
-			{game.host && (
+			{game.host === socket.id && (
 				<SHostButtons>
 					<SHostButton onClick={handleEndGame}>End Game</SHostButton>
 					<SHostButton onClick={restartGame}>Restart Game</SHostButton>

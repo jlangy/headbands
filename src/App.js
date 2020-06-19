@@ -34,8 +34,10 @@ const App = ({ game }) => {
 	}, []);
 
 	return (
+		<>
+		<button onClick={() => {debugger}}>PAUSE</button>
 		<Router>
-			<Navbar></Navbar>
+			<Navbar socket={socket}></Navbar>
 			<Alert />
 			{game.goToHome && <Redirect to="/" />}
 			{game.goToGame && <Redirect to="/game" />}
@@ -52,6 +54,7 @@ const App = ({ game }) => {
 				<Route path="/game">{game.gamePhase && <Game socket={socket} />}</Route>
 			</Switch>
 		</Router>
+		</>
 	);
 };
 
