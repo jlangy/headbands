@@ -17,7 +17,7 @@ function LocalLabel({
 		<SVideoLabel>
 			{(host === socket.id && (
 				<SIcon src="host.png" alt="this player is the host"></SIcon>
-			)) || <p></p>}
+			)) || <p> </p>}
 			<p>
 				{revealed.includes(socket.id) ? streams[socket.id].nameToGuess : '?'}
 			</p>

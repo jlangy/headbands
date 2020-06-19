@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-// Contains video svg element
 const SVideoLabel = styled.div`
 	font-family: 'Cabin', Helvetica, Arial, sans-serif;
 	position: absolute;
@@ -11,7 +10,7 @@ const SVideoLabel = styled.div`
 	background: rgba(255, 255, 255, 0.7);
 	text-align: center;
 	display: flex;
-	justify-content: space-evenly;
+	justify-content: space-between;
 	align-items: center;
 	padding: 0.25rem 1rem;
 	text-transform: capitalize;
@@ -19,6 +18,9 @@ const SVideoLabel = styled.div`
 	> * {
 		color: #222;
 		font-size: 1rem;
+		margin-left: 0;
+		margin-right: 0;
+		min-width: 10%;
 	}
 `;
 

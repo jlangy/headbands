@@ -57,9 +57,9 @@ const Game = ({ streams, totalPlayers, socket, game }) => {
 						<SVideoLabel>
 							{(game.host === streamName && (
 								<SIcon src="host.png" alt="this player is the host"></SIcon>
-							)) || <p></p>}
+							)) || <p> </p>}
 							<p>{streams[streamName] && streams[streamName].nameToGuess}</p>
-							<i></i>
+							<p> </p>
 						</SVideoLabel>
 					</SVideoContainer>
 				))}
