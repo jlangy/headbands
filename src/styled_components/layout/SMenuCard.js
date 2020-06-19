@@ -13,7 +13,7 @@ const SMenuCard = styled(SCard)`
 		flex-direction: column;
 		justify-content: start;
 		align-items: center;
-		width: 90%;
+		width: 85%;
 		padding: 2.5%;
 	}
 `;

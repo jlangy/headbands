@@ -38,7 +38,7 @@ const mobileLinks = () => (
 		<SLinks>
 			<li>
 				<SLink to="/about">
-					<i className="fas fa-piggy-bank"></i>
+					<i className="fas fa-question"></i>
 				</SLink>
 			</li>
 			<li>
