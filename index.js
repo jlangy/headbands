@@ -77,9 +77,14 @@ io.on('connection', function (socket) {
 		io.in(roomName).emit('message', { type: 'restart' });
 	});
 
-	socket.on('end game', ({ roomName }) => {
-		endGame(roomName);
-		socket.to(roomName).emit('message', { type: 'host disconnection' });
+	socket.on('leave game', ({ roomName }) => {
+		if(rooms[roomName] && rooms[roomName].host == socket.id){
+			socket.to(roomName).emit('message', { type: 'host disconnection' });
+			endGame(roomName);
+		} else {
+			socket.to(roomName).emit('message', { type: 'disconnection', id: socket.id });
+			rooms[roomName].playersJoined -= 1;
+		}
 	});
 
 	socket.on('media on', async ({roomName, fromId}) => {
