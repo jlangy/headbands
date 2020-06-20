@@ -82,8 +82,9 @@ npm run start-react
 - [styled-components](https://styled-components.com) - Modular, easy-to-navigate styling for React components
 - [NodeJS](https://nodejs.org/en) - JS runtime
 - [Express](https://expressjs.com) - Framework used for API in Node
-- [socket.io](https://socket.io) - [DESC NEEDED]
-- [Twilio](https://twilio.com) - [DESC NEEDED]
+- [socket.io](https://socket.io) - Real time server-signalling
+- [WebRTC](https://webrtc.org/) - Peer-to-peer real time communication standard
+- [Twilio](https://twilio.com) - STUN and TURN servers for WebRTC connections
 
 ## Contributing
 
