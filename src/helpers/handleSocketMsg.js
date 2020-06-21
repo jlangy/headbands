@@ -29,7 +29,6 @@ const socketMessages = {
 	nameTaken: 'name taken',
 	roomNameOk: 'room name ok',
 	joining: 'joining',
-	xirres: 'xir response',
 	updateSetNames: 'update set names',
 	disconnection: 'disconnection',
 	hostDisconnection: 'host disconnection',
@@ -62,7 +61,6 @@ const createStreamConnection = (socketId, iceServers, localId) => {
 };
 
 const handleSocketMsg = async (msg, socket, setRedirect) => {
-	console.log(msg);
 	switch (msg.type) {
 		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
@@ -85,7 +83,6 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 					});
 				} else {
 					// TODO: might need some cleanup here if candidate null
-					console.log('ice candidates finished');
 				}
 			};
 			return socket.emit('description', {
@@ -118,10 +115,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 						fromId: msg.toId,
 						toId: msg.fromId
 					});
-				} else {
-					// TODO: might need some cleanup here if candidate null
-					console.log('ice candidates finished');
-				}
+				} 
 			};
 			await connections[msg.fromId].setRemoteDescription(msg.description);
 			const answer = await connections[msg.fromId].createAnswer();
@@ -181,10 +175,6 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 		case socketMessages.restart:
 			store.dispatch({ type: CLEAR_STREAM_NAMES });
 			return store.dispatch({ type: RESTART_GAME });
-
-		case socketMessages.xirres:
-			console.log(msg.iceServers);
-			break;
 
 		case socketMessages.disconnection: {
 			const socketId = msg.id;
