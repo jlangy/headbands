@@ -4,7 +4,7 @@ import gamePhases from '../reducers/gamePhases';
 import SStatus from '../styled_components/controls/SStatus';
 import Timer from './Timer';
 
-const Info = ({ game, nameChosen, nameToGuess }) => {
+const Info = ({ game, nameChosen }) => {
 	return (
 		<>
 			{game.gamePhase !== gamePhases.playing ? (
@@ -15,7 +15,7 @@ const Info = ({ game, nameChosen, nameToGuess }) => {
 							: `${game.playersJoined} / ${game.totalPlayers} players have joined. Waiting for remaining players...`}
 					</SStatus>
 				) : (
-					<SStatus>{`You chose "${nameToGuess}". Waiting for ${
+					<SStatus>{`You chose "${game.nameToPass}". Waiting for ${
 						game.totalPlayers - game.totalNamesSet
 					} players to choose a name.`}</SStatus>
 				)

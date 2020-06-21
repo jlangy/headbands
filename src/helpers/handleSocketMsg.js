@@ -12,7 +12,9 @@ import {
 	END_GAME,
 	RESTART_GAME,
 	CLEAR_STREAM_NAMES,
-	GAME_END
+	GAME_END,
+	REMOVE_PLAYER,
+	SET_PHASE
 } from '../reducers/types';
 import endGame from '../helpers/endGame';
 import gamePhases from '../reducers/gamePhases';
@@ -24,6 +26,7 @@ const socketMessages = {
 	joinRequest: 'joinRequest',
 	offer: 'offer',
 	answer: 'answer',
+	rejoin: 'rejoin',
 	ready: 'gameReady',
 	gotNames: 'give names',
 	nameTaken: 'name taken',
@@ -61,6 +64,7 @@ const createStreamConnection = (socketId, iceServers, localId) => {
 };
 
 const handleSocketMsg = async (msg, socket, setRedirect) => {
+	console.log(msg)
 	switch (msg.type) {
 		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
@@ -91,6 +95,15 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				fromId: socket.id,
 				room: store.getState().game.name
 			});
+
+		case socketMessages.rejoin:
+			{
+				const {turn, names, revealed} = msg;
+				console.log(names)
+				store.dispatch({type: GOT_NAMES, payload: {names}})
+				store.dispatch({type: SET_PHASE, payload: {gamePhase: 'playing'}})
+				return store.dispatch({type: NEW_TURN, payload: {turn, revealed}})
+			}
 
 		case socketMessages.gameEnd:
 			addAlert('Game Over. Host can restart round');
@@ -178,6 +191,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.disconnection: {
 			const socketId = msg.id;
+			store.dispatch({type: REMOVE_PLAYER});
 			return store.dispatch({ type: REMOVE_STREAM, socketId });
 		}
 
