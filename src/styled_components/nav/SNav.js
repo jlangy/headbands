@@ -11,6 +11,7 @@ const SNav = styled.nav`
 	justify-content: space-between;
 	padding: 2vh 5vw;
 	height: 5vh;
+	min-height: 4rem;
 	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
 
 	> a:first-child {

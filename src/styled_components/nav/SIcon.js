@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const SIcon = styled.img`
-	height: 3rem;
+	height: 4rem;
 	margin-right: 0.5rem;
 `;
 
