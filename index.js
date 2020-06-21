@@ -70,9 +70,11 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('restart game', ({ roomName }) => {
-		rooms[roomName].turn = 0;
-		Object.keys(rooms[roomName].players).forEach((key) => {
-			rooms[roomName].players[key] = {};
+		const room = rooms[roomName];
+		room.turn = 0;
+		room.gameOn = false;
+		Object.keys(room.players).forEach((key) => {
+			room.players[key] = {};
 		});
 		io.in(roomName).emit('message', { type: 'restart' });
 	});
@@ -147,11 +149,14 @@ io.on('connection', function (socket) {
 		});
 	});
 
-	socket.on('setName', ({ nameToGuess, roomName }) => {
+	socket.on('setName', ({ nameToPass, roomName }) => {
 		const room = rooms[roomName];
-		room.players[socket.id].sentName = nameToGuess;
+		room.players[socket.id].sentName = nameToPass;
 		if (Object.values(room.players).every((val) => val.sentName)) {
 			const shiftedNames = shiftNames(room.players);
+			console.log('players', room.players);
+			console.log('shifted names', shiftedNames);
+			room.gameOn = true;
 			io.in(roomName).emit('message', {
 				type: 'give names',
 				names: shiftedNames,
@@ -171,13 +176,26 @@ io.on('connection', function (socket) {
 		const room = rooms[roomName];
 		//There will be n-1 answers from nth joiner, so add 1/n-1.
 		room.playersJoined += 1 / Math.floor(room.playersJoined);
-		room.players[joinerId] = { nameToGuess: null, sentName: null };
+		room.players[joinerId] = room.players[joinerId] || { nameToGuess: null, sentName: null };
 		if (Math.round(room.playersJoined) == room.totalPlayers) {
-			room.turn = 0;
-			room.turnOrder = Object.keys(room.players);
-			io.in(roomName).emit('message', {
-				type: 'gameReady'
-			});
+			//handle rejoining
+			if(room.gameOn){
+				const shiftedNames = shiftNames(room.players);
+				console.log('players', room.players);
+				console.log('shifted names', shiftedNames);
+				io.in(roomName).emit('message', {
+					type: 'rejoin',
+					turn: room.turnOrder[room.turn],
+					names: shiftedNames,
+					revealed: room.turnOrder.slice(0, room.turn)
+				})
+			} else {
+				room.turn = 0;
+				room.turnOrder = Object.keys(room.players);
+				io.in(roomName).emit('message', {
+					type: 'gameReady'
+				});
+			}
 		}
 	});
 

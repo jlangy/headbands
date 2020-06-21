@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	RESTART_GAME,
-	CLEAR_STREAM_NAMES
+	CLEAR_STREAM_NAMES,
+	NAME_CHOSEN
 } from '../reducers/types';
 import gamePhases from '../reducers/gamePhases';
 import SHostButtons from '../styled_components/controls/SHostButtons';
@@ -16,18 +17,16 @@ import addAlert from '../helpers/addAlert';
 import endGame from '../helpers/endGame';
 
 const Menu = ({ socket, game, dispatch, streams }) => {
-	const [nameChosen, setNameChosen] = useState(false);
-	const [nameToGuess, setNameToGuess] = useState('');
+	const [nameToPass, setNameToPass] = useState('');
 
 	useEffect(() => {
-		setNameChosen(false);
-		setNameToGuess('');
-	}, [game.gameEnd, game.gamePhase])
+		setNameToPass('');
+	}, [game.nameToPass])
 
 	const setName = () => {
-		if (nameToGuess.trim().length > 1) {
-			setNameChosen(true);
-			socket.emit('setName', { nameToGuess, roomName: game.name });
+		if (nameToPass.trim().length > 1) {
+			dispatch({type: NAME_CHOSEN, payload: {nameToPass}})
+			socket.emit('setName', { nameToPass, roomName: game.name });
 		} else {
 			addAlert('Invalid name');
 		}
@@ -48,7 +47,7 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 
 	return (
 		<SMenuCard>
-			<Info socket={socket} nameToGuess={nameToGuess} nameChosen={nameChosen} />
+			<Info socket={socket} nameToPass={nameToPass} nameChosen={game.nameToPass} />
 			{game.host === socket.id && (
 				<SHostButtons>
 					<SHostButton onClick={handleEndGame}>End Game</SHostButton>
@@ -59,13 +58,13 @@ const Menu = ({ socket, game, dispatch, streams }) => {
 				<SNameInputGroup>
 					<SNameInput
 						placeholder="Enter a name..."
-						onChange={(e) => setNameToGuess(e.target.value)}
+						onChange={(e) => setNameToPass(e.target.value)}
 						minlength="2"
 						maxlength="24"
-						disabled={nameChosen}
+						disabled={game.nameToPass}
 					></SNameInput>
-					<SMenuButton onClick={setName} disabled={nameChosen}>
-						{nameChosen ? 'Waiting' : 'Confirm'}
+					<SMenuButton onClick={setName} disabled={game.nameToPass}>
+						{game.nameToPass ? 'Waiting' : 'Confirm'}
 					</SMenuButton>
 				</SNameInputGroup>
 			)}

@@ -14,3 +14,6 @@ export const REMOVE_STREAM = 'REMOVE_STREAM';
 export const ADD_ALERT = 'ADD_ALERT';
 export const REMOVE_ALERT = 'REMOVE_ALERT';
 export const GAME_END = 'GAME_END';
+export const REMOVE_PLAYER = "REMOVE_PLAYER";
+export const NAME_CHOSEN = "NAME_CHOSEN";
+export const SET_PHASE = "SET_PHASE";

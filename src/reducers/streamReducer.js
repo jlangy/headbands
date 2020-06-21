@@ -22,10 +22,8 @@ const streamReducer = (state = initialState, action) => {
 			return newState;
 		case REMOVE_STREAM: {
 			const idToRemove = action.socketId;
-			const newState = { ...state };
-			console.log(idToRemove, newState);
+			const newState = { ...state};
 			delete newState[idToRemove];
-			console.log(newState);
 			return newState;
 		}
 		case CLEAR_STREAMS:
