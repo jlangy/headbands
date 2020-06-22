@@ -17,7 +17,7 @@ const Info = ({ game, nameChosen }) => {
 				) : (
 					<SStatus>{`You chose "${game.nameToPass}". Waiting for ${
 						game.totalPlayers - game.totalNamesSet
-					} players to choose a name.`}</SStatus>
+					} player(s) to choose a name.`}</SStatus>
 				)
 			) : (
 				<Timer />

@@ -31,7 +31,7 @@ Navigate to the ["How-to-Play"](www.headbands.com/about#how-to-play) section for
 
 ### Demo:
 
-![Demo](https://github.com/jlangy/headbands/blob/development/docs/demo.gif?raw=true)
+![Quality acting](https://github.com/jlangy/headbands/blob/development/docs/demo.gif?raw=true)
 
 The above gif demonstrates our basic app flow. For more screenshots and other documentation, navigate to the /docs directory from the root of this repo.
 

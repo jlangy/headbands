@@ -7,7 +7,7 @@ const SAlert = styled.p`
 	align-items: center;
 	padding: 0.75rem 1.5rem;
 	text-align: center;
-	background-color: #3ca7d2bf;
+	background-color: #3ca7d280;
 	color: white;
 	text-transform: uppercase;
 `;
