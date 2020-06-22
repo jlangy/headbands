@@ -64,7 +64,7 @@ const createStreamConnection = (socketId, iceServers, localId) => {
 };
 
 const handleSocketMsg = async (msg, socket, setRedirect) => {
-	console.log(msg)
+	console.log(msg);
 	switch (msg.type) {
 		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
@@ -96,14 +96,13 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				room: store.getState().game.name
 			});
 
-		case socketMessages.rejoin:
-			{
-				const {turn, names, revealed} = msg;
-				console.log(names)
-				store.dispatch({type: GOT_NAMES, payload: {names}})
-				store.dispatch({type: SET_PHASE, payload: {gamePhase: 'playing'}})
-				return store.dispatch({type: NEW_TURN, payload: {turn, revealed}})
-			}
+		case socketMessages.rejoin: {
+			const { turn, names, revealed } = msg;
+			console.log(names);
+			store.dispatch({ type: GOT_NAMES, payload: { names } });
+			store.dispatch({ type: SET_PHASE, payload: { gamePhase: 'playing' } });
+			return store.dispatch({ type: NEW_TURN, payload: { turn, revealed } });
+		}
 
 		case socketMessages.gameEnd:
 			addAlert('Game Over. Host can restart round');
@@ -128,7 +127,7 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 						fromId: msg.toId,
 						toId: msg.fromId
 					});
-				} 
+				}
 			};
 			await connections[msg.fromId].setRemoteDescription(msg.description);
 			const answer = await connections[msg.fromId].createAnswer();
@@ -168,12 +167,14 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			return addAlert('Lobby name already taken');
 
 		case socketMessages.roomNameOk:
-			let { name, totalPlayers } = msg;
+			let { name, totalPlayers, useCategories, turnMode } = msg;
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
 					name,
 					totalPlayers,
+					useCategories,
+					turnMode,
 					gamePhase: gamePhases.joining,
 					playersJoined: 1,
 					host: socket.id
@@ -191,19 +192,26 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.disconnection: {
 			const socketId = msg.id;
-			store.dispatch({type: REMOVE_PLAYER});
+			store.dispatch({ type: REMOVE_PLAYER });
 			return store.dispatch({ type: REMOVE_STREAM, socketId });
 		}
 
 		case socketMessages.hostDisconnection:
 			addAlert('Host disconnected');
-			endGame(store.getState().streams[socket.id].stream, store.dispatch, true)
+			endGame(store.getState().streams[socket.id].stream, store.dispatch, true);
 			connections = {};
 			break;
 
 		case socketMessages.joining: {
 			await turnOnLocalMedia(store.getState().streams, socket);
-			let { totalPlayers, name, playersJoined, host } = msg;
+			let {
+				totalPlayers,
+				name,
+				playersJoined,
+				host,
+				useCategories,
+				turnMode
+			} = msg;
 			socket.emit('media on', { roomName: name, fromId: socket.id });
 			return store.dispatch({
 				type: NEW_GAME,
@@ -212,7 +220,9 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 					totalPlayers,
 					gamePhase: gamePhases.joining,
 					playersJoined,
-					host
+					host,
+					useCategories,
+					turnMode
 				}
 			});
 		}
