@@ -12,6 +12,7 @@ const SCard = styled.article`
 	margin: 2rem auto;
 	padding: 1rem 0 2rem 0;
 	background-color: white;
+	position: relative;
 
 	:hover {
 		box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
