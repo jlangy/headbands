@@ -7,11 +7,20 @@ const app = express();
 const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
-let rooms = {};
+const rooms = {};
+const possibleCategories = [
+	'Sports',
+	'Music',
+	'Movies',
+	'Historical leaders',
+	'TV characters',
+	'Books',
+	'Monuments or buildings'
+];
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-function endGame(roomName) {
+const endGame = (roomName) => {
 	delete rooms[roomName];
 	io.of('/')
 		.in(roomName)
@@ -23,9 +32,9 @@ function endGame(roomName) {
 					io.sockets.sockets[socketId].leave(roomName)
 			);
 		});
-}
+};
 
-function shiftNames(players) {
+const shiftNames = (players) => {
 	Object.keys(players).forEach((id, i, keys) => {
 		if (i === Object.keys(players).length - 1) {
 			players[id].nameToGuess = players[keys[0]].sentName;
@@ -36,22 +45,39 @@ function shiftNames(players) {
 		}
 	});
 	return players;
-}
+};
 
-io.on('connection', function (socket) {
+io.on('connection', (socket) => {
 	// turnMode === false ? consecutive (normal) : concurrent (back and forth);
 	socket.on('make room', ({ name, totalPlayers, useCategories, turnMode }) => {
 		totalPlayers = Number(totalPlayers);
 		if (rooms[name]) {
 			return socket.emit('message', { type: 'name taken' });
 		}
-		socket.emit('message', { type: 'room name ok', name, totalPlayers });
-		rooms[name] = {
-			totalPlayers,
+
+		const category = useCategories
+			? possibleCategories[
+					Math.floor(Math.random() * possibleCategories.length)
+			  ]
+			: null;
+
+		socket.emit('message', {
 			name,
+			totalPlayers,
+			useCategories,
+			category,
+			turnMode,
+			type: 'room name ok'
+		});
+		rooms[name] = {
+			name,
+			host: socket.id,
+			totalPlayers,
 			playersJoined: 1,
-			players: { [socket.id]: { nameToGuess: null, sentName: null } },
-			host: socket.id
+			useCategories,
+			category,
+			turnMode,
+			players: { [socket.id]: { nameToGuess: null, sentName: null } }
 		};
 		socket.join(name);
 	});
@@ -73,28 +99,38 @@ io.on('connection', function (socket) {
 		const room = rooms[roomName];
 		room.turn = 0;
 		room.gameOn = false;
+		room.category = room.useCategories
+			? possibleCategories[
+					Math.floor(Math.random() * possibleCategories.length)
+			  ]
+			: null;
 		Object.keys(room.players).forEach((key) => {
 			room.players[key] = {};
 		});
-		io.in(roomName).emit('message', { type: 'restart' });
+		io.in(roomName).emit('message', {
+			type: 'restart',
+			category: room.category
+		});
 	});
 
 	socket.on('leave game', ({ roomName }) => {
-		if(rooms[roomName] && rooms[roomName].host == socket.id){
+		if (rooms[roomName] && rooms[roomName].host == socket.id) {
 			socket.to(roomName).emit('message', { type: 'host disconnection' });
 			endGame(roomName);
 		} else {
-			socket.to(roomName).emit('message', { type: 'disconnection', id: socket.id });
+			socket
+				.to(roomName)
+				.emit('message', { type: 'disconnection', id: socket.id });
 			rooms[roomName].playersJoined -= 1;
 		}
 	});
 
-	socket.on('media on', async ({roomName, fromId}) => {
-		let roomToJoin = rooms[roomName];
+	socket.on('media on', async ({ roomName, fromId }) => {
+		const roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
-		// 	const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
+			// 	const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 			// const token = await client.tokens.create();
-			const token = {iceServers: null};
+			const token = { iceServers: null };
 			socket.to(roomName).emit('message', {
 				type: 'joinRequest',
 				roomName,
@@ -104,15 +140,18 @@ io.on('connection', function (socket) {
 		}
 	});
 
-	socket.on('join room', async ({ roomName, fromId }) => {
-		let roomToJoin = rooms[roomName];
+	socket.on('join room', ({ roomName, fromId }) => {
+		const roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			socket.emit('message', {
-				type: 'joining',
+				name: roomName,
+				host: roomToJoin.host,
 				totalPlayers: roomToJoin.totalPlayers,
 				playersJoined: roomToJoin.playersJoined + 1,
-				name: roomName,
-				host: roomToJoin.host
+				useCategories: roomToJoin.useCategories,
+				category: roomToJoin.category,
+				turnMode: roomToJoin.turnMode,
+				type: 'joining'
 			});
 			socket.join(roomName);
 		} else {
@@ -123,7 +162,7 @@ io.on('connection', function (socket) {
 	socket.on('description', async ({ description, toId, fromId }) => {
 		// const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 		// const token = await client.tokens.create();
-		const token = {iceServers: null};
+		const token = { iceServers: null };
 		io.sockets.sockets[toId].emit('message', {
 			type: 'offer',
 			description,
@@ -154,8 +193,6 @@ io.on('connection', function (socket) {
 		room.players[socket.id].sentName = nameToPass;
 		if (Object.values(room.players).every((val) => val.sentName)) {
 			const shiftedNames = shiftNames(room.players);
-			console.log('players', room.players);
-			console.log('shifted names', shiftedNames);
 			room.gameOn = true;
 			io.in(roomName).emit('message', {
 				type: 'give names',
@@ -176,19 +213,20 @@ io.on('connection', function (socket) {
 		const room = rooms[roomName];
 		//There will be n-1 answers from nth joiner, so add 1/n-1.
 		room.playersJoined += 1 / Math.floor(room.playersJoined);
-		room.players[joinerId] = room.players[joinerId] || { nameToGuess: null, sentName: null };
+		room.players[joinerId] = room.players[joinerId] || {
+			nameToGuess: null,
+			sentName: null
+		};
 		if (Math.round(room.playersJoined) == room.totalPlayers) {
 			//handle rejoining
-			if(room.gameOn){
+			if (room.gameOn) {
 				const shiftedNames = shiftNames(room.players);
-				console.log('players', room.players);
-				console.log('shifted names', shiftedNames);
 				io.in(roomName).emit('message', {
 					type: 'rejoin',
 					turn: room.turnOrder[room.turn],
 					names: shiftedNames,
 					revealed: room.turnOrder.slice(0, room.turn)
-				})
+				});
 			} else {
 				room.turn = 0;
 				room.turnOrder = Object.keys(room.players);
@@ -204,13 +242,11 @@ io.on('connection', function (socket) {
 		//Last turn over check
 		if (room.turn === room.turnOrder.length - 1) {
 			room.turn = 0;
-			return io
-				.in(roomName)
-				.emit('message', {
-					type: 'game end',
-					revealed: room.turnOrder,
-					turn: room.turnOrder[0]
-				});
+			return io.in(roomName).emit('message', {
+				type: 'game end',
+				revealed: room.turnOrder,
+				turn: room.turnOrder[0]
+			});
 		}
 		room.turn += 1;
 		io.in(roomName).emit('message', {

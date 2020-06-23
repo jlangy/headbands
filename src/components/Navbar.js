@@ -8,11 +8,9 @@ import SIcon from '../styled_components/nav/SIcon';
 import { connect } from 'react-redux';
 import endGame from '../helpers/endGame';
 
-
-
 const desktopLinks = (handleRedirect) => (
 	<>
-		<Link to="/"  onClick={handleRedirect}>
+		<Link to="/" onClick={handleRedirect}>
 			<SBrand>
 				<SIcon src="/android-chrome-192x192.png"></SIcon>
 				Headbands
@@ -20,13 +18,19 @@ const desktopLinks = (handleRedirect) => (
 		</Link>
 		<SLinks>
 			<li>
-				<SLink to="/about#how-to-play" onClick={handleRedirect}>How-to-Play</SLink>
+				<SLink to="/about#how-to-play" onClick={handleRedirect}>
+					How-to-Play
+				</SLink>
 			</li>
 			<li>
-				<SLink to="/about" onClick={handleRedirect}>About</SLink>
+				<SLink to="/about" onClick={handleRedirect}>
+					About
+				</SLink>
 			</li>
 			<li>
-				<SLink to="/contact" onClick={handleRedirect}>Contact</SLink>
+				<SLink to="/contact" onClick={handleRedirect}>
+					Contact
+				</SLink>
 			</li>
 		</SLinks>
 	</>
@@ -59,18 +63,16 @@ const mobileLinks = (handleRedirect) => (
 	</>
 );
 
-const Navbar = ({game, streams, dispatch, socket}) => {
+const Navbar = ({ game, streams, dispatch, socket }) => {
 	let [screenWidth, setScreenWidth] = useState(1024);
 
 	const handleRedirect = () => {
 		try {
 			const roomName = game.name;
-			endGame(streams[socket.id].stream, dispatch)
+			endGame(streams[socket.id].stream, dispatch);
 			socket.emit('leave game', { roomName });
-		} catch (e) {
-			console.log(e)
-		}
-	}
+		} catch {}
+	};
 
 	useEffect(() => {
 		updateWindowDimensions();
@@ -82,12 +84,18 @@ const Navbar = ({game, streams, dispatch, socket}) => {
 
 	const updateWindowDimensions = () => setScreenWidth(window.innerWidth);
 
-	return <SNav>{screenWidth > 768 ? desktopLinks(handleRedirect) : mobileLinks(handleRedirect)}</SNav>;
+	return (
+		<SNav>
+			{screenWidth > 768
+				? desktopLinks(handleRedirect)
+				: mobileLinks(handleRedirect)}
+		</SNav>
+	);
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	game: state.game,
 	streams: state.streams
-})
+});
 
 export default connect(mapStateToProps)(Navbar);

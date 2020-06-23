@@ -7,6 +7,7 @@ import Timer from './Timer';
 const Info = ({ game, nameChosen }) => {
 	return (
 		<>
+			{game.category && <SStatus>Category: {game.category}</SStatus>}
 			{game.gamePhase !== gamePhases.playing ? (
 				!nameChosen ? (
 					<SStatus>

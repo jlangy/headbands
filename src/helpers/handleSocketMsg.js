@@ -64,78 +64,94 @@ const createStreamConnection = (socketId, iceServers, localId) => {
 };
 
 const handleSocketMsg = async (msg, socket, setRedirect) => {
-	console.log(msg)
-	switch (msg.type) {
+	const {
+		type,
+		id,
+		fromId,
+		toId,
+		candidate,
+		iceServers,
+		host,
+		turn,
+		name,
+		useCategories,
+		category,
+		turnMode,
+		names,
+		revealed,
+		description,
+		answer,
+		totalPlayers,
+		playersJoined
+	} = msg;
+	switch (type) {
 		// Server sending ICE candidate, add to connection
 		case socketMessages.iceCandidate:
-			return connections[msg.fromId].addIceCandidate(
-				new RTCIceCandidate(msg.candidate)
+			return connections[fromId].addIceCandidate(
+				new RTCIceCandidate(candidate)
 			);
 		// return connections[msg.fromId].addIceCandidate(msg.candidate)
 
 		// Received join request, create connection and attach stream, create offer, set and send description
 		case socketMessages.joinRequest:
-			createStreamConnection(msg.fromId, msg.iceServers, socket.id);
-			const offer = await connections[msg.fromId].createOffer();
-			await connections[msg.fromId].setLocalDescription(offer);
-			connections[msg.fromId].onicecandidate = function (event) {
+			createStreamConnection(fromId, iceServers, socket.id);
+			const offer = await connections[fromId].createOffer();
+			await connections[fromId].setLocalDescription(offer);
+			connections[fromId].onicecandidate = function (event) {
 				if (event.candidate) {
 					socket.emit('iceCandidate', {
 						candidate: event.candidate,
 						fromId: socket.id,
-						toId: msg.fromId
+						toId: fromId
 					});
 				} else {
 					// TODO: might need some cleanup here if candidate null
 				}
 			};
 			return socket.emit('description', {
-				description: connections[msg.fromId].localDescription,
-				toId: msg.fromId,
+				description: connections[fromId].localDescription,
+				toId: fromId,
 				fromId: socket.id,
 				room: store.getState().game.name
 			});
 
-		case socketMessages.rejoin:
-			{
-				const {turn, names, revealed} = msg;
-				console.log(names)
-				store.dispatch({type: GOT_NAMES, payload: {names}})
-				store.dispatch({type: SET_PHASE, payload: {gamePhase: 'playing'}})
-				return store.dispatch({type: NEW_TURN, payload: {turn, revealed}})
-			}
+		case socketMessages.rejoin: {
+			store.dispatch({ type: GOT_NAMES, payload: { names } });
+			store.dispatch({ type: SET_PHASE, payload: { gamePhase: 'playing' } });
+			return store.dispatch({ type: NEW_TURN, payload: { revealed, turn } });
+		}
 
 		case socketMessages.gameEnd:
 			addAlert('Game Over. Host can restart round');
 			return store.dispatch({
 				type: GAME_END,
-				payload: { revealed: msg.revealed, turn: msg.turn }
+				payload: { revealed, turn }
 			});
 
 		case socketMessages.newTurn:
 			return store.dispatch({
 				type: NEW_TURN,
-				payload: { turn: msg.turn, revealed: msg.revealed }
+				payload: { revealed, turn }
 			});
 
 		// recieved offer, create connection, add candidate handler, set description, set and send answer
 		case socketMessages.offer:
-			createStreamConnection(msg.fromId, msg.iceServers, socket.id);
-			connections[msg.fromId].onicecandidate = function (event) {
+			createStreamConnection(fromId, iceServers, socket.id);
+			connections[fromId].onicecandidate = (event) => {
 				if (event.candidate) {
 					socket.emit('iceCandidate', {
 						candidate: event.candidate,
-						fromId: msg.toId,
-						toId: msg.fromId
+						fromId: toId,
+						toId: fromId
 					});
-				} 
+				}
 			};
-			await connections[msg.fromId].setRemoteDescription(msg.description);
-			const answer = await connections[msg.fromId].createAnswer();
-			await connections[msg.fromId].setLocalDescription(answer);
+			await connections[fromId].setRemoteDescription(description);
+			const newAnswer = await connections[fromId].createAnswer();
+			await connections[fromId].setLocalDescription(newAnswer);
 			return socket.emit('answer', {
-				answer,
-				toId: msg.fromId,
+				answer: newAnswer,
+				toId: fromId,
 				fromId: socket.id
 			});
 
@@ -149,17 +165,18 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 		case socketMessages.answer:
 			socket.emit('ready', {
 				roomName: store.getState().game.name,
-				joinerId: msg.fromId
+				joinerId: fromId
 			});
+
 			// Set players joined here
 			store.dispatch({ type: ADD_PLAYER });
-			return await connections[msg.fromId].setRemoteDescription(msg.answer);
+			return await connections[fromId].setRemoteDescription(answer);
 
 		case socketMessages.roomDNE:
 			return addAlert('Lobby does not exist');
 
 		case socketMessages.gotNames:
-			store.dispatch({ type: GOT_NAMES, payload: { names: msg.names } });
+			store.dispatch({ type: GOT_NAMES, payload: { names } });
 			return store.dispatch({
 				type: SETUP_COMPLETE
 			});
@@ -168,15 +185,17 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			return addAlert('Lobby name already taken');
 
 		case socketMessages.roomNameOk:
-			let { name, totalPlayers } = msg;
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
 					name,
+					host: socket.id,
 					totalPlayers,
-					gamePhase: gamePhases.joining,
 					playersJoined: 1,
-					host: socket.id
+					useCategories,
+					category,
+					turnMode,
+					gamePhase: gamePhases.joining
 				}
 			});
 
@@ -187,32 +206,36 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.restart:
 			store.dispatch({ type: CLEAR_STREAM_NAMES });
-			return store.dispatch({ type: RESTART_GAME });
+			return store.dispatch({ type: RESTART_GAME, payload: category });
 
 		case socketMessages.disconnection: {
-			const socketId = msg.id;
-			store.dispatch({type: REMOVE_PLAYER});
+			const socketId = id;
+			store.dispatch({ type: REMOVE_PLAYER });
 			return store.dispatch({ type: REMOVE_STREAM, socketId });
 		}
 
 		case socketMessages.hostDisconnection:
 			addAlert('Host disconnected');
-			endGame(store.getState().streams[socket.id].stream, store.dispatch, true)
+			endGame(store.getState().streams[socket.id].stream, store.dispatch, true);
 			connections = {};
 			break;
 
 		case socketMessages.joining: {
 			await turnOnLocalMedia(store.getState().streams, socket);
-			let { totalPlayers, name, playersJoined, host } = msg;
+
 			socket.emit('media on', { roomName: name, fromId: socket.id });
+
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
 					name,
+					host,
 					totalPlayers,
-					gamePhase: gamePhases.joining,
 					playersJoined,
-					host
+					useCategories,
+					category,
+					turnMode,
+					gamePhase: gamePhases.joining
 				}
 			});
 		}
