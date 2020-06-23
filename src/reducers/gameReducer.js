@@ -29,15 +29,15 @@ const gameReducer = (state = initialState, action) => {
 			} = action.payload;
 			return {
 				name,
+				host,
 				totalPlayers,
 				playersJoined,
-				host,
+				useCategories,
+				turnMode,
 				totalNamesSet: 0,
 				gamePhase: gamePhases.joining,
 				goToGame: true,
-				revealed: [],
-				useCategories,
-				turnMode
+				revealed: []
 			};
 		case ALL_PLAYERS_JOINED: {
 			return { ...state, gamePhase: gamePhases.settingNames };

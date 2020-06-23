@@ -8,6 +8,15 @@ const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
 const rooms = {};
+const possibleCategories = [
+	'Sports',
+	'Music',
+	'Movies',
+	'Historical leaders',
+	'TV characters',
+	'Books',
+	'Monuments or buildings'
+];
 
 app.use(express.static(path.join(__dirname, 'build')));
 
@@ -45,10 +54,18 @@ io.on('connection', (socket) => {
 		if (rooms[name]) {
 			return socket.emit('message', { type: 'name taken' });
 		}
+
+		const category = useCategories
+			? possibleCategories[
+					Math.floor(Math.random() * possibleCategories.length)
+			  ]
+			: null;
+
 		socket.emit('message', {
 			name,
 			totalPlayers,
 			useCategories,
+			category,
 			turnMode,
 			type: 'room name ok'
 		});
@@ -58,6 +75,7 @@ io.on('connection', (socket) => {
 			totalPlayers,
 			playersJoined: 1,
 			useCategories,
+			category,
 			turnMode,
 			players: { [socket.id]: { nameToGuess: null, sentName: null } }
 		};
@@ -81,6 +99,11 @@ io.on('connection', (socket) => {
 		const room = rooms[roomName];
 		room.turn = 0;
 		room.gameOn = false;
+		room.category = room.useCategories
+			? possibleCategories[
+					Math.floor(Math.random() * possibleCategories.length)
+			  ]
+			: null;
 		Object.keys(room.players).forEach((key) => {
 			room.players[key] = {};
 		});
@@ -123,6 +146,7 @@ io.on('connection', (socket) => {
 				totalPlayers: roomToJoin.totalPlayers,
 				playersJoined: roomToJoin.playersJoined + 1,
 				useCategories: roomToJoin.useCategories,
+				category: roomToJoin.category,
 				turnMode: roomToJoin.turnMode,
 				type: 'joining'
 			});
