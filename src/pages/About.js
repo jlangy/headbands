@@ -7,6 +7,7 @@ import SSubheading from '../styled_components/layout/SSubheading';
 import SPara from '../styled_components/layout/SPara';
 import SInlineLink from '../styled_components/layout/SInlineLink';
 import SInlineExternalLink from '../styled_components/layout/SInlineExternalLink';
+import SInfoImage from '../styled_components/layout/SInfoImage';
 import SAboutHenry from '../styled_components/special/SAboutHenry';
 
 const About = (props) => {
@@ -51,9 +52,44 @@ const About = (props) => {
 			<SCard>
 				<SHeading id="how-to-play">How to Play</SHeading>
 				<SBreak></SBreak>
+				<SSubheading>Creating a Game</SSubheading>
 				<SPara>
-					Content TBA, but here's a link to{' '}
-					<SInlineLink to="/">start playing</SInlineLink> in the meantime
+					<SInfoImage src="img/creating.png"/>
+					To create a game, go to the main page, select your options from the create game menu, choose a name for the lobby, and 
+					press Create Game. Once the game is created, all other players can join the game by entering the lobby name into the 
+					join game menu, and pressing Join Game. After all Players have connected, you can begin selecting your names to pass.
+				</SPara>
+				{/* <SSubheading>Joining a Game</SSubheading>
+				<SPara>
+					<SInfoImage src="img/joining.png"/>
+					Once you have entered the lobby, you will be able to see your own stream, the streams of joined players, and waiting screens for players that haven't joined yet. 
+					Once all players have joined, the game will let you begin choosing the names to pass.
+				</SPara> */}
+				<SSubheading>Selecting a Name</SSubheading>
+				<SPara>
+					<SInfoImage src="img/choose-name.png"/>
+					Once all players have joined, you will have a menu to select a name below the streams. Enter your name and click confirm. Once all players
+					have selected their names the game will begin, with the host going first. Players will be able to see all other players names in a label on 
+					their stream, with their own blocked out.
+				</SPara>
+				<SSubheading>Guessing Names</SSubheading>
+				<SPara>
+					<SInfoImage src="img/guessing.png"/>
+					The player whose turn it is will have a blue highlight around their screen, and the Reveal button enabled. They can begin asking questions to
+					the lobby, for example "Am I a superhero?". Once the player has figured out their identity, or given up, they can press the reveal button to 
+					end their turn. Gameplay is intentionally free-form, make the rules around guessing as strict or relaxed as your group prefers.
+				</SPara>
+				<SSubheading>Ending Your Turn</SSubheading>
+				<SPara>
+					<SInfoImage src="img/reveal-backup.png"/>
+					Once a player has revealed their name, their turn is complete. The streams of finished players will be grayed out to indicate this,
+					and the next player can begin guessing.
+				</SPara>
+				<SSubheading>Game Over</SSubheading>
+				<SPara>
+					<SInfoImage src="img/end-game.png"/>
+					The host of the game will have the option to restart the game or end the game at any time. If the players wish to play again after the game 
+					has finished, the host can click restart to go back to the choosing names phase.
 				</SPara>
 			</SCard>
 		</SPage>
