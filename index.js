@@ -107,7 +107,10 @@ io.on('connection', (socket) => {
 		Object.keys(room.players).forEach((key) => {
 			room.players[key] = {};
 		});
-		io.in(roomName).emit('message', { type: 'restart' });
+		io.in(roomName).emit('message', {
+			type: 'restart',
+			category: room.category
+		});
 	});
 
 	socket.on('leave game', ({ roomName }) => {

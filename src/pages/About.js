@@ -37,7 +37,7 @@ const About = (props) => {
 					preferably have yes-or-no answers but we don't enforce that so you're
 					free to go rogue.
 				</SPara>
-				<SSubheading>Why is your logo an octopus?</SSubheading>
+				<SSubheading>Why is the logo an octopus?</SSubheading>
 				<SPara>
 					What do you call an octopus born with only six tentacles?{' '}
 					<SInlineExternalLink href="https://en.wikipedia.org/wiki/Henry_the_Hexapus">
