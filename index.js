@@ -166,8 +166,6 @@ io.on('connection', (socket) => {
 		room.players[socket.id].sentName = nameToPass;
 		if (Object.values(room.players).every((val) => val.sentName)) {
 			const shiftedNames = shiftNames(room.players);
-			console.log('players', room.players);
-			console.log('shifted names', shiftedNames);
 			room.gameOn = true;
 			io.in(roomName).emit('message', {
 				type: 'give names',
@@ -196,8 +194,6 @@ io.on('connection', (socket) => {
 			//handle rejoining
 			if (room.gameOn) {
 				const shiftedNames = shiftNames(room.players);
-				console.log('players', room.players);
-				console.log('shifted names', shiftedNames);
 				io.in(roomName).emit('message', {
 					type: 'rejoin',
 					turn: room.turnOrder[room.turn],
