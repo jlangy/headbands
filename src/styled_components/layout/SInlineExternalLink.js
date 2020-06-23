@@ -4,7 +4,6 @@ const SInlineExternalLink = styled.a`
 	display: block;
 	font-size: 1.25rem;
 	font-weight: 300;
-	text-decoration: none;
 	font-family: 'Lobster', Georgia, Times, serif;
 	display: inline;
 	text-decoration: underline;

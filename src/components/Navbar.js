@@ -5,7 +5,7 @@ import SLinks from '../styled_components/nav/SLinks';
 import SLink from '../styled_components/nav/SLink';
 import SBrand from '../styled_components/nav/SBrand';
 import SIcon from '../styled_components/nav/SIcon';
-import SHashLink from '../styled_components/forms/SHashLink';
+import SHashLink from '../styled_components/nav/SHashLink';
 import { connect } from 'react-redux';
 import endGame from '../helpers/endGame';
 
@@ -13,7 +13,7 @@ const desktopLinks = (handleRedirect) => (
 	<>
 		<Link to="/" onClick={handleRedirect}>
 			<SBrand>
-				<SIcon src="/android-chrome-192x192.png"></SIcon>
+				<SIcon src="/android-chrome-192x192.png" alt="henry"></SIcon>
 				Headbands
 			</SBrand>
 		</Link>
