@@ -34,7 +34,7 @@ const About = (props) => {
 					get some face time that isn't meeting-related. You can play Headbands
 					with up to six players, either playing the guesser one at a time or
 					all at once while taking turns to ask questions. Questions should
-					preferably have yes or no answers but we don't enforce that so you're
+					preferably have yes-or-no answers but we don't enforce that so you're
 					free to go rogue.
 				</SPara>
 				<SSubheading>Why is your logo an octopus?</SSubheading>

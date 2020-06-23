@@ -7,11 +7,11 @@ const app = express();
 const server = app.listen(port, () => console.log(`listening on port ${port}`));
 const io = socket(server);
 
-let rooms = {};
+const rooms = {};
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-function endGame(roomName) {
+const endGame = (roomName) => {
 	delete rooms[roomName];
 	io.of('/')
 		.in(roomName)
@@ -23,9 +23,9 @@ function endGame(roomName) {
 					io.sockets.sockets[socketId].leave(roomName)
 			);
 		});
-}
+};
 
-function shiftNames(players) {
+const shiftNames = (players) => {
 	Object.keys(players).forEach((id, i, keys) => {
 		if (i === Object.keys(players).length - 1) {
 			players[id].nameToGuess = players[keys[0]].sentName;
@@ -36,9 +36,9 @@ function shiftNames(players) {
 		}
 	});
 	return players;
-}
+};
 
-io.on('connection', function (socket) {
+io.on('connection', (socket) => {
 	// turnMode === false ? consecutive (normal) : concurrent (back and forth);
 	socket.on('make room', ({ name, totalPlayers, useCategories, turnMode }) => {
 		totalPlayers = Number(totalPlayers);
@@ -46,20 +46,20 @@ io.on('connection', function (socket) {
 			return socket.emit('message', { type: 'name taken' });
 		}
 		socket.emit('message', {
-			type: 'room name ok',
 			name,
 			totalPlayers,
 			useCategories,
-			turnMode
+			turnMode,
+			type: 'room name ok'
 		});
 		rooms[name] = {
-			totalPlayers,
 			name,
-			playersJoined: 1,
-			players: { [socket.id]: { nameToGuess: null, sentName: null } },
 			host: socket.id,
+			totalPlayers,
+			playersJoined: 1,
 			useCategories,
-			turnMode
+			turnMode,
+			players: { [socket.id]: { nameToGuess: null, sentName: null } }
 		};
 		socket.join(name);
 	});
@@ -100,7 +100,7 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('media on', async ({ roomName, fromId }) => {
-		let roomToJoin = rooms[roomName];
+		const roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			// 	const client = require('twilio')(process.env.acct_sid, process.env.auth_token);
 			// const token = await client.tokens.create();
@@ -114,17 +114,17 @@ io.on('connection', function (socket) {
 		}
 	});
 
-	socket.on('join room', async ({ roomName, fromId }) => {
-		let roomToJoin = rooms[roomName];
+	socket.on('join room', ({ roomName, fromId }) => {
+		const roomToJoin = rooms[roomName];
 		if (roomToJoin && roomToJoin.playersJoined < roomToJoin.totalPlayers) {
 			socket.emit('message', {
-				type: 'joining',
-				totalPlayers: roomToJoin.totalPlayers,
-				playersJoined: roomToJoin.playersJoined + 1,
 				name: roomName,
 				host: roomToJoin.host,
+				totalPlayers: roomToJoin.totalPlayers,
+				playersJoined: roomToJoin.playersJoined + 1,
 				useCategories: roomToJoin.useCategories,
-				turnMode: roomToJoin.turnMode
+				turnMode: roomToJoin.turnMode,
+				type: 'joining'
 			});
 			socket.join(roomName);
 		} else {

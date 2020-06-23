@@ -22,7 +22,6 @@ const gameReducer = (state = initialState, action) => {
 			const {
 				name,
 				totalPlayers,
-				afoot,
 				playersJoined,
 				host,
 				useCategories,
@@ -31,7 +30,6 @@ const gameReducer = (state = initialState, action) => {
 			return {
 				name,
 				totalPlayers,
-				afoot,
 				playersJoined,
 				host,
 				totalNamesSet: 0,

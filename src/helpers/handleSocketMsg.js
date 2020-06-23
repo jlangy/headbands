@@ -167,17 +167,17 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			return addAlert('Lobby name already taken');
 
 		case socketMessages.roomNameOk:
-			let { name, totalPlayers, useCategories, turnMode } = msg;
+			const { name, totalPlayers, useCategories, turnMode } = msg;
 			return store.dispatch({
 				type: NEW_GAME,
 				payload: {
 					name,
+					host: socket.id,
 					totalPlayers,
+					playersJoined: 1,
 					useCategories,
 					turnMode,
-					gamePhase: gamePhases.joining,
-					playersJoined: 1,
-					host: socket.id
+					gamePhase: gamePhases.joining
 				}
 			});
 
@@ -204,11 +204,11 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 
 		case socketMessages.joining: {
 			await turnOnLocalMedia(store.getState().streams, socket);
-			let {
-				totalPlayers,
+			const {
 				name,
-				playersJoined,
 				host,
+				totalPlayers,
+				playersJoined,
 				useCategories,
 				turnMode
 			} = msg;
@@ -217,12 +217,12 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 				type: NEW_GAME,
 				payload: {
 					name,
-					totalPlayers,
-					gamePhase: gamePhases.joining,
-					playersJoined,
 					host,
+					totalPlayers,
+					playersJoined,
 					useCategories,
-					turnMode
+					turnMode,
+					gamePhase: gamePhases.joining
 				}
 			});
 		}
