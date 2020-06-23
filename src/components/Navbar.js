@@ -5,6 +5,7 @@ import SLinks from '../styled_components/nav/SLinks';
 import SLink from '../styled_components/nav/SLink';
 import SBrand from '../styled_components/nav/SBrand';
 import SIcon from '../styled_components/nav/SIcon';
+import SHashLink from '../styled_components/forms/SHashLink';
 import { connect } from 'react-redux';
 import endGame from '../helpers/endGame';
 
@@ -18,9 +19,9 @@ const desktopLinks = (handleRedirect) => (
 		</Link>
 		<SLinks>
 			<li>
-				<SLink to="/about#how-to-play" onClick={handleRedirect}>
+				<SHashLink to="/about#how-to-play" onClick={handleRedirect}>
 					How-to-Play
-				</SLink>
+				</SHashLink>
 			</li>
 			<li>
 				<SLink to="/about" onClick={handleRedirect}>
