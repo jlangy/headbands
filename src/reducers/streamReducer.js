@@ -13,6 +13,7 @@ const streamReducer = (state = initialState, action) => {
 		case NEW_STREAM:
 			const { stream, socketId } = action.payload;
 			return { ...state, [socketId]: { stream } };
+
 		case GOT_NAMES:
 			const { names } = action.payload;
 			const newState = { ...state };
@@ -20,20 +21,24 @@ const streamReducer = (state = initialState, action) => {
 				newState[id] = { ...newState[id], ...playerInformation };
 			});
 			return newState;
+
 		case REMOVE_STREAM: {
 			const idToRemove = action.socketId;
-			const newState = { ...state};
+			const newState = { ...state };
 			delete newState[idToRemove];
 			return newState;
 		}
+
 		case CLEAR_STREAMS:
 			return {};
+
 		case CLEAR_STREAM_NAMES:
 			const newStateWithoutNames = {};
 			for (const [key, value] of Object.entries(state)) {
 				newStateWithoutNames[key] = { stream: value.stream };
 			}
 			return newStateWithoutNames;
+
 		default:
 			return state;
 	}
