@@ -205,8 +205,9 @@ const handleSocketMsg = async (msg, socket, setRedirect) => {
 			});
 
 		case socketMessages.restart:
+			console.log('restart', category)
 			store.dispatch({ type: CLEAR_STREAM_NAMES });
-			return store.dispatch({ type: RESTART_GAME, payload: category });
+			return store.dispatch({ type: RESTART_GAME, payload: {category} });
 
 		case socketMessages.disconnection: {
 			const socketId = id;
